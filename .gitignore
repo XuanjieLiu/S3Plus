@@ -1,0 +1,14 @@
+*.pt
+*.txt
+*.png
+*.gif
+*.pyc
+*.zip
+/dataset
+.idea
+*.rar
+slurm_*.out
+slurm_*.err
+*.sbatch
+*.gz
+*.pickle
