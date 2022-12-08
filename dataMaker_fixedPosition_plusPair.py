@@ -8,7 +8,7 @@ matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
 
-NUMBERS = range(1, 9)
+NUMBERS = range(0, 9)
 MARKERS = ['o', 'v', '*', 'd']
 DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'

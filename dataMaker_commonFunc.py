@@ -45,6 +45,10 @@ def plot_a_scatter(position_list, save_dir, marker: str, color: str):
     return
 
 
+def Zero(center: tuple):
+    return [(center[0]+10, center[1]+10)]
+
+
 def One(center: tuple):
     return [center]
 
@@ -88,6 +92,7 @@ ANCHORS = {
 }
 
 POSITIONS = {
+    0:    Zero(ANCHORS[1][0]),
     1:    One(ANCHORS[1][0]),
     2:    Two(ANCHORS[1][0], interval=0.2),
     3:    Three(ANCHORS[1][0], interval=0.2),
