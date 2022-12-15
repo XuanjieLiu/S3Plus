@@ -12,14 +12,14 @@ from torchvision import transforms
 from shared import DEVICE
 
 
-RANGE = (2.5, -2.5)
+RANGE = (3.0, -2.5)
 TICK_INTERVAL = 0.05
 CODE_LEN = CONFIG['latent_code_1']+CONFIG['latent_code_2']
 IMG_PATH = 'eval_decoder-ImgBuffer'
 IGM_NAME = IMG_PATH + "/test.png"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MODEL_PATH = 'curr_model.pt'
+MODEL_PATH = 'checkpoint_30000.pt'
 
 COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
 NUMBERS = range(1, 17)

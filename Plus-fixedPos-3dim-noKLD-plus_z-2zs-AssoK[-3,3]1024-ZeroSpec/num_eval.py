@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 matplotlib.use('AGG')
 
-MODEL_PATH = 'checkpoint_30000.pt'
+MODEL_PATH = 'curr_model.pt'
 EVAL_PATH = f'num_eval-{MODEL_PATH.split(".")[0]}/'
 
 

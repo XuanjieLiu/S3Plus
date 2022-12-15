@@ -29,12 +29,18 @@ MARK_NAME_SPACE = {
 }
 
 
-def plot_a_scatter(position_list, save_dir, marker: str, color: str):
+def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=True):
     x = [n[0] for n in position_list]
     y = [n[1] for n in position_list]
     fig = plt.figure(figsize=(0.64, 0.64))
     a1 = fig.add_axes([0, 0, 1, 1])
-    a1.scatter(x, y, c=color, marker=marker, s=18)
+    a1.scatter(x, y,
+               c=color if is_fill else 'none',
+               facecolors=color if is_fill else 'none',
+               edgecolors=color,
+               marker=marker,
+               s=18,
+               )
     a1.set_ylim(-0.5, 0.5)
     a1.set_xlim(-0.5, 0.5)
     # plt.show()

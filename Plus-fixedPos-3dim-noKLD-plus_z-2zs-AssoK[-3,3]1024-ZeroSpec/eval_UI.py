@@ -19,10 +19,10 @@ IMG_PATH = 'eval_decoder-ImgBuffer'
 IGM_NAME = IMG_PATH + "/test.png"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MODEL_PATH = 'checkpoint_20000.pt'
+MODEL_PATH = 'curr_model.pt'
 
 COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
-NUMBERS = range(0, 17)
+NUMBERS = range(1, 17)
 MARKERS = ['o', 'v', '*', 'd']
 
 
