@@ -7,13 +7,15 @@ matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
 
-NUMBERS = range(0, 17)
-MARKERS = ['o', 'v', '*', 'd']
+NUMBERS = range(0, 21)
+# MARKERS = ['o', 'v', '*', 'd']
+MARKERS = ['o']
 DATA_ROOT = 'dataset'
-DATA_PATH = f'{DATA_ROOT}/({NUMBERS[0]},{NUMBERS[-1]})-FixedPos-4Color'
+DATA_PATH = f'{DATA_ROOT}/({NUMBERS[0]},{NUMBERS[-1]})-FixedPos-oneStyle'
 
 # COLORS_TRAIN = ['purple', 'brown', 'salmon', 'chocolate', 'olive', 'blue', 'deeppink', 'teal']
-COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
+# COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
+COLORS_TRAIN = ['blue']
 
 
 def make_dataset_1():

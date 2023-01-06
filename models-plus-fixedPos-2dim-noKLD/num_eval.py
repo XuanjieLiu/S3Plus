@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
-from dataloader import Dataset
+from dataloader import SingleImgDataset
 from loss_counter import LossCounter
 from model import S3Plus
 from shared import *
@@ -38,7 +38,7 @@ def plot_z_against_label(num_z, num_labels):
 
 class MumEval:
     def __init__(self, config, is_train=True):
-        dataset = Dataset('../dataset/(1,16)-FixedPos-4Color')
+        dataset = SingleImgDataset('../dataset/(1,16)-FixedPos-4Color')
         self.batch_size = config['batch_size']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         self.model = S3Plus(config).to(DEVICE)

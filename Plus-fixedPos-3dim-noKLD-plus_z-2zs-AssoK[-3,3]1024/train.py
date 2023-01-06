@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
 from dataloader_plus import Dataset
-import dataloader as singleImgLoader
+from dataloader import SingleImgDataset
 from loss_counter import LossCounter
 from model import S3Plus
 from shared import *
@@ -48,7 +48,7 @@ def split_into_three(tensor):
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         dataset = Dataset(config['train_data_path'])
-        eval_set_1 = singleImgLoader.Dataset(config['eval_path_1'])
+        eval_set_1 = SingleImgDataset(config['eval_path_1'])
         self.batch_size = config['batch_size']
         self.min_loss_scalar = config['min_loss_scalar']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)

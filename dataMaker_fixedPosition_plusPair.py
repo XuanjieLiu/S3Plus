@@ -8,11 +8,14 @@ matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
 
-NUMBERS = range(0, 9)
+
+NUMBERS = range(1, 11)
 MARKERS = ['o', 'v', '*', 'd']
+# MARKERS = ['o']
 DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
+# COLORS_TRAIN = ['blue']
 
 
 def draw_plus_data(i, j, mar, color, data_path):
@@ -38,7 +41,7 @@ def make_train_dataset():
     data_root = os.path.join(DATA_PATH, 'train')
     os.makedirs(data_root, exist_ok=True)
     for i in NUMBERS:
-        for j in range(i, NUMBERS[-1]):
+        for j in range(i, NUMBERS[-1]+1):
             for mar in MARKERS:
                 for color in COLORS_TRAIN:
                     data_name = f'{i}-{j}-{MARK_NAME_SPACE[mar]}-{color}'

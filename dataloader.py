@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 
-class Dataset(torch.utils.data.Dataset):
+class SingleImgDataset(torch.utils.data.Dataset):
     def __init__(
             self, dataset_path,
             cache_all=True,
@@ -42,7 +42,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = Dataset("dataset/(1,16)-8-['circle', 'triangle_down', 'star', 'thin_diamond']")
+    dataset = SingleImgDataset("dataset/(1,16)-8-['circle', 'triangle_down', 'star', 'thin_diamond']")
     loader = DataLoader(dataset, batch_size=32, shuffle=True)
     aaa = []
     for batch_ndx, sample in enumerate(loader):

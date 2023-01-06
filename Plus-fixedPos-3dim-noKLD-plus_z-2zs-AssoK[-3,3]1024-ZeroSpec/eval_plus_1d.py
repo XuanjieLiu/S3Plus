@@ -16,7 +16,7 @@ import matplotlib.markers
 import matplotlib.pyplot as plt
 
 matplotlib.use('AGG')
-MODEL_PATH = 'checkpoint_1000.pt'
+MODEL_PATH = 'checkpoint_12000.pt'
 EVAL_ROOT = 'eval_z'
 
 
@@ -71,13 +71,14 @@ def plot_z_against_label(all_enc_z, all_plus_z, eval_path):
     for i in range(0, dim_z):
         enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
-        axs.scatter(enc_x, enc_y, c='blue', label='z by encoder')
-        axs.scatter(plus_x, plus_y, c='red', label='z by plus')
+        axs.scatter(enc_x, enc_y, edgecolors='blue', label='z by encoder', facecolors='none')
+        axs.scatter(plus_x, plus_y, edgecolors='red', label='z by plus', facecolors='none')
     #for ax in axs.flat:
         axs.set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, 18))
     # for ax in axs.flat:
     #     ax.label_outer()
     plt.legend()
+    plt.grid()
     plt.savefig(eval_path)
     plt.cla()
     plt.clf()

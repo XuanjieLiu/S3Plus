@@ -3,7 +3,7 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/PlusPair-(1,8)-FixedPos/train",
+    'train_data_path': f"{data_root}/PlusPair-(1,7)-FixedPos/train",
     'eval_path_1': f"{data_root}/(1,16)-FixedPos-4Color",
     'latent_code_1': 1,
     'latent_code_2': 2,

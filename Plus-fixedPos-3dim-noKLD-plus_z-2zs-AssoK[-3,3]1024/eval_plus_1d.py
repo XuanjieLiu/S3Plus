@@ -65,20 +65,25 @@ def load_z(loader, encode_func, plus_func, zc_dim):
 
 def plot_z_against_label(all_enc_z, all_plus_z, eval_path):
     dim_z = all_enc_z[0].z.size(0)
+    if dim_z == 1:
+        axs = []
+        fig, ax = plt.subplots(1, dim_z, sharey='all', figsize=(dim_z * 5, 5))
+        axs.append(ax)
+    else:
+        fig, axs = plt.subplots(1, dim_z, sharey='all', figsize=(dim_z * 5, 5))
     enc_x = [ob.label for ob in all_enc_z]
     plus_x = [ob.label_c for ob in all_plus_z]
-    fig, axs = plt.subplots(1, dim_z, sharey='all', figsize=(dim_z * 5, 5))
     for i in range(0, dim_z):
         enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
-        axs.scatter(enc_x, enc_y, edgecolors='blue', label='z by encoder', facecolors='none')
-        axs.scatter(plus_x, plus_y, edgecolors='red', label='z by plus', facecolors='none')
+        axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='z by encoder', facecolors='none')
+        axs[i].scatter(plus_x, plus_y, edgecolors='red', label='z by plus', facecolors='none')
     #for ax in axs.flat:
-        axs.set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, 18))
+        axs[i].set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, 18))
+        axs[i].grid()
     # for ax in axs.flat:
     #     ax.label_outer()
     plt.legend()
-    plt.grid()
     plt.savefig(eval_path)
     plt.cla()
     plt.clf()
