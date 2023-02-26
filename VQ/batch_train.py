@@ -1,7 +1,9 @@
-from importlib import reload
-import os
-from train import is_need_train, PlusTrainer
 import sys
+import os
+sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
+from importlib import reload
+from train import is_need_train, PlusTrainer
+
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 sys.path.append(EXP_ROOT_PATH)
