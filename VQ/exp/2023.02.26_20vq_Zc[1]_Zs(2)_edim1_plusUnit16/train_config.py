@@ -7,13 +7,13 @@ CONFIG = {
     'latent_embedding_1': 1,
     'latent_embedding_2': 2,
     'latent_code_2': 2,
-    'embedding_dim': 64,
+    'embedding_dim': 1,
     'embeddings_num': 20,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 6001,
+    'max_iter_num': 12001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'train_record_path': "Train_record.txt",
@@ -42,7 +42,7 @@ CONFIG = {
             'first_ch_num': 64,
         },
         'plus': {
-            'plus_unit': 32,
+            'plus_unit': 16,
         }
     },
 }
