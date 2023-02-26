@@ -1,32 +1,13 @@
-import torch
-import torch.nn as nn
-
-import random
-import torch.nn.functional as F
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-
-# def get_sample_prob(step):
-#     alpha = 2200
-#     beta = 6000
-#     return alpha / (alpha + np.exp((step + beta) / alpha))
+# import torch
+# import torch.nn as nn
 #
-#
-# trend = [get_sample_prob(a) for a in range(0, 50000)]
-# plt.plot(trend)
-# plt.show()
-# data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/')
-# print(data_root)
+# import random
+# import torch.nn.functional as F
+# import os
+# import numpy as np
+# import matplotlib.pyplot as plt
 
-# a = torch.tensor(0.2)
-# b = torch.tensor(0.5)
-# c = torch.stack((a, b), dim=0)
-# d = torch.std(c)
-# m = torch.mean(c)
-# e = nn.MSELoss()(a, b)
-# print(e/torch.pow(d, 2))
-
+"""Embedding test"""
 # embedding = nn.Embedding(10, 3)
 # input = torch.LongTensor([[1,2,4,5],[4,3,2,9]])
 #
@@ -48,4 +29,16 @@ import matplotlib.pyplot as plt
 # x = torch.ones(2, 5)
 # get_code_indices(x)
 
-print(np.ones(3))
+
+"""Ling ren Knight test"""
+def dps(bounce_num, decay):
+    init_dmg = 1
+    total_dmg = 1
+    for i in range(bounce_num):
+        init_dmg *= decay
+        total_dmg += init_dmg
+    print(total_dmg)
+
+
+print(4.28/3.05)
+print(4.97/3.24)

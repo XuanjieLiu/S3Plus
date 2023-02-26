@@ -16,7 +16,7 @@ class LossCounter:
     def clear_values_list(self):
         self.values_list = []
 
-    def make_record(self, num, round_idx=3):
+    def make_record(self, num, round_idx=6):
         means = self.calc_values_mean()
         str_list = [f'{self.name_list[i]}:{round(means[i], round_idx)}' for i in range(len(self.name_list))]
         split_str = ','

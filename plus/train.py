@@ -16,6 +16,7 @@ from shared import *
 from train_config import CONFIG
 from eval_enc import plot_z_against_label, load_enc_eval_data
 from eval_plus import load_plusZ_eval_data, plot_plusZ_against_label
+from visual_imgs import VisImgs
 
 
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
@@ -67,13 +68,12 @@ class PlusTrainer:
         self.checkpoint_interval = config['checkpoint_interval']
         self.max_iter_num = config['max_iter_num']
         self.latent_code_1 = config['latent_code_1']
-        self.z_std_loss_scalar = config['z_std_loss_scalar']
         self.sub_batch = int(self.batch_size / 3)
         self.mean_mse = nn.MSELoss(reduction='mean')
-        self.z_minus_loss_scalar = config['z_minus_loss_scalar']
         self.z_plus_loss_scalar = config['z_plus_loss_scalar']
         self.commutative_z_loss_scalar = config['commutative_z_loss_scalar']
         self.associative_z_loss_scalar = config['associative_z_loss_scalar']
+        self.plus_recon_loss_scalar = ['plus_recon_loss_scalar']
         self.K = config['K']
         self.assoc_aug_range = config['assoc_aug_range']
 
@@ -103,6 +103,7 @@ class PlusTrainer:
             print(f'Epoch: {epoch_num}')
             is_log = (epoch_num % self.log_interval == 0 and epoch_num != 0)
             for batch_ndx, sample in enumerate(self.loader):
+                vis_imgs = VisImgs()
                 optimizer.zero_grad()
                 data, labels = sample
                 sizes = data[0].size()
@@ -111,14 +112,18 @@ class PlusTrainer:
                 z_content = z_all[..., 0:self.latent_code_1]
                 za, zb, zc = split_into_three(z_all)
                 recon = self.model.batch_decode_from_z(z_all)
+                recon_a, recon_b, recon_c = split_into_three(recon)
+                vis_imgs.gt_a, vis_imgs.gt_b, vis_imgs.gt_c = data[0][0], data[1][0], data[2][0]
+                vis_imgs.recon_a, vis_imgs.recon_b, vis_imgs.recon_c = recon_a[0], recon_b[0], recon_c[0]
                 vae_loss = self.vae_loss(data_all, recon, mu, logvar)
-                plus_loss = self.bi_plus_loss(za, zb, zc, data[2])
+                plus_loss = self.bi_plus_loss(za, zb, zc, data[2], vis_imgs)
                 operations_loss = self.operation_loss_z(z_content)
                 loss = self.loss_func(vae_loss, plus_loss, operations_loss, train_loss_counter)
                 loss.backward()
                 optimizer.step()
                 if self.is_save_img and batch_ndx == 0 and is_log:
-                    save_image(recon[0], os.path.join(self.train_result_path, f'{epoch_num}.png'))
+                    # save_image(recon[0], os.path.join(self.train_result_path, f'{epoch_num}.png'))
+                    vis_imgs.save_img(os.path.join(self.train_result_path, f'{epoch_num}.png'))
 
             # scheduler.step()
 
@@ -151,8 +156,8 @@ class PlusTrainer:
         eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')
         plot_z_against_label(num_z, num_labels, eval_path)
 
-    def bi_plus_loss(self, za, zb, zc, imgs_c):
-        plus_loss1 = self.plus_loss(za, zb, zc, imgs_c)
+    def bi_plus_loss(self, za, zb, zc, imgs_c, vis_imgs: VisImgs = None):
+        plus_loss1 = self.plus_loss(za, zb, zc, imgs_c, vis_imgs)
         plus_loss2 = self.plus_loss(zb, za, zc, imgs_c)
         plus_loss = (
             plus_loss1[0] + plus_loss2[0],
@@ -160,12 +165,14 @@ class PlusTrainer:
         )
         return plus_loss
 
-    def plus_loss(self, za, zb, zc, imgs_c):
+    def plus_loss(self, za, zb, zc, imgs_c, vis_imgs: VisImgs = None):
         z_s = za[..., self.latent_code_1:] if random.random() > 0.5 else zb[..., self.latent_code_1:]
         z_ab_content = self.model.plus(za[..., 0:self.latent_code_1], zb[..., 0:self.latent_code_1])
         z_ab = torch.cat((z_ab_content, z_s), -1)
         recon_c = self.model.batch_decode_from_z(z_ab)
-        recon_loss = self.mean_mse(recon_c, imgs_c)
+        recon_loss = self.mean_mse(recon_c, imgs_c) * self.plus_recon_loss_scalar
+        if vis_imgs is not None:
+            vis_imgs.plus_c = recon_c[0]
         if self.z_plus_loss_scalar > self.min_loss_scalar:
             z_loss = self.mean_mse(z_ab, zc) * self.z_plus_loss_scalar
         else:
@@ -179,7 +186,7 @@ class PlusTrainer:
         return loss * self.commutative_z_loss_scalar
 
     def associative_z_loss(self):
-        trans_dim = np.ones(self.latent_code_1, dtype=np.int)
+        trans_dim = np.ones(self.latent_code_1, dtype=int)
         z_a, _ = make_translation_batch(self.K, dim=trans_dim, t_range=self.assoc_aug_range)
         z_b, _ = make_translation_batch(self.K, dim=trans_dim, t_range=self.assoc_aug_range)
         z_c, _ = make_translation_batch(self.K, dim=trans_dim, t_range=self.assoc_aug_range)
@@ -191,11 +198,11 @@ class PlusTrainer:
         return loss * self.associative_z_loss_scalar
 
     def operation_loss_z(self, z):
-        # idx_1 = torch.randperm(z.size(0))
-        # z1 = z[idx_1, ...] + torch.randn_like(z)
+        idx_1 = torch.randperm(z.size(0))
+        z1 = z[idx_1, ...] + torch.randn_like(z)
 
         za, zb, zc = split_into_three(z)
-        # zd = z1[0:za.size(0)].detach()
+        zd = z1[0:za.size(0)].detach()
 
         loss = torch.zeros(1)[0].to(DEVICE)
         if self.commutative_z_loss_scalar > self.min_loss_scalar:

@@ -10,7 +10,7 @@ from dataloader import SingleImgDataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *
-from train_config12 import CONFIG
+from train_config import CONFIG
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
@@ -23,25 +23,39 @@ EVAL_PATH = f'num_eval-{MODEL_PATH.split(".")[0]}/'
 
 
 def plot_z_against_label(num_z, num_labels, eval_path, eval_helper: EvalHelper = None):
-    fig, axs = plt.subplots(1, num_z.size(1), figsize=(num_z.size(1) * 7, 5))
+    fig, axs = plt.subplots(1, num_z.size(1), sharey='all', figsize=(num_z.size(1) * 5, 5))
     for i in range(0, num_z.size(1)):
         x = num_labels
         y = num_z[:, i].detach().cpu()
         axs[i].scatter(x, y)
         axs[i].set_title(f'z{i + 1}')
-        axs[i].set(xlabel='Num of Points on the card', xticks=range(0, 18))
         if eval_helper is not None:
             eval_helper.draw_scatter_point_line(axs[i], i, x, y)
-            eval_helper.set_axis(axs[i], i)
         else:
             axs[i].grid(True)
-
-    # for ax in axs.flat:
-    #     ax.label_outer()
+    for ax in axs.flat:
+        ax.set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, 18))
+    for ax in axs.flat:
+        ax.label_outer()
     plt.savefig(eval_path)
     plt.cla()
     plt.clf()
     plt.close()
+
+
+# def plot_z_against_label(num_z, num_labels):
+#     for i in range(0, num_z.size(1)):
+#         x = num_labels
+#         y = num_z[:, i].detach().cpu()
+#         plt.scatter(x, y)
+#         plt.xlabel('Num of Points on the card')
+#         plt.ylabel('z value')
+#         plt.xticks(range(0, 18))
+#         fig_name = f'z_{i+1}.png'
+#         plt.savefig(os.path.join(EVAL_PATH, fig_name))
+#         plt.cla()
+#         plt.clf()
+#         plt.close()
 
 
 def load_enc_eval_data(loader, encode_func):
@@ -51,7 +65,7 @@ def load_enc_eval_data(loader, encode_func):
         data, labels = sample
         data = data.to(DEVICE)
         num = [int(label.split('-')[0]) for label in labels]
-        z = encode_func(data)
+        z, e_q_loss = encode_func(data)
         num_labels.extend(num)
         if num_z is None:
             num_z = z
@@ -73,12 +87,8 @@ class MumEval:
 
     def eval(self):
         os.makedirs(EVAL_PATH, exist_ok=True)
-        num_z, num_labels = load_enc_eval_data(
-                                    self.loader,
-                                    lambda x: self.model.find_indices(
-                                          self.model.batch_encode_to_z(x)[0], True
-                                    )
-        )
+        num_z, num_labels = load_enc_eval_data(self.loader,
+                                      lambda x: self.model.batch_encode_to_z(x))
         eval_path = os.path.join(EVAL_PATH, f'z.png')
         eval_helper = EvalHelper(self.config)
         plot_z_against_label(num_z, num_labels, eval_path, eval_helper)

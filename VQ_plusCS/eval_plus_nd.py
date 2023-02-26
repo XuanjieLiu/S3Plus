@@ -8,15 +8,16 @@ from torchvision.utils import save_image
 import torch.optim as optim
 from dataloader_plus import Dataset
 from loss_counter import LossCounter
-from model import S3Plus
+from VQVAE import VQVAE
 from shared import *
 from train_config import CONFIG
+from eval_common import EvalHelper
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
 
 matplotlib.use('AGG')
-MODEL_PATH = 'checkpoint_30000.pt'
+MODEL_PATH = 'curr_model.pt'
 EVAL_ROOT = 'eval_z'
 
 
@@ -43,16 +44,16 @@ def load_plusZ_eval_data(loader, encode_func, plus_func, zc_dim):
         enc_z_list = []
         plus_z_list = []
         data, labels = sample
-        _, za, _ = encode_func(data[0])
-        _, zb, _ = encode_func(data[1])
-        _, zc, _ = encode_func(data[2])
+        za, _ = encode_func(data[0])
+        zb, _ = encode_func(data[1])
+        zc, _ = encode_func(data[2])
         za = za[..., 0:zc_dim]
         zb = zb[..., 0:zc_dim]
         zc = zc[..., 0:zc_dim]
         label_a = [parse_label(x) for x in labels[0]]
         label_b = [parse_label(x) for x in labels[1]]
         label_c = [parse_label(x) for x in labels[2]]
-        plus_c = plus_func(za, zb)
+        plus_c, _ = plus_func(za, zb)
         for i in range(0, za.size(0)):
             enc_z_list.append(EncZ(label_a[i], za[i]))
             enc_z_list.append(EncZ(label_b[i], zb[i]))
@@ -63,7 +64,7 @@ def load_plusZ_eval_data(loader, encode_func, plus_func, zc_dim):
     return all_enc_z, all_plus_z
 
 
-def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path):
+def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
     dim_z = all_enc_z[0].z.size(0)
     if dim_z == 1:
         fig, ax = plt.subplots(1, dim_z, sharey='all', figsize=(dim_z * 5, 5))
@@ -77,10 +78,13 @@ def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path):
         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
         axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='z by encoder', facecolors='none')
         axs[i].scatter(plus_x, plus_y, edgecolors='red', label='z by plus', facecolors='none')
-    #for ax in axs.flat:
-        axs[i].set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, max(enc_x)+1))
-        axs[i].grid()
+        # for ax in axs.flat:
+        axs[i].set(ylabel='z value', xlabel='Num of Points on the card', xticks=range(0, max(enc_x) + 1))
         axs[i].set_title(f"z_c ({i + 1})")
+        if eval_helper is not None:
+            eval_helper.draw_scatter_point_line(axs[i], i, [*enc_x, *plus_x], [*enc_y, *plus_y])
+        else:
+            axs[i].grid(True)
     # for ax in axs.flat:
     #     ax.label_outer()
     plt.legend()
@@ -90,15 +94,12 @@ def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path):
     plt.close()
 
 
-
-
-
 class PlusEval:
     def __init__(self, config, is_train=True):
         dataset = Dataset(config['train_data_path'])
         self.batch_size = config['batch_size']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
-        self.model = S3Plus(config).to(DEVICE)
+        self.model = VQVAE(config).to(DEVICE)
         self.model.load_state_dict(self.model.load_tensor(MODEL_PATH))
         self.isVAE = config['kld_loss_scalar'] > 0.00001
         self.latent_code_1 = config['latent_code_1']
@@ -107,7 +108,7 @@ class PlusEval:
     def eval(self):
         all_enc_z, all_plus_z = load_plusZ_eval_data(
             self.loader,
-            lambda x: self.model.batch_encode_to_z(x, is_VAE=self.isVAE),
+            lambda x: self.model.batch_encode_to_z(x),
             self.model.plus,
             self.latent_code_1
         )
