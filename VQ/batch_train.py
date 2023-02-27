@@ -9,8 +9,8 @@ EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp'
 sys.path.append(EXP_ROOT_PATH)
 EXP_NAME_LIST = [
     "2023.02.26_20vq_Zc[1]_Zs(2)_edim64",
-    "2023.02.26_20vq_Zc[1]_Zs(2)_edim1_plusUnit16",
-    "2023.02.26_20vq_Zc[1]_Zs[2]_edim1_plusUnit16",
+    # "2023.02.26_20vq_Zc[1]_Zs(2)_edim1_plusUnit16",
+    # "2023.02.26_20vq_Zc[1]_Zs[2]_edim1_plusUnit16",
 ]
 EXP_NUM_LIST = ['1', '2', '3', '4', '5']
 
