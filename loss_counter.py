@@ -1,11 +1,14 @@
 import numpy as np
 import os
 
+RECORD_PATH_DEFAULT = 'path-default'
+
 
 class LossCounter:
-    def __init__(self, name_list):
+    def __init__(self, name_list, record_path=None):
         self.name_list = name_list
         self.values_list = []  # iter X values
+        self.record_path = record_path
 
     def add_values(self, values):
         self.values_list.append(values)
@@ -24,16 +27,26 @@ class LossCounter:
         final_str = start_str + split_str.join(str_list) + '\n'
         return final_str
 
-    def record_and_clear(self, record_path, num, round_idx=3):
+    def record_and_clear(self, record_path=RECORD_PATH_DEFAULT, num=0, round_idx=6):
+        r_path = self.choose_path(record_path)
         final_str = self.make_record(num, round_idx)
-        fo = open(record_path, "a")
+        fo = open(r_path, "a")
         fo.writelines(final_str)
         fo.close()
         self.clear_values_list()
 
-    def load_iter_num(self, record_path):
-        if os.path.exists(record_path):
-            f = open(record_path, "r")
+    def choose_path(self, record_path):
+        if record_path == RECORD_PATH_DEFAULT:
+            assert self.record_path is not None, "Record_path should not be None"
+            r_path = self.record_path
+        else:
+            r_path = record_path
+        return r_path
+
+    def load_iter_num(self, record_path=RECORD_PATH_DEFAULT):
+        r_path = self.choose_path(record_path)
+        if os.path.exists(r_path):
+            f = open(r_path, "r")
             lines = f.readlines()
             t_list = [int(a.split('-')[0]) for a in lines]
             f.close()

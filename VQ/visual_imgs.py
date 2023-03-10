@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib
@@ -7,7 +9,8 @@ matplotlib.use('AGG')
 
 
 class VisImgs:
-    def __init__(self):
+    def __init__(self, save_path):
+        self.save_path = save_path
         self.gt_a = torch.ones(3, 10, 10)
         self.gt_b = torch.ones(3, 10, 10)
         self.gt_c = torch.ones(3, 10, 10)
@@ -21,7 +24,7 @@ class VisImgs:
         tensor = input.permute(1, 2, 0) if need_permute else input
         return np.array(tensor.cpu().detach(), dtype=float)
 
-    def save_img(self, path):
+    def save_img(self, name):
         fig, axs = plt.subplots(3, 3)
         axs[0, 0].imshow(self.arrange_tensor(self.gt_a))
         axs[0, 0].set_title("GT a")
@@ -49,7 +52,8 @@ class VisImgs:
             ax.set_xticks([])
             ax.set_yticks([])
 
-        plt.savefig(path)
+        save_path = os.path.join(self.save_path, name)
+        plt.savefig(save_path)
         plt.cla()
         plt.clf()
         plt.close()

@@ -2,15 +2,15 @@ import sys
 import os
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
-from train import is_need_train, PlusTrainer
+from train_2 import is_need_train, PlusTrainer
 
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 sys.path.append(EXP_ROOT_PATH)
 EXP_NAME_LIST = [
-    "2023.02.26_20vq_Zc[1]_Zs(2)_edim64",
-    # "2023.02.26_20vq_Zc[1]_Zs(2)_edim1_plusUnit16",
-    # "2023.02.26_20vq_Zc[1]_Zs[2]_edim1_plusUnit16",
+    "2023.03.09_10vq_Zc[2]_Zs[0]_edim1_plusUnit32_singleStyle",
+    "2023.03.09_30vq_Zc[1]_Zs[0]_edim1_plusUnit32_singleStyle",
+    "2023.03.09_30vq_Zc[1]_Zs[0]_edim8_plusUnit32_singleStyle",
 ]
 EXP_NUM_LIST = ['1', '2', '3', '4', '5']
 

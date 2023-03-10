@@ -10,7 +10,6 @@ from dataloader import SingleImgDataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *
-from train_config12 import CONFIG
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
@@ -24,6 +23,8 @@ EVAL_PATH = f'num_eval-{MODEL_PATH.split(".")[0]}/'
 
 def plot_z_against_label(num_z, num_labels, eval_path, eval_helper: EvalHelper = None):
     fig, axs = plt.subplots(1, num_z.size(1), figsize=(num_z.size(1) * 7, 5))
+    if num_z.size(1) == 1:
+        axs = [axs]
     for i in range(0, num_z.size(1)):
         x = num_labels
         y = num_z[:, i].detach().cpu()
@@ -83,7 +84,7 @@ class MumEval:
         eval_helper = EvalHelper(self.config)
         plot_z_against_label(num_z, num_labels, eval_path, eval_helper)
 
-
-if __name__ == "__main__":
-    evaler = MumEval(CONFIG)
-    evaler.eval()
+#
+# if __name__ == "__main__":
+#     evaler = MumEval(CONFIG)
+#     evaler.eval()

@@ -1,4 +1,5 @@
 import os
+import random
 from typing import List
 
 import torch.nn as nn
@@ -10,16 +11,18 @@ from dataloader_plus import Dataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *
-from train_config12 import CONFIG
 from eval_common import EvalHelper
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
+from scipy import stats
 
 matplotlib.use('AGG')
 MODEL_PATH = 'curr_model.pt'
 EVAL_ROOT = 'eval_z'
 
+
+MIN_KS_NUM = 3
 
 class EncZ:
     def __init__(self, label, z):
@@ -38,12 +41,11 @@ def parse_label(label):
 
 
 def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
+    ks_mean = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
     dim_z = all_enc_z[0].z.size(0)
+    fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
     if dim_z == 1:
-        fig, ax = plt.subplots(1, dim_z, figsize=(dim_z * 5, 5))
-        axs = [ax]
-    else:
-        fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
+        axs = [axs]
     enc_x = [ob.label for ob in all_enc_z]
     plus_x = [ob.label_c for ob in all_plus_z]
     for i in range(0, dim_z):
@@ -61,10 +63,54 @@ def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: Eval
     # for ax in axs.flat:
     #     ax.label_outer()
     plt.legend()
-    plt.savefig(eval_path)
+    plt.savefig(f'{eval_path}_ks_{ks_mean}.png')
     plt.cla()
     plt.clf()
     plt.close()
+
+
+class LabelKs:
+    def __init__(self, label: int):
+        self.label = label
+        self.enc_z_list = []
+        self.plus_z_list = []
+        self.min_len = -1
+        self.ks = -1
+
+    def calc_min_len(self):
+        self.min_len = min(len(self.enc_z_list), len(self.plus_z_list))
+        return self.min_len
+
+    def calc_ks(self):
+        min_len = self.calc_min_len()
+        sample1 = random.sample(self.enc_z_list, min_len)
+        sample2 = random.sample(self.plus_z_list, min_len)
+        ks, p_value = stats.ks_2samp(sample1, sample2)
+        self.ks = ks
+        return ks, p_value
+
+
+def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
+    min_label = min(enc_z, key=lambda x: x.label).label
+    max_label = max(enc_z, key=lambda x: x.label).label
+    label_dict = {}
+    for i in range(min_label, max_label+1):
+        label_dict[i] = LabelKs(i)
+    for item in enc_z:
+        label_dict[item.label].enc_z_list.append(item.z.cpu().item())
+    for item in plus_z:
+        label_dict[item.label_c].plus_z_list.append(item.plus_c_z.cpu().item())
+    label_ks_list = list(label_dict.values())
+    ks_all = 0
+    item_num = 0
+    for item in label_ks_list:
+        item.calc_min_len()
+        if item.min_len >= MIN_KS_NUM:
+            item.calc_ks()
+            ks_all += item.ks
+            item_num += 1
+    ks_mean = ks_all / item_num
+    return round(ks_mean, 4)
 
 
 class VQvaePlusEval:
@@ -115,10 +161,10 @@ class VQvaePlusEval:
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path)
 
 
-if __name__ == "__main__":
-    os.makedirs(EVAL_ROOT, exist_ok=True)
-    dataset = Dataset(CONFIG['train_data_path'])
-    loader = DataLoader(dataset, batch_size=CONFIG['batch_size'], shuffle=True)
-    evaler = VQvaePlusEval(CONFIG, loader, model_path=MODEL_PATH)
-    result_path = os.path.join(EVAL_ROOT, f'plus_eval_{MODEL_PATH}.png')
-    evaler.eval(result_path)
+# if __name__ == "__main__":
+#     os.makedirs(EVAL_ROOT, exist_ok=True)
+#     dataset = Dataset(CONFIG['train_data_path'])
+#     loader = DataLoader(dataset, batch_size=CONFIG['batch_size'], shuffle=True)
+#     evaler = VQvaePlusEval(CONFIG, loader, model_path=MODEL_PATH)
+#     result_path = os.path.join(EVAL_ROOT, f'plus_eval_{MODEL_PATH}.png')
+#     evaler.eval(result_path)
