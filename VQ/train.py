@@ -1,7 +1,8 @@
 import os
 import random
 import sys
-from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label
+from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z
+
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.nn as nn
 import numpy as np
@@ -63,6 +64,7 @@ class PlusTrainer:
         self.eval_result_path = config['eval_result_path']
         self.train_record_path = config['train_record_path']
         self.eval_record_path = config['eval_record_path']
+        self.plus_accu_record_path = config['plus_accu_record_path']
         self.model_path = config['model_path']
         self.learning_rate = config['learning_rate']
         self.scheduler_base_num = config['scheduler_base_num']
@@ -157,6 +159,10 @@ class PlusTrainer:
                                           'plus_recon',
                                           'plus_z',
                                           'loss_oper'], self.eval_record_path)
+        special_loss_counter = LossCounter(['train_ks',
+                                            'train_accu',
+                                            'eval_ks',
+                                            'eval_accu'], self.plus_accu_record_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(start_epoch))
@@ -172,8 +178,10 @@ class PlusTrainer:
                 self.model.train()
                 if self.is_save_img:
                     self.plot_enc_z(epoch_num, self.eval_loader_1)
-                    self.plot_plus_z(epoch_num, self.loader, self.train_result_path)
-                    self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
+                    train_ks, train_accu = self.plot_plus_z(epoch_num, self.loader, self.train_result_path)
+                    eval_ks, eval_accu = self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
+                    special_loss_counter.add_values([train_ks, train_accu, eval_ks, eval_accu])
+                    special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')
 
@@ -195,6 +203,8 @@ class PlusTrainer:
         all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data()
         eval_path = os.path.join(result_path, f'{epoch_num}_plus_z')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, self.eval_help)
+        ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+        return ks, accu
 
     def bi_plus_loss(self, z_all, imgs_c, vis_imgs: VisImgs = None):
         za, zb, zc = split_into_three(z_all)

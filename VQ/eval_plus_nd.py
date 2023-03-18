@@ -22,7 +22,7 @@ MODEL_PATH = 'curr_model.pt'
 EVAL_ROOT = 'eval_z'
 
 
-MIN_KS_NUM = 3
+MIN_KS_NUM = 1
 
 class EncZ:
     def __init__(self, label, z):
@@ -41,7 +41,7 @@ def parse_label(label):
 
 
 def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
-    ks_mean = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+    ks_mean, _ = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
     dim_z = all_enc_z[0].z.size(0)
     fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
     if dim_z == 1:
@@ -74,20 +74,25 @@ class LabelKs:
         self.label = label
         self.enc_z_list = []
         self.plus_z_list = []
-        self.min_len = -1
-        self.ks = -1
 
     def calc_min_len(self):
-        self.min_len = min(len(self.enc_z_list), len(self.plus_z_list))
-        return self.min_len
+        return min(len(self.enc_z_list), len(self.plus_z_list))
 
     def calc_ks(self):
         min_len = self.calc_min_len()
         sample1 = random.sample(self.enc_z_list, min_len)
         sample2 = random.sample(self.plus_z_list, min_len)
         ks, p_value = stats.ks_2samp(sample1, sample2)
-        self.ks = ks
         return ks, p_value
+
+    def calc_accu(self):
+        total = len(self.plus_z_list)
+        assert total != 0, f"plus_z_list of card {self.label} is empty."
+        assert len(self.enc_z_list) != 0, f"enc_z_list of card {self.label} is empty."
+        mode_enc = stats.mode(self.enc_z_list, keepdims=False)[0]
+        correct = len(list(filter(lambda x: x == mode_enc, self.plus_z_list)))
+        accu = correct/total
+        return accu
 
 
 def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
@@ -102,15 +107,17 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
         label_dict[item.label_c].plus_z_list.append(item.plus_c_z.cpu().item())
     label_ks_list = list(label_dict.values())
     ks_all = 0
+    accu_all = 0
     item_num = 0
     for item in label_ks_list:
-        item.calc_min_len()
-        if item.min_len >= MIN_KS_NUM:
-            item.calc_ks()
-            ks_all += item.ks
+        min_len = item.calc_min_len()
+        if min_len >= MIN_KS_NUM:
+            ks_all += item.calc_ks()[0]
+            accu_all += item.calc_accu()
             item_num += 1
     ks_mean = ks_all / item_num
-    return round(ks_mean, 4)
+    accu_mean = accu_all / item_num
+    return round(ks_mean, 4), round(accu_mean, 4)
 
 
 class VQvaePlusEval:

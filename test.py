@@ -46,17 +46,23 @@ from scipy import stats
 #
 # print(4.28/3.05)
 # print(4.97/3.24)
+def calc_accu(s1, s2):
+    mode_enc = stats.mode(s1, keepdims=False)[0]
+    total = len(s2)
+    correct = len(list(filter(lambda x: x == mode_enc, s2)))
+    return correct / total
 
-
-sample1 = [4,4,3,3]
-sample2 = [4,3,3]
-ks_statistic, p_value = stats.ks_2samp(sample1, sample2)
-print(ks_statistic)
-print(p_value)
-
-a = [0.1,0.2,0.1]
-a = [i + np.mean(a) for i in a]
-b = [0.01,0.02,0.01] + [1 for j in range(3)]
-b = [i + np.mean(b) for i in b]
-print(np.std(a))
-print(np.std(b))
+sample1 = [3,4.0,4,4]
+sample2 = [3, 3, 4, 4]
+# ks_statistic, p_value = stats.ks_2samp(sample1, sample2)
+# print(ks_statistic)
+# print(p_value)
+#
+# a = [0.1,0.2,0.1]
+# a = [i + np.mean(a) for i in a]
+# b = [0.01,0.02,0.01] + [1 for j in range(3)]
+# b = [i + np.mean(b) for i in b]
+# print(np.std(a))
+# print(np.std(b))
+print(stats.mode(sample1, keepdims=False)[0])
+print(calc_accu(sample1, sample2))
