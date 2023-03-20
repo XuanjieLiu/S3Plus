@@ -82,6 +82,6 @@ def gen_compare_groups(exp_groups: List[ExpGroup]):
 
 if __name__ == '__main__':
     os.makedirs(OUTPUT_PATH, exist_ok=True)
-    cg_list = gen_compare_groups(exp_groups)
+    cg_list = gen_compare_groups(exp_groups_2)
     save_path = os.path.join(OUTPUT_PATH, RESULT_NAME)
     plot_graph(cg_list, save_path)
