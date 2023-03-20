@@ -20,7 +20,29 @@ eg2 = ExpGroup(
     record_name="plus_eval.txt",
 )
 
+egd1 = ExpGroup(
+    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
+    exp_alias='emb_dim = 1',
+    sub_exp=[1, 2, 3, 4, 5],
+    record_name="plus_eval.txt",
+)
+
+egd8 = ExpGroup(
+    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim8_singleS",
+    exp_alias='emb_dim = 8',
+    sub_exp=[1, 2, 3, 4, 5],
+    record_name="plus_eval.txt",
+)
+
+egd64 = ExpGroup(
+    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim64_singleS",
+    exp_alias='emb_dim = 64',
+    sub_exp=[1, 2, 3, 4, 5],
+    record_name="plus_eval.txt",
+)
+
 exp_groups = [eg1, eg2]
+exp_groups_2 = [egd1, egd8, egd64]
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
