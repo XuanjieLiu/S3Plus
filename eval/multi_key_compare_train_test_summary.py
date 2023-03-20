@@ -31,7 +31,7 @@ IS_MAX_BETTER = True
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 8000
-Y_NAME = "Plus Accuracy ↑ (max=1.0)"
+Y_NAME = "Plus Accuracy (max=1.0)"
 RESULT_NAME = "Assoc_vs_noAssoc.png"
 
 
