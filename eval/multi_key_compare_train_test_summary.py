@@ -1,7 +1,6 @@
 import sys
 import os
 from typing import List
-from loss_counter import read_record
 from load_batch_record import ExpGroup
 from multi_key_compare import CompareGroup, plot_graph
 import numpy as np
