@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import os
 
@@ -53,3 +55,38 @@ class LossCounter:
             return t_list[-1] + 1
         else:
             return 0
+
+
+class Records:
+    def __init__(self, name: str = None, X: List[float] = None, Y: List[float] = None):
+        self.name = name,
+        self.X = X
+        self.Y = Y
+
+    def find_iter_idx(self, iter_num):
+        for i in range(len(self.X)):
+            if self.X[i] > iter_num:
+                return i
+
+    def find_topMin_after_iter(self, num_extreme, iter_after=0, reverse=False):
+        iter_idx = self.find_iter_idx(iter_after)
+        search_list = self.Y[iter_idx:]
+        search_list.sort(reverse=reverse)
+        return search_list[0:num_extreme]
+
+
+def read_record(path: str):
+    with open(path, 'r') as f:
+        lines = f.readlines()
+    X = [int(line.split('-')[0]) for line in lines]
+    items = [line.split('-')[1].split('\n')[0].split(',') for line in lines]
+    records = {}
+    for i in range(len(items[0])):
+        name = items[0][i].split(':')[0]
+        Y = [float(item[i].split(':')[1]) for item in items]
+        records[name] = Records(name, X, Y)
+    return records
+
+if __name__ == '__main__':
+    path = "VQ/exp/2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS/1/plus_eval.txt"
+    read_record(path)
