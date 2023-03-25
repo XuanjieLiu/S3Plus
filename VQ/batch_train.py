@@ -18,7 +18,7 @@ for exp_num in EXP_NUM_LIST:
         exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
         os.chdir(exp_path)
         sys.path.append(exp_path)
-        print(f'Exp path: {exp_path}')
+        # print(f'Exp path: {exp_path}')
         t_config = __import__('train_config')
         reload(t_config)
         sys.path.pop()
