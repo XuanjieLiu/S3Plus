@@ -66,3 +66,6 @@ sample2 = [3, 3, 4, 4]
 # print(np.std(b))
 print(stats.mode(sample1, keepdims=False)[0])
 print(calc_accu(sample1, sample2))
+
+EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+print(EXP_NUM_LIST)

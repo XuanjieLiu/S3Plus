@@ -2,7 +2,7 @@ from typing import List
 import matplotlib.pyplot as plt
 
 
-class CompareGroup:
+class MultiKeyCompareGroup:
     def __init__(
             self,
             title: str,
@@ -17,7 +17,7 @@ class CompareGroup:
         assert len(keys) == len(values[0]), "The number of keys should be equal to the number of values."
 
 
-def plot_sub_graph(ax: plt.Axes, compare_group: CompareGroup):
+def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
     x = list(range(1, len(compare_group.keys)+1))
     y_list = compare_group.values
     i = 1
@@ -30,7 +30,7 @@ def plot_sub_graph(ax: plt.Axes, compare_group: CompareGroup):
     ax.set_title(compare_group.title)
 
 
-def plot_graph(groups: List[CompareGroup], save_path):
+def plot_graph(groups: List[MultiKeyCompareGroup], save_path):
     group_num = len(groups)
     fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 3, 5))
     if group_num == 1:

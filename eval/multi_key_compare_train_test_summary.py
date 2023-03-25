@@ -3,7 +3,7 @@ import os
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from typing import List
 from load_batch_record import ExpGroup
-from multi_key_compare import CompareGroup, plot_graph
+from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
 eg1 = ExpGroup(
@@ -20,29 +20,29 @@ eg2 = ExpGroup(
     record_name="plus_eval.txt",
 )
 
-egd1 = ExpGroup(
-    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
-    exp_alias='emb_dim = 1',
-    sub_exp=[1, 2, 3, 4, 5],
-    record_name="plus_eval.txt",
-)
-
-egd8 = ExpGroup(
-    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim8_singleS",
-    exp_alias='emb_dim = 8',
-    sub_exp=[1, 2, 3, 4, 5],
-    record_name="plus_eval.txt",
-)
-
-egd64 = ExpGroup(
-    exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim64_singleS",
-    exp_alias='emb_dim = 64',
-    sub_exp=[1, 2, 3, 4, 5],
-    record_name="plus_eval.txt",
-)
+# egd1 = ExpGroup(
+#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
+#     exp_alias='emb_dim = 1',
+#     sub_exp=[1, 2, 3, 4, 5],
+#     record_name="plus_eval.txt",
+# )
+#
+# egd8 = ExpGroup(
+#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim8_singleS",
+#     exp_alias='emb_dim = 8',
+#     sub_exp=[1, 2, 3, 4, 5],
+#     record_name="plus_eval.txt",
+# )
+#
+# egd64 = ExpGroup(
+#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim64_singleS",
+#     exp_alias='emb_dim = 64',
+#     sub_exp=[1, 2, 3, 4, 5],
+#     record_name="plus_eval.txt",
+# )
 
 exp_groups = [eg1, eg2]
-exp_groups_2 = [egd1, egd8, egd64]
+# exp_groups_2 = [egd1, egd8, egd64]
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
@@ -64,7 +64,7 @@ def exp_group2compare_group(exp_group: ExpGroup):
             mean = float(np.mean(record_data.find_topMin_after_iter(EXTREME_NUM, ITER_AFTER, IS_MAX_BETTER)))
             y.append(mean)
         y_list.append(y)
-    compare_group = CompareGroup(
+    compare_group = MultiKeyCompareGroup(
         title=exp_group.exp_alias,
         y_name=Y_NAME,
         keys=COMPARE_KEYS_NAME,
@@ -82,6 +82,6 @@ def gen_compare_groups(exp_groups: List[ExpGroup]):
 
 if __name__ == '__main__':
     os.makedirs(OUTPUT_PATH, exist_ok=True)
-    cg_list = gen_compare_groups(exp_groups_2)
+    cg_list = gen_compare_groups(exp_groups)
     save_path = os.path.join(OUTPUT_PATH, RESULT_NAME)
     plot_graph(cg_list, save_path)
