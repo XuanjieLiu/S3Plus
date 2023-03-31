@@ -13,6 +13,7 @@ class ExpGroup:
             sub_exp: List,
             record_name: str,
             exp_root: str = '../VQ/exp',
+            check_point: str = ''
             ):
         self.exp_name = exp_name
         self.sub_exps = [str(n) for n in sub_exp]
