@@ -39,7 +39,7 @@ def plot_graph(groups: List[MultiKeyCompareGroup], save_path):
         plot_sub_graph(axs[i], groups[i])
     for ax in axs.flat:
         ax.label_outer()
-    plt.legend()
+    # plt.legend()
     plt.savefig(save_path)
     plt.cla()
     plt.clf()
