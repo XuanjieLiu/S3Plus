@@ -23,7 +23,7 @@ class EpochCompareGroup:
 
 def plot_sub_graph(ax: plt.Axes, compare_group: EpochCompareGroup):
     for i in range(len(compare_group.sub_record)):
-        color = colors_order[i]
+        # color = colors_order[i]
         for j in range(len(compare_group.keys)):
             key = compare_group.keys[j]
             key_label = compare_group.key_labels[j]
