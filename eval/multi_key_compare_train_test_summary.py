@@ -7,42 +7,21 @@ from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
 eg1 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128",
+    exp_name="2023.04.01_30vq_Zc[1]_Zs[0]_edim1_singleS",
     exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_noAssoc_plusUnit128",
+    exp_name="2023.04.01_5vq_Zc[2]_Zs[0]_edim1_singleS_noAssoc",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
-# egd1 = ExpGroup(
-#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
-#     exp_alias='emb_dim = 1',
-#     sub_exp=[1, 2, 3, 4, 5],
-#     record_name="plus_eval.txt",
-# )
-#
-# egd8 = ExpGroup(
-#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim8_singleS",
-#     exp_alias='emb_dim = 8',
-#     sub_exp=[1, 2, 3, 4, 5],
-#     record_name="plus_eval.txt",
-# )
-#
-# egd64 = ExpGroup(
-#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim64_singleS",
-#     exp_alias='emb_dim = 64',
-#     sub_exp=[1, 2, 3, 4, 5],
-#     record_name="plus_eval.txt",
-# )
 
 exp_groups = [eg1, eg2]
-# exp_groups_2 = [egd1, egd8, egd64]
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
@@ -52,7 +31,7 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 8000
 Y_NAME = "Plus Accuracy (max=1.0)"
-RESULT_NAME = "dim_8_3.25_compare.png"
+RESULT_NAME = "dim_1_4.01_compare.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup):
