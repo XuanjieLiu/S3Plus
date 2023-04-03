@@ -30,7 +30,8 @@ def plot_sub_graph(ax: plt.Axes, compare_group: EpochCompareGroup):
             line_style = compare_group.keys_linestyle[j]
             x = compare_group.sub_record[i][key].X
             y = compare_group.sub_record[i][key].Y
-            ax.plot(x, y, marker='o', linestyle=line_style, linewidth=1, markersize=1, label=f'exp {i} {key_label}', color=color)
+            # ax.plot(x, y, marker='o', linestyle=line_style, linewidth=1, markersize=1, label=f'exp {i} {key_label}', color=color)
+            ax.plot(x, y, marker='o', linestyle=line_style, linewidth=1, markersize=1, label=f'exp {i} {key_label}')
             ax.grid(True)
             ax.set(ylabel=compare_group.y_name)
             ax.set(xlabel="Epoch Number")
