@@ -21,6 +21,7 @@ class ExpGroup:
         self.check_point = check_point
         self.exp_alias = exp_alias
         self.record_name = record_name
-        self.check_point_path = os.path.join(exp_root, exp_name, sub_exp, check_point)
+        self.file_name = os.path.join(exp_name, sub_exp, check_point)
+        self.check_point_path = os.path.join(exp_root, self.file_name)
 
 
