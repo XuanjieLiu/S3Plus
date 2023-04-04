@@ -1,6 +1,6 @@
 from typing import List
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 class MultiKeyCompareGroup:
     def __init__(
@@ -20,13 +20,15 @@ class MultiKeyCompareGroup:
 def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
     x = list(range(1, len(compare_group.keys)+1))
     y_list = compare_group.values
+    y0_mean = float(np.mean([y[0] for y in y_list]))
+    y1_mean = float(np.mean([y[1] for y in y_list]))
+    ax.axhline(y=y0_mean, c='red', label=f'{compare_group.keys[0]} mean', linestyle='dashed', linewidth=1.5)
+    ax.axhline(y=y1_mean, c='red', label=f'{compare_group.keys[1]} mean', linestyle='solid', linewidth=1.5)
     i = 1
     for y in y_list:
         ax.plot(x, y, marker='o', linestyle='dashed', markerfacecolor='none', linewidth=1, markersize=12, label=f'exp {i}')
         i += 1
     ax.grid(True)
-    box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax.set(ylabel=compare_group.y_name)
     ax.set_xticks(x, compare_group.keys)
     ax.set_title(compare_group.title)
@@ -41,7 +43,9 @@ def plot_graph(groups: List[MultiKeyCompareGroup], save_path):
         plot_sub_graph(axs[i], groups[i])
     for ax in axs.flat:
         ax.label_outer()
+
     plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
+    plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
     plt.savefig(save_path)
     plt.cla()
     plt.clf()
