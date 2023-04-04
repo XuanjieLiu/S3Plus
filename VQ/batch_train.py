@@ -8,7 +8,7 @@ from train import is_need_train, PlusTrainer
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 sys.path.append(EXP_ROOT_PATH)
 EXP_NAME_LIST = [
-    "2023.04.04_20vq_Zc[1]_Zs[0]_edim1_singleS_noAssoc",
+    "2023.04.04_20vq_Zc[1]_Zs[0]_edim1_singleS",
 ]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 
