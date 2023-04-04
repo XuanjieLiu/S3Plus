@@ -25,6 +25,8 @@ def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
         ax.plot(x, y, marker='o', linestyle='dashed', markerfacecolor='none', linewidth=1, markersize=12, label=f'exp {i}')
         i += 1
     ax.grid(True)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax.set(ylabel=compare_group.y_name)
     ax.set_xticks(x, compare_group.keys)
     ax.set_title(compare_group.title)
@@ -32,14 +34,14 @@ def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
 
 def plot_graph(groups: List[MultiKeyCompareGroup], save_path):
     group_num = len(groups)
-    fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 3, 5))
+    fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 3+1, 5))
     if group_num == 1:
         axs = [axs]
     for i in range(group_num):
         plot_sub_graph(axs[i], groups[i])
     for ax in axs.flat:
         ax.label_outer()
-    # plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
     plt.savefig(save_path)
     plt.cla()
     plt.clf()

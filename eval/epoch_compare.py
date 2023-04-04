@@ -30,6 +30,9 @@ def plot_sub_graph(ax: plt.Axes, compare_group: EpochCompareGroup):
             line_style = compare_group.keys_linestyle[j]
             x = compare_group.sub_record[i][key].X
             y = compare_group.sub_record[i][key].Y
+            # Shrink current axis by 20%
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0, box.width * 0.97, box.height])
             # ax.plot(x, y, marker='o', linestyle=line_style, linewidth=1, markersize=1, label=f'exp {i} {key_label}', color=color)
             ax.plot(x, y, marker='o', linestyle=line_style, linewidth=1, markersize=1, label=f'exp {i} {key_label}')
             ax.grid(True)
@@ -40,14 +43,14 @@ def plot_sub_graph(ax: plt.Axes, compare_group: EpochCompareGroup):
 
 def plot_graph(groups: List[EpochCompareGroup], save_path):
     group_num = len(groups)
-    fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 5, 5))
+    fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 5+3, 5))
     if group_num == 1:
         axs = [axs]
     for i in range(group_num):
         plot_sub_graph(axs[i], groups[i])
     for ax in axs.flat:
         ax.label_outer()
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
     plt.savefig(save_path)
     plt.cla()
     plt.clf()
