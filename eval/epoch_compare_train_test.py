@@ -22,14 +22,14 @@ from epoch_compare import EpochCompareGroup, plot_graph
 # )
 
 eg1 = ExpGroup(
-    exp_name="2023.04.03_25vq_Zc[1]_Zs[0]_edim1_singleS",
+    exp_name="2023.04.01_30vq_Zc[1]_Zs[0]_edim1_singleS",
     exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.04.03_25vq_Zc[1]_Zs[0]_edim1_singleS_noAssoc",
+    exp_name="2023.04.01_30vq_Zc[1]_Zs[0]_edim1_singleS",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
