@@ -45,7 +45,7 @@ KEYS_NAME = ['TestSet']
 KEYS_STYLE = ['solid']
 OUTPUT_PATH = "train_test_epoch/"
 Y_NAME = "Plus Accuracy (max=1.0)"
-RESULT_NAME = "dim1_emb25.1_4.03_epoch.png"
+RESULT_NAME = "dim1_04.01_30vq_Zc[1]_epoch.png"
 
 def gen_compare_groups(exp_groups: List[ExpGroup]):
     compare_groups = []

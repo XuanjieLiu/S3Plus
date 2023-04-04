@@ -45,7 +45,7 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 8000
 Y_NAME = "Plus Accuracy (max=1.0)"
-RESULT_NAME = "dim1_emb25.1_4.03_compare.png"
+RESULT_NAME = "dim1_04.01_30vq_Zc[1]_compare.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup):
