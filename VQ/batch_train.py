@@ -10,7 +10,7 @@ sys.path.append(EXP_ROOT_PATH)
 EXP_NAME_LIST = [
     "2023.04.05_25vq_Zc[1]_Zs[0]_edim8_128_singleS",
 ]
-EXP_NUM_LIST = [str(i) for i in range(1, 41)]
+EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 
 for exp_num in EXP_NUM_LIST:
     for exp_name in EXP_NAME_LIST:
