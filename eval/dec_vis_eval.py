@@ -1,9 +1,10 @@
 import sys
 import os
+sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from typing import List
 from loss_counter import read_record
+from VQ.VQVAE import VQVAE
 
-sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 
 
 class ExpGroup:
@@ -25,3 +26,6 @@ class ExpGroup:
         self.check_point_path = os.path.join(exp_root, self.file_name)
 
 
+def plot_dec_img(loaded_model: VQVAE, emb_size: int, emb_num: int, save_path: str):
+    # Todo
+    return
