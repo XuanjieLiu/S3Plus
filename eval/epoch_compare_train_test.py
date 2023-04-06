@@ -22,14 +22,14 @@ from epoch_compare import EpochCompareGroup, plot_graph
 # )
 
 eg1 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128",
+    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim1_singleS",
     exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_noAssoc_plusUnit128",
+    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim1_singleS_noAssoc",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
@@ -44,8 +44,8 @@ KEYS = ['eval_accu']
 KEYS_NAME = ['TestSet']
 KEYS_STYLE = ['solid']
 OUTPUT_PATH = "train_test_epoch/"
-Y_NAME = "Plus Accuracy (max=1.0)"
-RESULT_NAME = "dim1_03.25_10vq_Zc[2]_epoch.png"
+Y_NAME = "Plus Accuracy (max=1.0) ↑"
+RESULT_NAME = f"{'.'.join(KEYS)}_{eg1.exp_name}.png"
 
 def gen_compare_groups(exp_groups: List[ExpGroup]):
     compare_groups = []
