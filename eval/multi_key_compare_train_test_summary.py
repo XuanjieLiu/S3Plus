@@ -7,14 +7,14 @@ from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
 eg1 = ExpGroup(
-    exp_name="2023.04.07_100vq_Zc[1]_Zs[0]_edim8_plusUnit128_singleS",
+    exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128",
     exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.04.07_100vq_Zc[1]_Zs[0]_edim8_plusUnit128_singleS_noAssoc",
+    exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128_noAssoc",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
