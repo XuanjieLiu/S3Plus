@@ -8,7 +8,7 @@ CONFIG = {
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'latent_code_2': 0,
-    'embedding_dim': 4,
+    'embedding_dim': 8,
     'embeddings_num': 10,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
@@ -51,7 +51,7 @@ CONFIG = {
         },
         'plus': {
             'plus_unit': 128,
-            'n_hidden_layers': 2,
+            'n_hidden_layers': 3,
         }
     },
 }

@@ -9,7 +9,6 @@ import torch.nn as nn
 from torch.autograd import Variable
 from shared import *
 
-
 class VectorQuantizer(nn.Module):
     """
     VQ-VAE layer: Input any tensor to be quantized.
@@ -34,8 +33,8 @@ class VectorQuantizer(nn.Module):
 
     def forward(self, x):
         encoding_indices = self.get_code_flat_indices(x)
-        quantized = self.quantize(encoding_indices)
-        quantized = quantized.view_as(x)
+        flat_quantized = self.quantize(encoding_indices)
+        quantized = flat_quantized.view_as(x)
 
         # embedding loss: move the embeddings towards the encoder's output
         q_latent_loss = self.mse_loss(quantized, x.detach()) * self.embedding_cost
@@ -138,6 +137,13 @@ class Decoder(nn.Module):
         return frames
 
 
+def make_multi_layers(layers_unit, num):
+    layers = []
+    for i in range(num):
+        layers.extend(layers_unit)
+    return layers
+
+
 class VQVAE(nn.Module):
     """VQ-VAE"""
     def __init__(self, config):
@@ -156,11 +162,16 @@ class VQVAE(nn.Module):
         self.decoder = Decoder(self.latent_code_num, config['network_config']['enc_dec'])
         self.mse_loss = nn.MSELoss(reduction='mean')
         self.plus_unit = config['network_config']['plus']['plus_unit']
+        n_plus_layers = config['network_config']['plus']['n_hidden_layers']
+        plus_hiddens = make_multi_layers(
+            [nn.Linear(self.plus_unit, self.plus_unit),
+            nn.ReLU()],
+            n_plus_layers
+        )
         self.plus_net = nn.Sequential(
             nn.Linear(self.latent_code_1 * 2, self.plus_unit),
             nn.ReLU(),
-            nn.Linear(self.plus_unit, self.plus_unit),
-            nn.ReLU(),
+            *plus_hiddens,
             nn.Linear(self.plus_unit, self.latent_code_1),
         )
 
