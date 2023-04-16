@@ -224,7 +224,7 @@ class PlusTrainer:
         e_ab = torch.cat((e_ab_content, z_s), -1)
         z_ab = torch.cat((z_ab_content, z_s), -1)
         recon_c = self.model.batch_decode_from_z(e_ab)
-        recon_loss = nn.MSELoss()(recon_c, imgs_c) * self.plus_recon_loss_scalar
+        recon_loss = nn.MSELoss()(recon_c, imgs_c) * self.plus_recon_loss_scalar if bool(self.VQPlus_eqLoss_scalar) else 0
         if vis_imgs is not None:
             vis_imgs.plus_c = recon_c[0]
         if self.z_plus_loss_scalar > self.min_loss_scalar:

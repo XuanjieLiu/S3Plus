@@ -8,4 +8,4 @@ def make_multi_layers(layers_unit, num):
     return layers
 
 aa = make_multi_layers([1,2], 3)
-print(aa)
+print(bool(0.0001))
