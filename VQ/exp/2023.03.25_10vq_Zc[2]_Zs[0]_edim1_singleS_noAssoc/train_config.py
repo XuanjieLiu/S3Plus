@@ -51,6 +51,7 @@ CONFIG = {
         },
         'plus': {
             'plus_unit': 32,
+            'n_hidden_layers': 1,
         }
     },
 }
