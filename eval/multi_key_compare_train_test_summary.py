@@ -6,19 +6,19 @@ from load_batch_record import ExpGroup
 from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
-eg1 = ExpGroup(
-    exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128",
-    exp_alias='w/ associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128_noAssoc",
-    exp_alias='w/o associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
+# eg1 = ExpGroup(
+#     exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128",
+#     exp_alias='w/ associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.04.09_10vq_Zc[2]_Zs[0]_edim4_singleS_plusUnit128_noAssoc",
+#     exp_alias='w/o associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
 
 # eg1 = ExpGroup(
 #     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
@@ -35,7 +35,28 @@ eg2 = ExpGroup(
 # )
 
 
-exp_groups = [eg1, eg2]
+eg1 = ExpGroup(
+    exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_AssZ",
+    exp_alias='associative loss on z',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg2 = ExpGroup(
+    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128",
+    exp_alias='associative loss on e (baseline)',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg3 = ExpGroup(
+    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_noAssoc_plusUnit128",
+    exp_alias='w/o associative loss',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+exp_groups = [eg1, eg2, eg3]
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
