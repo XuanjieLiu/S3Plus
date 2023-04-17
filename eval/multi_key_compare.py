@@ -30,6 +30,7 @@ def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
         i += 1
     ax.grid(True)
     ax.set(ylabel=compare_group.y_name)
+    ax.set_yticks([i * 0.1 for i in range(0, 11)])
     ax.set_xticks(x, compare_group.keys)
     ax.set_title(compare_group.title)
 
