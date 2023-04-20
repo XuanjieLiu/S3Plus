@@ -78,7 +78,7 @@ class VectorQuantizer(nn.Module):
 
 class Encoder(nn.Module):
     """Encoder of VQ-VAE"""
-    def __init__(self, latent_code_num, encoder_config):
+    def __init__(self, latent_code_num, encoder_config, enc_fc_config):
         super().__init__()
         self.latent_code_num = latent_code_num
         self.img_channel = encoder_config['img_channel']
@@ -95,8 +95,20 @@ class Encoder(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(self.first_ch_num * 2, self.last_ch_num, kernel_size=(4, 4), stride=(2, 2), padding=1),
         )
-
-        self.fc11 = nn.Linear(self.last_ch_num * self.last_H * self.last_W, self.latent_code_num)
+        fc_n_input = self.last_ch_num * self.last_H * self.last_W
+        fc_n_units = enc_fc_config['n_units']
+        fc_n_hidden_layers = enc_fc_config['n_hidden_layers']
+        fc_hiddens = make_multi_layers(
+            [nn.Linear(fc_n_units, fc_n_units),
+             nn.ReLU()],
+            fc_n_hidden_layers - 1
+        )
+        self.fc11 = nn.Sequential(
+            nn.Linear(fc_n_input, fc_n_units),
+            nn.ReLU(),
+            *fc_hiddens,
+            nn.Linear(fc_n_units, self.latent_code_num),
+        ) if fc_n_hidden_layers > 0 else nn.Linear(fc_n_input, self.latent_code_num)
 
     def forward(self, x):
         out = self.encoder(x)
@@ -157,23 +169,23 @@ class VQVAE(nn.Module):
         self.commitment_scalar = config['commitment_scalar']
         self.embedding_scalar = config['embedding_scalar']
         self.latent_code_num = self.latent_code_1 + self.latent_code_2
-        self.encoder = Encoder(self.latent_code_num, config['network_config']['enc_dec'])
+        self.encoder = Encoder(self.latent_code_num, config['network_config']['enc_dec'], config['network_config']['enc_fc'])
         self.vq_layer = VectorQuantizer(self.embedding_dim, self.embeddings_num, self.commitment_scalar, self.embedding_scalar)
         self.decoder = Decoder(self.latent_code_num, config['network_config']['enc_dec'])
         self.mse_loss = nn.MSELoss(reduction='mean')
-        self.plus_unit = config['network_config']['plus']['plus_unit']
+        plus_unit = config['network_config']['plus']['plus_unit']
         n_plus_layers = config['network_config']['plus']['n_hidden_layers']
         plus_hiddens = make_multi_layers(
-            [nn.Linear(self.plus_unit, self.plus_unit),
+            [nn.Linear(plus_unit, plus_unit),
             nn.ReLU()],
-            n_plus_layers
+            n_plus_layers - 1
         )
         self.plus_net = nn.Sequential(
-            nn.Linear(self.latent_code_1 * 2, self.plus_unit),
+            nn.Linear(self.latent_code_1 * 2, plus_unit),
             nn.ReLU(),
             *plus_hiddens,
-            nn.Linear(self.plus_unit, self.latent_code_1),
-        )
+            nn.Linear(plus_unit, self.latent_code_1),
+        ) if n_plus_layers > 0 else nn.Linear(self.latent_code_1 * 2, self.latent_code_1)
 
     def plus(self, z_a, z_b):
         comb = torch.cat((z_a, z_b), dim=-1)

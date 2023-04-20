@@ -14,7 +14,7 @@ CONFIG = {
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 50001,
+    'max_iter_num': 30001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'eval_result_path': 'EvalResults/',
@@ -36,7 +36,7 @@ CONFIG = {
     'commitment_scalar': 0.0025,
     'embedding_scalar': 0.01,
     'isVQStyle': False,
-    'plus_by_embedding': False,
+    'plus_by_embedding': True,
     'VQPlus_eqLoss_scalar': 0.5,
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
@@ -51,7 +51,7 @@ CONFIG = {
         },
         'enc_fc': {
             'n_units': 128,
-            'n_hidden_layers': 0,
+            'n_hidden_layers': 1,
         },
         'plus': {
             'plus_unit': 128,
