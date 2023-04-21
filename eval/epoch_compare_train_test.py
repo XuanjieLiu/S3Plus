@@ -36,14 +36,14 @@ from epoch_compare import EpochCompareGroup, plot_graph
 # )
 
 eg1 = ExpGroup(
-    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
+    exp_name="2023.04.20_100vq_Zc[1]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
     exp_alias='enc fc.1',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS_plusOnE",
+    exp_name="2023.04.20_100vq_Zc[1]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS_plusOnE",
     exp_alias='enc fc.1, plus on e',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
