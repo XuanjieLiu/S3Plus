@@ -12,3 +12,4 @@ slurm_*.err
 *.sbatch
 *.gz
 *.pickle
+/venv

@@ -36,27 +36,21 @@ import numpy as np
 
 
 eg1 = ExpGroup(
-    exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_AssZ",
-    exp_alias='associative loss on z',
+    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
+    exp_alias='enc fc.1',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128",
-    exp_alias='associative loss on e (baseline)',
+    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS_plusOnE",
+    exp_alias='enc fc.1, plus on e',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
-eg3 = ExpGroup(
-    exp_name="2023.03.25_10vq_Zc[2]_Zs[0]_edim8_singleS_noAssoc_plusUnit128",
-    exp_alias='w/o associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
 
-exp_groups = [eg1, eg2, eg3]
+exp_groups = [eg1, eg2]
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']

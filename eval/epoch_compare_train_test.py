@@ -21,19 +21,34 @@ from epoch_compare import EpochCompareGroup, plot_graph
 #     record_name="plus_eval.txt",
 # )
 
+# eg1 = ExpGroup(
+#     exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_Peq0_AssZ",
+#     exp_alias='w/ associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_Peq0_noAssoc",
+#     exp_alias='w/o associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+
 eg1 = ExpGroup(
-    exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_Peq0_AssZ",
-    exp_alias='w/ associative loss',
+    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
+    exp_alias='enc fc.1',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.04.16_10vq_Zc[2]_Zs[0]_edim8_singleS_plusUnit128.1_Peq0_noAssoc",
-    exp_alias='w/o associative loss',
+    exp_name="2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS_plusOnE",
+    exp_alias='enc fc.1, plus on e',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
+
 exp_groups = [eg1, eg2]
 # exp_groups_2 = [egd1, egd8, egd64]
 
