@@ -4,12 +4,13 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 from importlib import reload
 from train import is_need_train, PlusTrainer
 
+if len(sys.argv) < 2:
+    print("Usage: python myscript.py arg1 arg2 ...")
+    sys.exit()
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 sys.path.append(EXP_ROOT_PATH)
-EXP_NAME_LIST = [
-    "2023.04.20_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
-]
+EXP_NAME_LIST = sys.argv[1:]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 
 for exp_num in EXP_NUM_LIST:
