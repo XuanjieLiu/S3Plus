@@ -21,14 +21,14 @@ import numpy as np
 # )
 
 eg1 = ExpGroup(
-    exp_name="2023.04.23_10vq_Zc[2]_Zs[0]_edim16_plusUnit128.1_encFc128.1_singleS_plusOnE",
+    exp_name="2023.04.23_10vq_Zc[2]_Zs[0]_edim32_plusUnit128.1_encFc128.1_singleS_plusOnE",
     exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.04.23_10vq_Zc[2]_Zs[0]_edim16_plusUnit128.1_encFc128.1_singleS_plusOnE_noAssoc",
+    exp_name="2023.04.23_10vq_Zc[2]_Zs[0]_edim32_plusUnit128.1_encFc128.1_singleS_plusOnE_noAssoc",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
