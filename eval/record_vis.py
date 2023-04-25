@@ -56,9 +56,46 @@ class TextRecordVis(EpochVis):
                  alias: List[str],
                  ):
         assert len(keys) == len(alias), "Error: len(keys) != len(alias)"
-        float_vars = [DoubleVar() for n in keys]
-        records = read_record(record_dir)
-        self.available_epoch_list = records[keys[0]].X
+        self.keys = keys
+        self.records = read_record(record_dir)
+        self.available_epoch_list = self.records[keys[0]].X
+        epoch_frame = Frame(frame_win)
+        epoch_frame.pack(side=TOP)
+        self.epoch_var = StringVar()
+        self.epoch_label = Label(frame_win, textvariable=self.epoch_var)
+
+        self.index_list_frame = Frame(frame_win)
+        self.index_list_frame.pack(side=TOP)
+        l_name_list, l_value_list, self.var_list = self.init_index_list(self.index_list_frame, alias)
+
+    def init_index_list(self, frame_win, alias):
+        l_name_list = []
+        l_value_list = []
+        var_list = []
+        for i in range(len(alias)):
+            l_name = Label(frame_win, text=f'{alias[i]}: ')
+            l_name.grid(row=i, column=0)
+            l_name_list.append(l_name)
+
+            var = StringVar(value=str(0.0))
+            var_list.append(var)
+
+            l_value = Label(frame_win, textvariable=var)
+            l_value.grid(row=i, column=1)
+            l_value_list.append(l_value)
+        return l_name_list, l_value_list, var_list
+
+    def on_epoch_change(self, epoch: int):
+        if epoch not in self.available_epoch_list:
+            pass
+        idx = self.available_epoch_list.index(epoch)
+        self.epoch_var.set(str(epoch))
+        for i in range(len(self.keys)):
+            key = self.keys[i]
+            value = self.records[key].Y[idx]
+            self.var_list[i].set(str(value))
+
+
 
 
 
