@@ -96,7 +96,6 @@ class TextRecordVis(EpochVis):
             self.var_list[i].set(str(value))
 
 
-
 class EpochBar:
     def __init__(self,
                  frame_win: Tk,
@@ -104,12 +103,20 @@ class EpochBar:
                  epoch_end: int,
                  epoch_tick: int,
                  on_epoch_change: Callable):
-    # todo
-    pass
+        self.epoch_var = IntVar(value=0)
+        self.epoch_bar = Scale(
+            frame_win,
+            orient=HORIZONTAL,
+            from_=epoch_start,
+            to=epoch_end,
+            resolution=epoch_tick,
+            tickinterval=epoch_tick,
+            command=on_epoch_change
+        )
+        self.epoch_bar.pack(side=LEFT)
 
 
-
-
+class
 
 
 if __name__ == '__main__':
@@ -120,6 +127,7 @@ if __name__ == '__main__':
 
     def name_filter(name: str):
         return name.split('.')[0].isdigit()
+
 
     def name2epoch(name: str):
         return int(name.split('.')[0])
