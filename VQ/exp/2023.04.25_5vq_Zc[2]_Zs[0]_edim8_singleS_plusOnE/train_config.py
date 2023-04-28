@@ -9,7 +9,7 @@ CONFIG = {
     'latent_embedding_2': 0,
     'latent_code_2': 0,
     'embedding_dim': 8,
-    'embeddings_num': 10,
+    'embeddings_num': 5,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
