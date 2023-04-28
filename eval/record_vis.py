@@ -18,7 +18,7 @@ def load_img(label: tkinter.Label, img_path: str):
 
 class EpochVis(ABC):
     @abstractmethod
-    def on_epoch_change(self, epoch: int):
+    def epoch_update(self, epoch: int):
         pass
 
 
@@ -38,7 +38,7 @@ class ImgRecordVis(EpochVis):
         self.img_label = Label(frame_win)
         self.img_label.grid(row=1, column=0)
 
-    def on_epoch_change(self, epoch: int):
+    def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:
             pass
         self.label_var.set(f'Epoch {epoch}')
@@ -85,7 +85,7 @@ class TextRecordVis(EpochVis):
             l_value_list.append(l_value)
         return l_name_list, l_value_list, var_list
 
-    def on_epoch_change(self, epoch: int):
+    def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:
             pass
         idx = self.available_epoch_list.index(epoch)
@@ -94,6 +94,18 @@ class TextRecordVis(EpochVis):
             key = self.keys[i]
             value = self.records[key].Y[idx]
             self.var_list[i].set(str(value))
+
+
+
+class EpochBar:
+    def __init__(self,
+                 frame_win: Tk,
+                 epoch_start: int,
+                 epoch_end: int,
+                 epoch_tick: int,
+                 on_epoch_change: Callable):
+    # todo
+    pass
 
 
 
