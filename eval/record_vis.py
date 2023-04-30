@@ -116,7 +116,15 @@ class EpochBar:
         self.epoch_bar.pack(side=LEFT)
 
 
-class
+class DisplayPanel:
+    def __init__(self,
+                 win: Tk,
+                 exp_name_list: List[str],
+                 epoch_vis_list: List[List[EpochVis]],
+                 epoch_bar: EpochBar,
+                 ):
+        self.epoch_vis_frame = Frame(win)
+        self.epoch_vis_frame.pack(side=TOP)
 
 
 if __name__ == '__main__':
