@@ -25,6 +25,7 @@ class EpochVis(ABC):
 class ImgRecordVis(EpochVis):
     def __init__(self,
                  frame_win: Tk,
+                 vis_name: str,
                  img_dir: str,
                  name_filter: Callable[[str], bool],
                  name2epoch: Callable[[str], int]
@@ -32,11 +33,13 @@ class ImgRecordVis(EpochVis):
         self.img_dir = img_dir
         self.name_list = list(filter(name_filter, os.listdir(img_dir)))
         self.available_epoch_list = [name2epoch(name) for name in self.name_list]
+        name = Label(frame_win, text=vis_name)
+        name.grid(row=0, column=0)
         self.label_var = StringVar()
         self.epoch_label = Label(frame_win, textvariable=self.label_var)
-        self.epoch_label.grid(row=0, column=0)
+        self.epoch_label.grid(row=1, column=0)
         self.img_label = Label(frame_win)
-        self.img_label.grid(row=1, column=0)
+        self.img_label.grid(row=2, column=0)
 
     def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:
@@ -50,7 +53,8 @@ class ImgRecordVis(EpochVis):
 
 class TextRecordVis(EpochVis):
     def __init__(self,
-                 frame_win: Tk,
+                 frame_win: Frame,
+                 vis_name: str,
                  record_dir: str,
                  keys: List[str],
                  alias: List[str],
@@ -59,6 +63,9 @@ class TextRecordVis(EpochVis):
         self.keys = keys
         self.records = read_record(record_dir)
         self.available_epoch_list = self.records[keys[0]].X
+        name = Label(frame_win, text=vis_name)
+        name.pack(side=TOP)
+
         epoch_frame = Frame(frame_win)
         epoch_frame.pack(side=TOP)
         self.epoch_var = StringVar()
@@ -98,7 +105,7 @@ class TextRecordVis(EpochVis):
 
 class EpochBar:
     def __init__(self,
-                 frame_win: Tk,
+                 frame_win,
                  epoch_start: int,
                  epoch_end: int,
                  epoch_tick: int,
@@ -116,15 +123,54 @@ class EpochBar:
         self.epoch_bar.pack(side=LEFT)
 
 
+class NamePanel:
+    def __init__(self,
+                 win,
+                 names: List[str],
+                 ):
+        self.name_labels = []
+        for text in names:
+            label = Label(win, text=text)
+            label.pack(side=TOP)
+            self.name_labels.append(label)
+
+
 class DisplayPanel:
     def __init__(self,
-                 win: Tk,
-                 exp_name_list: List[str],
-                 epoch_vis_list: List[List[EpochVis]],
-                 epoch_bar: EpochBar,
+                 win: Frame,
+                 exp_name_list: List[List[str]],
+                 epoch_vis_creator_list: List[List[Callable[[Frame], EpochVis]]],
+                 epoch_bar_creator: Callable[[Frame, Callable], EpochBar],
                  ):
+        self.exp_name_list = exp_name_list
+        self.epoch_vis_creator_list = epoch_vis_creator_list
         self.epoch_vis_frame = Frame(win)
         self.epoch_vis_frame.pack(side=TOP)
+        self.widget_list = self.make_rows()
+        epoch_bar_frame = Frame(win)
+        epoch_bar_frame.pack(side=TOP)
+        self.epoch_bar = epoch_bar_creator(epoch_bar_frame, self.on_epoch_change)
+
+    def make_rows(self):
+        widget_list = []
+        for i in range(0, len(self.epoch_vis_creator_list)):
+            name_frame = Frame(self.epoch_vis_frame)
+            name_frame.grid(row=i, column=0)
+            name_panel = NamePanel(name_frame, self.exp_name_list[i])
+            for j in range(1, len(self.epoch_vis_creator_list[i])):
+                epoch_vis_creator = self.epoch_vis_creator_list[i][j]
+                widget_frame = Frame(self.epoch_vis_frame)
+                widget_frame.grid(row=i, column=j)
+                widget = epoch_vis_creator(widget_frame)
+                widget_list.append(widget)
+        return widget_list
+
+    def on_epoch_change(self, epoch):
+        int_epoch = int(epoch)
+        for widget in self.widget_list:
+            widget.epoch_update(int_epoch)
+
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,143 @@
+import os.path
+from tkinter import *
+from typing import Callable, List
+from eval.record_vis import TextRecordVis, ImgRecordVis, EpochBar
+from load_batch_record import ExpGroup
+
+
+COMMON_TXT_KEYS = ['loss_ED', 'plus_recon', 'plus_z', 'loss_oper']
+COMMON_TXT_ALIAS = ['Self-recon', 'Plus-recon', 'Plus loss', 'Assoc. loss']
+def common_recon_img_filter(name: str):
+    return name.split('.')[0].isdigit()
+
+def common_recon_img_name2epoch(name: str):
+    return int(name.split('.')[0])
+
+def common_enc_img_filter(name: str):
+    return "_plus_z_ks_" in name
+
+def common_enc_img_name2epoch(name: str):
+    return name.split('_')[0].isdigit()
+
+def exp2callable_list(exp_dir: str):
+    def train_record_creator(win: Frame):
+        txt_path = os.path.join(exp_dir, 'Train_record.txt')
+        text_record_vis = TextRecordVis(
+            win,
+            vis_name='(Train)',
+            record_dir=txt_path,
+            keys=COMMON_TXT_KEYS,
+            alias=COMMON_TXT_ALIAS
+        )
+        return text_record_vis
+
+    def eval_record_creator(win: Frame):
+        txt_path = os.path.join(exp_dir, 'Eval_record.txt')
+        text_record_vis = TextRecordVis(
+            win,
+            vis_name='(Eval)',
+            record_dir=txt_path,
+            keys=COMMON_TXT_KEYS,
+            alias=COMMON_TXT_ALIAS
+        )
+        return text_record_vis
+
+    def train_recon_img_creator(win: Frame):
+        img_dir = os.path.join(exp_dir, 'TrainingResults')
+        recon_img = ImgRecordVis(
+            win,
+            vis_name="Train Recons",
+            img_dir=img_dir,
+            name_filter=common_recon_img_filter,
+            name2epoch=common_recon_img_name2epoch,
+        )
+        return recon_img
+
+    def eval_recon_img_creator(win: Frame):
+        img_dir = os.path.join(exp_dir, 'EvalResults')
+        recon_img = ImgRecordVis(
+            win,
+            vis_name="Eval Recons",
+            img_dir=img_dir,
+            name_filter=common_recon_img_filter,
+            name2epoch=common_recon_img_name2epoch,
+        )
+        return recon_img
+
+    def train_enc_img_creator(win: Frame):
+        img_dir = os.path.join(exp_dir, 'TrainingResults')
+        enc_img = ImgRecordVis(
+            win,
+            vis_name="Train Enc",
+            img_dir=img_dir,
+            name_filter=common_enc_img_filter,
+            name2epoch=common_enc_img_name2epoch
+        )
+        return enc_img
+
+    def eval_enc_img_creator(win: Frame):
+        img_dir = os.path.join(exp_dir, 'EvalResults')
+        enc_img = ImgRecordVis(
+            win,
+            vis_name="Eval Enc",
+            img_dir=img_dir,
+            name_filter=common_enc_img_filter,
+            name2epoch=common_enc_img_name2epoch
+        )
+        return enc_img
+
+    def accu_txt_creator(win: Frame):
+        txt_path = os.path.join(exp_dir, 'plus_eval.txt')
+        text_record_vis = TextRecordVis(
+            win,
+            vis_name='Plus Accuracy',
+            record_dir=txt_path,
+            keys=['train_accu', 'eval_accu'],
+            alias=['Train accu.', 'Eval accu.']
+        )
+        return text_record_vis
+
+    return [
+        train_record_creator,
+        eval_record_creator,
+        train_recon_img_creator,
+        eval_recon_img_creator,
+        train_enc_img_creator,
+        eval_enc_img_creator,
+        accu_txt_creator
+    ]
+
+def exp_group2callable_list(exp_group: ExpGroup):
+    widget_list = []
+    name_list = []
+    for sub_exp in exp_group.sub_exps:
+        exp_dir = os.path.join(exp_group.exp_path, sub_exp)
+        widget_list.append(exp2callable_list(exp_dir))
+        names = [exp_group.exp_alias, sub_exp]
+        name_list.append(names)
+    return widget_list, name_list
+
+
+def epoch_bar_creator(win: Frame, on_epoch_change: Callable):
+    epoch_bar = EpochBar(
+        win,
+        epoch_start=100,
+        epoch_end=50000,
+        epoch_tick=200,
+        on_epoch_change=on_epoch_change
+    )
+    return epoch_bar
+
+
+def eg_list2panel_input(eg_list: List[ExpGroup]):
+
+
+
+eg1 = ExpGroup(
+    exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
+    exp_alias=None,
+    sub_exp=[3, 13]
+)
+
+eg_group = [eg1]
+

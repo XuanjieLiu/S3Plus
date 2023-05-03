@@ -13,14 +13,15 @@ class ExpGroup:
             sub_exp: List,
             record_name: str,
             exp_root: str = '../VQ/exp',
-            check_point: str = ''
+            is_load_record: bool = True
             ):
         self.exp_name = exp_name
         self.sub_exps = [str(n) for n in sub_exp]
         self.exp_path = os.path.join(exp_root, exp_name)
-        self.exp_alias = exp_alias
+        self.exp_alias = exp_alias if exp_alias is not None else exp_name
         self.record_name = record_name
-        self.sub_record = self.load_record()
+        if is_load_record:
+            self.sub_record = self.load_record()
 
     def load_record(self):
         sub_record = []
