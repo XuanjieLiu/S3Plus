@@ -129,6 +129,9 @@ def epoch_bar_creator(win: Frame, on_epoch_change: Callable):
     return epoch_bar
 
 
+def eg2panel_input(eg: ExpGroup):
+
+
 def eg_list2panel_input(eg_list: List[ExpGroup]):
 
 

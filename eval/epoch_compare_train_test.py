@@ -43,7 +43,7 @@ eg1 = ExpGroup(
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc",
+    exp_name="2023.05.04_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc",
     exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
