@@ -79,7 +79,7 @@ def read_record(path: str):
     with open(path, 'r') as f:
         lines = f.readlines()
     X = [int(line.split('-')[0]) for line in lines]
-    items = [line.split('-')[1].split('\n')[0].split(',') for line in lines]
+    items = ['-'.join(line.split('-')[1:]).split('\n')[0].split(',') for line in lines]
     records = {}
     for i in range(len(items[0])):
         name = items[0][i].split(':')[0]

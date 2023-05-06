@@ -11,7 +11,7 @@ class ExpGroup:
             exp_name: str,
             exp_alias: str,
             sub_exp: List,
-            record_name: str,
+            record_name: str = None,
             exp_root: str = '../VQ/exp',
             is_load_record: bool = True
             ):

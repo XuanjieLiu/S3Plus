@@ -10,7 +10,7 @@ from loss_counter import read_record
 
 def load_img(label: tkinter.Label, img_path: str):
     image = Image.open(img_path)
-    img = image.resize((200, 200))
+    img = image.resize((300, 250))
     photo = ImageTk.PhotoImage(img)
     label.config(image=photo)
     label.image = photo
@@ -43,7 +43,7 @@ class ImgRecordVis(EpochVis):
 
     def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:
-            pass
+            return
         self.label_var.set(f'Epoch {epoch}')
         idx = self.available_epoch_list.index(epoch)
         img_name = self.name_list[idx]
@@ -94,7 +94,7 @@ class TextRecordVis(EpochVis):
 
     def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:
-            pass
+            return
         idx = self.available_epoch_list.index(epoch)
         self.epoch_var.set(str(epoch))
         for i in range(len(self.keys)):
@@ -117,8 +117,9 @@ class EpochBar:
             from_=epoch_start,
             to=epoch_end,
             resolution=epoch_tick,
-            tickinterval=epoch_tick,
-            command=on_epoch_change
+            tickinterval=epoch_tick*10,
+            command=on_epoch_change,
+            length=1500,
         )
         self.epoch_bar.pack(side=LEFT)
 
@@ -130,14 +131,14 @@ class NamePanel:
                  ):
         self.name_labels = []
         for text in names:
-            label = Label(win, text=text)
+            label = Label(win, text=text, width=20, wraplength=100)
             label.pack(side=TOP)
             self.name_labels.append(label)
 
 
 class DisplayPanel:
     def __init__(self,
-                 win: Frame,
+                 win: Tk,
                  exp_name_list: List[List[str]],
                  epoch_vis_creator_list: List[List[Callable[[Frame], EpochVis]]],
                  epoch_bar_creator: Callable[[Frame, Callable], EpochBar],
@@ -157,10 +158,10 @@ class DisplayPanel:
             name_frame = Frame(self.epoch_vis_frame)
             name_frame.grid(row=i, column=0)
             name_panel = NamePanel(name_frame, self.exp_name_list[i])
-            for j in range(1, len(self.epoch_vis_creator_list[i])):
+            for j in range(0, len(self.epoch_vis_creator_list[i])):
                 epoch_vis_creator = self.epoch_vis_creator_list[i][j]
                 widget_frame = Frame(self.epoch_vis_frame)
-                widget_frame.grid(row=i, column=j)
+                widget_frame.grid(row=i, column=j+1)
                 widget = epoch_vis_creator(widget_frame)
                 widget_list.append(widget)
         return widget_list
@@ -187,7 +188,6 @@ if __name__ == '__main__':
         return int(name.split('.')[0])
 
 
-    irv = ImgRecordVis(win, dir, name_filter, name2epoch)
+    irv = ImgRecordVis(win, 'aa', dir, name_filter, name2epoch)
     print(irv.name_list)
-    irv.epoch_var.set(100)
-    irv.epoch_var.set(200)
+    irv.epoch_update(11800)

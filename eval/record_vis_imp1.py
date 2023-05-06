@@ -1,23 +1,29 @@
 import os.path
 from tkinter import *
 from typing import Callable, List
-from eval.record_vis import TextRecordVis, ImgRecordVis, EpochBar
+from eval.record_vis import TextRecordVis, ImgRecordVis, EpochBar, DisplayPanel
 from load_batch_record import ExpGroup
 
 
 COMMON_TXT_KEYS = ['loss_ED', 'plus_recon', 'plus_z', 'loss_oper']
 COMMON_TXT_ALIAS = ['Self-recon', 'Plus-recon', 'Plus loss', 'Assoc. loss']
+
+
 def common_recon_img_filter(name: str):
     return name.split('.')[0].isdigit()
+
 
 def common_recon_img_name2epoch(name: str):
     return int(name.split('.')[0])
 
+
 def common_enc_img_filter(name: str):
     return "_plus_z_ks_" in name
 
+
 def common_enc_img_name2epoch(name: str):
-    return name.split('_')[0].isdigit()
+    return int(name.split('_')[0])
+
 
 def exp2callable_list(exp_dir: str):
     def train_record_creator(win: Frame):
@@ -100,12 +106,13 @@ def exp2callable_list(exp_dir: str):
     return [
         train_record_creator,
         eval_record_creator,
-        train_recon_img_creator,
-        eval_recon_img_creator,
+        # train_recon_img_creator,
+        # eval_recon_img_creator,
         train_enc_img_creator,
         eval_enc_img_creator,
         accu_txt_creator
     ]
+
 
 def exp_group2callable_list(exp_group: ExpGroup):
     widget_list = []
@@ -121,26 +128,40 @@ def exp_group2callable_list(exp_group: ExpGroup):
 def epoch_bar_creator(win: Frame, on_epoch_change: Callable):
     epoch_bar = EpochBar(
         win,
-        epoch_start=100,
+        epoch_start=0,
         epoch_end=50000,
         epoch_tick=200,
-        on_epoch_change=on_epoch_change
+        on_epoch_change=on_epoch_change,
     )
     return epoch_bar
 
 
-def eg2panel_input(eg: ExpGroup):
-
-
 def eg_list2panel_input(eg_list: List[ExpGroup]):
-
+    widget_list = []
+    name_list = []
+    for eg in eg_list:
+        widgets, names = exp_group2callable_list(eg)
+        widget_list.extend(widgets)
+        name_list.extend(names)
+    return widget_list, name_list
 
 
 eg1 = ExpGroup(
     exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
     exp_alias=None,
-    sub_exp=[3, 13]
+    sub_exp=[3, 13],
+    is_load_record=False
 )
 
 eg_group = [eg1]
 
+if __name__ == '__main__':
+    win = Tk()
+    epoch_vis_creator_list, exp_name_list = eg_list2panel_input(eg_group)
+    display_panel = DisplayPanel(
+        win,
+        exp_name_list,
+        epoch_vis_creator_list,
+        epoch_bar_creator
+    )
+    win.mainloop()
