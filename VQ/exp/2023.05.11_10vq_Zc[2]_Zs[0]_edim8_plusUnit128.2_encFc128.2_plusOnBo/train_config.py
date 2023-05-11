@@ -42,7 +42,7 @@ CONFIG = {
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
     'is_assoc_on_e': True,
-    'is_assoc_on_z': False,
+    'is_assoc_on_z': True,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
