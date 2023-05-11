@@ -129,7 +129,7 @@ def epoch_bar_creator(win: Frame, on_epoch_change: Callable):
     epoch_bar = EpochBar(
         win,
         epoch_start=0,
-        epoch_end=50000,
+        epoch_end=40000,
         epoch_tick=200,
         on_epoch_change=on_epoch_change,
     )
@@ -148,12 +148,26 @@ def eg_list2panel_input(eg_list: List[ExpGroup]):
 
 eg1 = ExpGroup(
     exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
-    exp_alias=None,
-    sub_exp=[3, 13],
+    exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (效果好)',
+    sub_exp=[13],
     is_load_record=False
 )
 
-eg_group = [eg1]
+eg2 = ExpGroup(
+    exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
+    exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (效果差)',
+    sub_exp=[12],
+    is_load_record=False
+)
+
+eg3 = ExpGroup(
+    exp_name='2023.05.03_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc',
+    exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (无结合律)',
+    sub_exp=[12],
+    is_load_record=False
+)
+
+eg_group = [eg1, eg2, eg3]
 
 if __name__ == '__main__':
     win = Tk()
