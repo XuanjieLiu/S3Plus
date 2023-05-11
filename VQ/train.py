@@ -42,6 +42,9 @@ def is_need_train(train_config):
         return False
 
 
+def iter_add(a, b):
+    return [a[i] + b[i] for i in range(0, len(a))]
+
 def split_into_three(tensor):
     sizes = [3, int(tensor.size(0) / 3), *tensor.size()[1:]]
     new_tensor = tensor.reshape(*sizes)
@@ -86,6 +89,7 @@ class PlusTrainer:
         self.VQPlus_eqLoss_scalar = config['VQPlus_eqLoss_scalar']
         self.plus_recon_loss_scalar = config['plus_recon_loss_scalar']
         self.plus_by_embedding = config['plus_by_embedding']
+        self.plus_by_zcode = config['plus_by_zcode']
         self.isVQStyle = config['isVQStyle']
         self.is_commutative_train = config['is_commutative_train']
 
@@ -117,19 +121,19 @@ class PlusTrainer:
             vis_imgs.recon_a, vis_imgs.recon_b, vis_imgs.recon_c = recon_a[0], recon_b[0], recon_c[0]
             vae_loss = self.vae_loss(data_all, recon)
 
-            if self.plus_recon_loss_scalar < self.min_loss_scalar:
-                plus_loss = torch.zeros(2)
-            else:
+            plus_loss = torch.zeros(2).to(DEVICE)
+            if self.plus_recon_loss_scalar > self.min_loss_scalar:
                 if self.plus_by_embedding:
-                    plus_loss = self.bi_plus_loss(e_all, data[2], vis_imgs)
-                else:
-                    plus_loss = self.bi_plus_loss(z_all, data[2], vis_imgs)
+                    plus_loss = iter_add(plus_loss, self.bi_plus_loss(e_all, data[2], vis_imgs))
+                if self.plus_by_zcode:
+                    plus_loss = iter_add(plus_loss, self.bi_plus_loss(z_all, data[2], vis_imgs))
 
+            operations_loss = torch.zeros(1)[0].to(DEVICE)
             if self.plus_by_embedding:
-                operations_loss = self.operation_loss_z(e_content)
-            else:
+                operations_loss += self.operation_loss_z(e_content)
+            if self.plus_by_zcode:
                 z_content = z_all[..., 0:self.latent_code_1]
-                operations_loss = self.operation_loss_z(z_content)
+                operations_loss += self.operation_loss_z(z_content)
 
             loss = self.loss_func(vae_loss, e_q_loss, plus_loss, operations_loss, loss_counter)
             if optimizer is not None:
@@ -210,10 +214,7 @@ class PlusTrainer:
         za, zb, zc = split_into_three(z_all)
         plus_loss1 = self.plus_loss(za, zb, zc, imgs_c, vis_imgs)
         plus_loss2 = self.plus_loss(zb, za, zc, imgs_c) if self.is_commutative_train else torch.zeros(2)
-        plus_loss = (
-            plus_loss1[0] + plus_loss2[0],
-            plus_loss1[1] + plus_loss2[1]
-        )
+        plus_loss = iter_add(plus_loss1, plus_loss2)
         return plus_loss
 
     def plus_loss(self, za, zb, zc, imgs_c, vis_imgs: VisImgs = None):
