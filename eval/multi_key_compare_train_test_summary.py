@@ -37,7 +37,7 @@ import numpy as np
 
 eg1 = ExpGroup(
     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnE",
-    exp_alias='plus on E, assoc on Z of plus Es',
+    exp_alias='plus on E, assoc on E of plus Es',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
