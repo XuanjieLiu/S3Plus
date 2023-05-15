@@ -20,37 +20,54 @@ import numpy as np
 #     record_name="plus_eval.txt",
 # )
 
-eg1 = ExpGroup(
-    exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo",
-    exp_alias='w/ associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo_noAssoc",
-    exp_alias='w/o associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-
 # eg1 = ExpGroup(
-#     exp_name="2023.04.20_100vq_Zc[1]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS",
-#     exp_alias='enc fc.1',
+#     exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo",
+#     exp_alias='w/ associative loss',
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="plus_eval.txt",
 # )
 #
 # eg2 = ExpGroup(
-#     exp_name="2023.04.20_100vq_Zc[1]_Zs[0]_edim8_plusUnit128.1_encFc128.1_singleS_plusOnE",
-#     exp_alias='enc fc.1, plus on e',
+#     exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo_noAssoc",
+#     exp_alias='w/o associative loss',
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="plus_eval.txt",
 # )
 
 
-exp_groups = [eg1, eg2]
+eg1 = ExpGroup(
+    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnE",
+    exp_alias='plus on E, assoc on Z of plus Es',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg2 = ExpGroup(
+    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnZ",
+    exp_alias='plus on E, assoc on Z of plus Es',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg3 = ExpGroup(
+    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnBo",
+    exp_alias='plus on E, assoc on both',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg4 = ExpGroup(
+    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_noAssoc",
+    exp_alias='w/o assoc',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+
+# exp_groups = [eg1, eg2]
+exp_groups = [eg1, eg2, eg3, eg4]
+
+
 
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
