@@ -2,6 +2,10 @@ import sys
 import os
 import matplotlib.pyplot as plt
 import matplotlib
+from torch.utils.data import DataLoader
+
+from dataloader import SingleImgDataset
+
 matplotlib.use('AGG')
 import torch
 import numpy as np
@@ -11,7 +15,7 @@ from VQ.VQVAE import VQVAE
 from shared import *
 import os
 from importlib import reload
-
+from VQ.num_eval import load_enc_eval_data
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 RECORD_ROOT = os.path.join(CURR_DIR, "dec_vis_eval_2digit")
@@ -24,15 +28,16 @@ class ExpGroup:
             sub_exp: str,
             check_point: str = '',
             exp_root: str = os.path.join(CURR_DIR, '../VQ/exp'),
-            result_path: str = "temporal.png",
+            result_path: str = "result.png",
             ):
         os.makedirs(RECORD_ROOT, exist_ok=True)
         self.exp_root = exp_root
         self.exp_name = exp_name
         self.sub_exp = sub_exp
         self.check_point = check_point
-        self.result_path = os.path.join(RECORD_ROOT, result_path)
-        self.model, self.digit_num, self.emb_dim, self.dict_size = self.init_model()
+        result_name = f'{check_point}.{result_path}'
+        self.result_path = os.path.join(RECORD_ROOT, result_name)
+        self.model, self.digit_num, self.emb_dim, self.dict_size, self.eval_loader_1 = self.init_model()
 
     def init_model(self):
         tar_exp_path = os.path.join(self.exp_root, self.exp_name)
@@ -49,11 +54,20 @@ class ExpGroup:
         digit_num = t_config.CONFIG['latent_embedding_1']
         emb_dim = t_config.CONFIG['embedding_dim']
         dict_size = t_config.CONFIG['embeddings_num']
-        return model, digit_num, emb_dim, dict_size
+        eval_set_1 = SingleImgDataset(t_config.CONFIG['eval_path_1'])
+        eval_loader_1 = DataLoader(eval_set_1, batch_size=32)
+        return model, digit_num, emb_dim, dict_size, eval_loader_1
 
     def run_eval(self):
-        plot_dec_img(self.model, self.dict_size, self.digit_num, self.emb_dim, self.result_path)
-
+        num_z, num_labels = load_enc_eval_data(
+            self.eval_loader_1,
+            lambda x: self.model.find_indices(
+                self.model.batch_encode_to_z(x)[0],
+                True
+            )
+        )
+        enc_flat_z = [int(t.item()) for t in num_z]
+        plot_dec_img(self.model, self.dict_size, self.digit_num, self.emb_dim, self.result_path, enc_flat_z, num_labels)
 
 
 def flat_idx_list(dict_size, digit_num):
@@ -66,7 +80,8 @@ def flat_idx_list(dict_size, digit_num):
     flat_list = [num for sublist in total_digit_num_list for num in sublist]
     return flat_list
 
-def plot_dec_img(loaded_model: VQVAE, dict_size: int, digit_num: int, emb_dim: int, save_path: str):
+
+def plot_dec_img(loaded_model: VQVAE, dict_size: int, digit_num: int, emb_dim: int, save_path: str, enc_flat_z, enc_labels):
     flat_idx = torch.tensor(flat_idx_list(dict_size, digit_num), dtype=torch.int).to(DEVICE)
     flat_emb = loaded_model.vq_layer.quantize(flat_idx)
     total_img = pow(dict_size, digit_num)
@@ -76,9 +91,10 @@ def plot_dec_img(loaded_model: VQVAE, dict_size: int, digit_num: int, emb_dim: i
     n_row = 1 if digit_num == 1 else dict_size
     imgs2D = imgs.reshape(n_row, dict_size, *imgs.size()[1:])
     print(flat_idx)
-    tensor2imgs(imgs2D, save_path)
+    tensor2imgs(imgs2D, save_path, enc_flat_z, enc_labels)
 
-def tensor2imgs(imgs, save_path):
+
+def tensor2imgs(imgs, save_path, enc_flat_z, enc_labels):
     n_row = len(imgs)
     n_col = len(imgs[0])
     fig, axs = plt.subplots(n_row, n_col)
@@ -89,6 +105,7 @@ def tensor2imgs(imgs, save_path):
             axs[i, j].set(xlabel=f"{j}")
             axs[i, j].set_xticks([])
             axs[i, j].set_yticks([])
+            label_enc(i, j, axs[i, j], enc_flat_z, enc_labels, n_row)
     for ax in axs.flat:
         ax.label_outer()
     plt.suptitle("View from decoder")
@@ -96,6 +113,16 @@ def tensor2imgs(imgs, save_path):
     plt.cla()
     plt.clf()
     plt.close()
+
+
+def label_enc(i, j, axs, enc_flat_z: List[int], enc_labels, dict_size):
+    num = i*dict_size + j
+    if num not in enc_flat_z:
+        return
+    idx = enc_flat_z.index(num)
+    label = enc_labels[idx]
+    axs.set_title(f'{label}', y=1.0, pad=-14, fontweight='bold', color=(0.8, 0.2, 0.2, 0.8))
+
 
 def decimal_to_base(n, base):
     if base < 2 or base > 36:
@@ -110,9 +137,11 @@ def decimal_to_base(n, base):
         n //= base
     return result
 
+
 def arrange_tensor(input: torch.Tensor, need_permute=True):
     tensor = input.permute(1, 2, 0) if need_permute else input
     return np.array(tensor.cpu().detach(), dtype=float)
+
 
 if __name__ == '__main__':
     EXP_ROOT_PATH = os.path.join(CURR_DIR, '../VQ/exp')

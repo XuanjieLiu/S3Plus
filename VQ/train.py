@@ -18,7 +18,7 @@ from shared import *
 from num_eval import plot_z_against_label, load_enc_eval_data
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
-
+from eval.dec_vis_eval_2digit import plot_dec_img
 
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
     scale = t_range[1] - t_range[0]
@@ -77,6 +77,7 @@ class PlusTrainer:
         self.max_iter_num = config['max_iter_num']
         self.embedding_dim = config['embedding_dim']
         self.latent_code_1 = config['latent_embedding_1'] * self.embedding_dim
+        self.latent_embedding_1 = config['latent_embedding_1']
         self.sub_batch = int(self.batch_size / 3)
         self.sum_mse = nn.MSELoss(reduction='sum')
         self.mean_mse = nn.MSELoss(reduction='mean')
@@ -92,6 +93,7 @@ class PlusTrainer:
         self.plus_by_zcode = config['plus_by_zcode']
         self.isVQStyle = config['isVQStyle']
         self.is_commutative_train = config['is_commutative_train']
+        self.embeddings_num = config['embeddings_num']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -199,8 +201,19 @@ class PlusTrainer:
                                     True
                                 )
         )
-        eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')
-        plot_z_against_label(num_z, num_labels, eval_path, self.eval_help)
+        z_eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')
+        vis_eval_path = os.path.join(self.eval_result_path, f'{epoch_num}_numVis.png')
+        enc_flat_z = [int(t.item()) for t in num_z]
+        plot_dec_img(
+            loaded_model=self.model,
+            dict_size=self.embeddings_num,
+            digit_num=self.latent_embedding_1,
+            emb_dim=self.embedding_dim,
+            save_path=vis_eval_path,
+            enc_flat_z=enc_flat_z,
+            enc_labels=num_labels
+        )
+        plot_z_against_label(num_z, num_labels, z_eval_path, self.eval_help)
 
     def plot_plus_z(self, epoch_num, data_loader, result_path):
         plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)

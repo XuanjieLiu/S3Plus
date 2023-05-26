@@ -8,12 +8,12 @@ from torchvision.utils import save_image
 import torch.optim as optim
 from dataloader import SingleImgDataset
 from loss_counter import LossCounter
-from VQVAE import VQVAE
+from VQ.VQVAE import VQVAE
 from shared import *
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
-from eval_common import EvalHelper
+from VQ.eval_common import EvalHelper
 
 matplotlib.use('AGG')
 
