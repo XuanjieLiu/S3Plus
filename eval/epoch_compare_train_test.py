@@ -21,52 +21,52 @@ from epoch_compare import EpochCompareGroup, plot_graph
 #     record_name="plus_eval.txt",
 # )
 
-# eg1 = ExpGroup(
-#     exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.05.11_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnBo_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-
-
 eg1 = ExpGroup(
-    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnE",
-    exp_alias='plus on E, assoc on E of plus Es',
+    exp_name="2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS",
+    exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnZ",
-    exp_alias='plus on E, assoc on Z of plus Es',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg3 = ExpGroup(
-    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnBo",
-    exp_alias='plus on E, assoc on both',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg4 = ExpGroup(
-    exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_noAssoc",
-    exp_alias='plus on E, w/o assoc loss',
+    exp_name="2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc",
+    exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 
-# exp_groups = [eg1, eg2]
-exp_groups = [eg1, eg2, eg3, eg4]
+# eg1 = ExpGroup(
+#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnE",
+#     exp_alias='plus on E, assoc on E of plus Es',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnZ",
+#     exp_alias='plus on E, assoc on Z of plus Es',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnBo",
+#     exp_alias='plus on E, assoc on both',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg4 = ExpGroup(
+#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_noAssoc",
+#     exp_alias='plus on E, w/o assoc loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+#
+exp_groups = [eg1, eg2]
+# exp_groups = [eg1, eg2, eg3, eg4]
 
 # KEYS = ['train_accu', 'eval_accu']
 # KEYS_NAME = ['TrainSet', 'TestSet']
