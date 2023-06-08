@@ -94,6 +94,7 @@ class PlusTrainer:
         self.isVQStyle = config['isVQStyle']
         self.is_commutative_train = config['is_commutative_train']
         self.embeddings_num = config['embeddings_num']
+        self.plus_mse_scalar = config['plus_mse_scalar']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -230,6 +231,12 @@ class PlusTrainer:
         plus_loss = iter_add(plus_loss1, plus_loss2)
         return plus_loss
 
+    def plus_mse(self, a, b):
+        if self.plus_mse_scalar < 0:
+            return self.mean_mse(a, b)
+        else:
+            return self.mean_mse(a, b.detach()) * self.plus_mse_scalar + self.mean_mse(a.detach(), b)
+
     def plus_loss(self, za, zb, zc, imgs_c, vis_imgs: VisImgs = None):
         z_s = za[..., self.latent_code_1:] if random.random() > 0.5 else zb[..., self.latent_code_1:]
         if self.isVQStyle:
@@ -243,9 +250,9 @@ class PlusTrainer:
             vis_imgs.plus_c = recon_c[0]
         if self.z_plus_loss_scalar > self.min_loss_scalar:
             if self.plus_by_embedding:
-                z_loss = self.mean_mse(e_ab, zc) * self.z_plus_loss_scalar
+                z_loss = self.plus_mse(e_ab, zc) * self.z_plus_loss_scalar
             else:
-                z_loss = self.mean_mse(z_ab, zc) * self.z_plus_loss_scalar
+                z_loss = self.plus_mse(z_ab, zc) * self.z_plus_loss_scalar
         else:
             z_loss = torch.zeros(1)[0]
         return recon_loss, z_loss + e_q_loss * self.VQPlus_eqLoss_scalar

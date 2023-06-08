@@ -20,6 +20,8 @@ def common_recon_img_name2epoch(name: str):
 def common_enc_img_filter(name: str):
     return "_plus_z_ks_" in name
 
+def common_dec_img_filter(name: str):
+    return "_numVis" in name
 
 def common_enc_img_name2epoch(name: str):
     return int(name.split('_')[0])
@@ -92,6 +94,17 @@ def exp2callable_list(exp_dir: str):
         )
         return enc_img
 
+    def dec_vis_img_creator(win: Frame):
+        img_dir = os.path.join(exp_dir, 'EvalResults')
+        enc_img = ImgRecordVis(
+            win,
+            vis_name="Eval Dec",
+            img_dir=img_dir,
+            name_filter=common_dec_img_filter,
+            name2epoch=common_enc_img_name2epoch
+        )
+        return enc_img
+
     def accu_txt_creator(win: Frame):
         txt_path = os.path.join(exp_dir, 'plus_eval.txt')
         text_record_vis = TextRecordVis(
@@ -110,6 +123,7 @@ def exp2callable_list(exp_dir: str):
         # eval_recon_img_creator,
         train_enc_img_creator,
         eval_enc_img_creator,
+        dec_vis_img_creator,
         accu_txt_creator
     ]
 
@@ -147,23 +161,23 @@ def eg_list2panel_input(eg_list: List[ExpGroup]):
 
 
 eg1 = ExpGroup(
-    exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
+    exp_name='2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
     exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (效果好)',
-    sub_exp=[13],
+    sub_exp=[10],
     is_load_record=False
 )
 
 eg2 = ExpGroup(
-    exp_name='2023.05.01_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
+    exp_name='2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS',
     exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (效果差)',
-    sub_exp=[12],
+    sub_exp=[6],
     is_load_record=False
 )
 
 eg3 = ExpGroup(
-    exp_name='2023.05.03_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc',
+    exp_name='2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS_noAssoc',
     exp_alias='高维度(8 dim),\n 两位数,\n 多冗余(10 tokens),\n (无结合律)',
-    sub_exp=[12],
+    sub_exp=[14],
     is_load_record=False
 )
 
