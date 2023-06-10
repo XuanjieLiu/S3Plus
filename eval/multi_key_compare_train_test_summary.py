@@ -20,52 +20,46 @@ import numpy as np
 #     record_name="plus_eval.txt",
 # )
 
-eg1 = ExpGroup(
-    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
-    exp_alias='w/ associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1_noAssoc",
-    exp_alias='w/o associative loss',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-
 # eg1 = ExpGroup(
-#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnE",
-#     exp_alias='plus on E, assoc on E of plus Es',
+#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
+#     exp_alias='w/ associative loss',
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="plus_eval.txt",
 # )
 #
 # eg2 = ExpGroup(
-#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnZ",
-#     exp_alias='plus on E, assoc on Z of plus Es',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg3 = ExpGroup(
-#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_AssocOnBo",
-#     exp_alias='plus on E, assoc on both',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg4 = ExpGroup(
-#     exp_name="2023.05.14_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusOnE_noAssoc",
-#     exp_alias='plus on E, w/o assoc',
+#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1_noAssoc",
+#     exp_alias='w/o associative loss',
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="plus_eval.txt",
 # )
 
 
-exp_groups = [eg1, eg2]
-# exp_groups = [eg1, eg2, eg3, eg4]
+eg1 = ExpGroup(
+    exp_name="2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS",
+    exp_alias='baseline',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg2 = ExpGroup(
+    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS0.3",
+    exp_alias='plus loss scaler 0.3',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg3 = ExpGroup(
+    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
+    exp_alias='plus loss scaler 1',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+
+
+#exp_groups = [eg1, eg2]
+exp_groups = [eg1, eg2, eg3]
 
 
 
