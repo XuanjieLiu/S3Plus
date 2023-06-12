@@ -10,7 +10,7 @@ from loss_counter import read_record
 
 def load_img(label: tkinter.Label, img_path: str):
     image = Image.open(img_path)
-    img = image.resize((300, 250))
+    img = image.resize((350, 290))
     photo = ImageTk.PhotoImage(img)
     label.config(image=photo)
     label.image = photo
@@ -33,13 +33,15 @@ class ImgRecordVis(EpochVis):
         self.img_dir = img_dir
         self.name_list = list(filter(name_filter, os.listdir(img_dir)))
         self.available_epoch_list = [name2epoch(name) for name in self.name_list]
-        name = Label(frame_win, text=vis_name)
+        info_frame = Frame(frame_win)
+        info_frame.grid(row=0, column=0)
+        name = Label(info_frame, text=vis_name)
         name.grid(row=0, column=0)
         self.label_var = StringVar()
-        self.epoch_label = Label(frame_win, textvariable=self.label_var)
-        self.epoch_label.grid(row=1, column=0)
+        self.epoch_label = Label(info_frame, textvariable=self.label_var)
+        self.epoch_label.grid(row=0, column=1)
         self.img_label = Label(frame_win)
-        self.img_label.grid(row=2, column=0)
+        self.img_label.grid(row=1, column=0)
 
     def epoch_update(self, epoch: int):
         if epoch not in self.available_epoch_list:

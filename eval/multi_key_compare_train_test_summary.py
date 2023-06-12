@@ -20,46 +20,46 @@ import numpy as np
 #     record_name="plus_eval.txt",
 # )
 
-# eg1 = ExpGroup(
-#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-
-
 eg1 = ExpGroup(
-    exp_name="2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS",
-    exp_alias='baseline',
+    exp_name="2023.06.12_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plus0.1",
+    exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS0.3",
-    exp_alias='plus loss scaler 0.3',
+    exp_name="2023.06.12_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plus0.1_noAssoc",
+    exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
-eg3 = ExpGroup(
-    exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
-    exp_alias='plus loss scaler 1',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
+#
+# eg1 = ExpGroup(
+#     exp_name="2023.05.26_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_singleS",
+#     exp_alias='baseline',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS0.3",
+#     exp_alias='plus loss scaler 0.3',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS1",
+#     exp_alias='plus loss scaler 1',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
 
 
 
-#exp_groups = [eg1, eg2]
-exp_groups = [eg1, eg2, eg3]
+exp_groups = [eg1, eg2]
+# exp_groups = [eg1, eg2, eg3]
 
 
 
