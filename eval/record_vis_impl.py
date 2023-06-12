@@ -143,7 +143,7 @@ def epoch_bar_creator(win: Frame, on_epoch_change: Callable):
     epoch_bar = EpochBar(
         win,
         epoch_start=0,
-        epoch_end=40000,
+        epoch_end=80000,
         epoch_tick=200,
         on_epoch_change=on_epoch_change,
     )
@@ -159,6 +159,16 @@ def eg_list2panel_input(eg_list: List[ExpGroup]):
         name_list.extend(names)
     return widget_list, name_list
 
+def run_eval(eg_group):
+    win = Tk()
+    epoch_vis_creator_list, exp_name_list = eg_list2panel_input(eg_group)
+    display_panel = DisplayPanel(
+        win,
+        exp_name_list,
+        epoch_vis_creator_list,
+        epoch_bar_creator
+    )
+    win.mainloop()
 
 eg1 = ExpGroup(
     exp_name='2023.06.09_10vq_Zc[2]_Zs[0]_edim8_plusUnit128.2_encFc128.2_plusS0.3',
@@ -182,14 +192,5 @@ eg3 = ExpGroup(
 )
 
 eg_group = [eg1, eg2, eg3]
-
 if __name__ == '__main__':
-    win = Tk()
-    epoch_vis_creator_list, exp_name_list = eg_list2panel_input(eg_group)
-    display_panel = DisplayPanel(
-        win,
-        exp_name_list,
-        epoch_vis_creator_list,
-        epoch_bar_creator
-    )
-    win.mainloop()
+    run_eval(eg_group)

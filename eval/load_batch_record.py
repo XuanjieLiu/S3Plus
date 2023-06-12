@@ -5,6 +5,7 @@ from loss_counter import read_record
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 
+
 class ExpGroup:
     def __init__(
             self,
@@ -12,7 +13,7 @@ class ExpGroup:
             exp_alias: str,
             sub_exp: List,
             record_name: str = None,
-            exp_root: str = '../VQ/exp',
+            exp_root: str = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp'),
             is_load_record: bool = True
             ):
         self.exp_name = exp_name
