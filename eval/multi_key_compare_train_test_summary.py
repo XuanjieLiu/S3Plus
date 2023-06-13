@@ -69,7 +69,7 @@ BEST_MEAN = 5
 IS_MAX_BETTER = True
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
-ITER_AFTER = 100000
+ITER_AFTER = 10000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}.png"
 
