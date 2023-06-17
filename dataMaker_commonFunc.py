@@ -52,7 +52,8 @@ def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=Tru
 
 
 def Zero(center: tuple):
-    return [(center[0]+10, center[1]+10)]
+    # return [(center[0]+10, center[1]+10)]
+    return [center]
 
 
 def One(center: tuple):

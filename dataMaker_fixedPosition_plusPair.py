@@ -11,13 +11,14 @@ from scipy.spatial import distance
 import os
 
 
-NUMBERS = range(1, 11)
+NUMBERS = range(0, 21)
 MARKERS = ['o', 'v', '*', 'd']
 DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
 
-SINGLE_STYLE_DATA_ROOT = 'dataset/single_style_pairs'
+NUM_RAN = (0, 20)
+SINGLE_STYLE_DATA_ROOT = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_MARKERS = ['o']
 SINGLE_COLOR = ['blue']
 
@@ -63,17 +64,18 @@ class PairData:
         self.path = path
 
 
-def make_train_test_dataset_maxN(max_number, min_sample_num, sample_rate, markers, colors, data_root):
+def make_train_test_dataset_maxN(min_number, max_number, min_sample_num, sample_rate, markers, colors, data_root):
+    os.makedirs(data_root, exist_ok=True)
     train_root = os.path.join(data_root, 'train')
     test_root = os.path.join(data_root, 'test')
     train_set = []
     test_set = []
     for mar in markers:
         for color in colors:
-            for i in range(2, max_number+1):
+            for i in range(min_number, max_number+1):
                 data = []
-                all_idx = [x for x in range(0, i-1)]
-                sample_num = min(i-1, max(min_sample_num, int(round(i * sample_rate, 0))))
+                all_idx = [x for x in range(min_number, i+1)]
+                sample_num = min(i+1, max(min_sample_num, int(round(i * sample_rate, 0))))
                 train_idx = random.sample(all_idx, sample_num)
                 for a, b in sum_pairs(i):
                     data.append(PairData(a, b, mar, color))
@@ -100,7 +102,7 @@ def render_dataset(data_list: List[PairData], data_root: str):
 
 
 def sum_pairs(max_number):
-    for a in range(1, max_number):
+    for a in range(0, max_number+1):
         b = max_number - a
         yield a, b
 
@@ -108,4 +110,4 @@ def sum_pairs(max_number):
 
 if __name__ == "__main__":
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    make_train_test_dataset_maxN(20, 2, 0.33, SINGLE_MARKERS, SINGLE_COLOR, DATA_ROOT)
+    make_train_test_dataset_maxN(NUM_RAN[0], NUM_RAN[1], 3, 0.33, SINGLE_MARKERS, SINGLE_COLOR, SINGLE_STYLE_DATA_ROOT)

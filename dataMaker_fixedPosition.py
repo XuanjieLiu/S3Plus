@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from dataMaker_commonFunc import *
+
 matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
@@ -25,7 +26,7 @@ def make_dataset_1():
             for color in COLORS_TRAIN:
                 position = POSITIONS[i]
                 fig_path = os.path.join(DATA_PATH, f'{i}-{MARK_NAME_SPACE[mar]}-{color}')
-                plot_a_scatter(position, fig_path, marker=mar, color=color)
+                plot_a_scatter(position, fig_path, marker=mar, color=color, is_fill=i != 0)
 
 
 if __name__ == "__main__":

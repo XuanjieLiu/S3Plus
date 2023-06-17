@@ -51,6 +51,35 @@ def split_into_three(tensor):
     return new_tensor[0], new_tensor[1], new_tensor[2]
 
 
+def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
+    dig_num = int(a_con.size(1) / emb_dim)
+    batch_size = a_con.size(0)
+    sub_batch = int(batch_size / (dig_num + 1))
+    randperm_idx = torch.randperm(batch_size)
+    a_perm = a_con[randperm_idx, ...]
+    b_perm = b_con[randperm_idx, ...]
+    a_list = []
+    b_list = []
+    for i in range(0, dig_num):
+        a_mask_list = []
+        for j in range(0, dig_num):
+            if j == i:
+                a_mask_list.append(torch.ones(emb_dim).to(DEVICE))
+            else:
+                a_mask_list.append(torch.zeros(emb_dim).to(DEVICE))
+        a_mask = torch.concat(a_mask_list, dim=0)
+        b_mask = torch.ones(a_con.size(1)).to(DEVICE) - a_mask
+        a_slice = a_perm[i*sub_batch:(i+1)*sub_batch, ...]
+        b_slice = b_perm[i * sub_batch:(i + 1) * sub_batch, ...]
+        a_list.append(a_slice.mul(a_mask) + b_slice.mul(b_mask))
+        b_list.append(a_slice.mul(b_mask) + b_slice.mul(a_mask))
+    a_list.append(a_perm[dig_num * sub_batch:, ...])
+    b_list.append(b_perm[dig_num * sub_batch:, ...])
+    a_switch = torch.concat(a_list)
+    b_switch = torch.concat(b_list)
+    return a_switch, b_switch
+
+
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
@@ -95,6 +124,8 @@ class PlusTrainer:
         self.is_commutative_train = config['is_commutative_train']
         self.embeddings_num = config['embeddings_num']
         self.plus_mse_scalar = config['plus_mse_scalar']
+        self.is_switch_digital = config['is_switch_digital']
+        self.is_assoc_within_batch = config['is_assoc_within_batch']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -241,7 +272,11 @@ class PlusTrainer:
         z_s = za[..., self.latent_code_1:] if random.random() > 0.5 else zb[..., self.latent_code_1:]
         if self.isVQStyle:
             z_s = self.model.vq_layer(z_s)[0]
-        e_ab_content, e_q_loss, z_ab_content = self.model.plus(za[..., 0:self.latent_code_1], zb[..., 0:self.latent_code_1])
+        za_content = za[..., 0:self.latent_code_1]
+        zb_content = zb[..., 0:self.latent_code_1]
+        if self.is_switch_digital:
+            za_content, zb_content = switch_digital(za_content, zb_content, self.embedding_dim)
+        e_ab_content, e_q_loss, z_ab_content = self.model.plus(za_content, zb_content)
         e_ab = torch.cat((e_ab_content, z_s), -1)
         z_ab = torch.cat((z_ab_content, z_s), -1)
         recon_c = self.model.batch_decode_from_z(e_ab)
@@ -279,9 +314,15 @@ class PlusTrainer:
         return z_a.to(DEVICE), z_b.to(DEVICE), z_c.to(DEVICE)
 
     def zc_based_associative_z(self, z_all_content):
-        idx_1 = torch.randperm(z_all_content.size(0))
-        z_perm = z_all_content[idx_1, ...]
-        z_a, z_b, z_c = split_into_three(z_perm)
+        if self.is_assoc_within_batch:
+            za, zb, zc = split_into_three(z_all_content)
+            z_all = torch.concat([za, zb, za, zb], dim=0)
+        else:
+            z_all = z_all_content
+        idx_1 = torch.randperm(z_all.size(0))
+        z_perm = z_all[idx_1, ...]
+        z_slice = z_perm[:z_all_content.size(0), ...]
+        z_a, z_b, z_c = split_into_three(z_slice)
         return z_a, z_b, z_c
 
     def associative_loss(self, z_a, z_b, z_c):
