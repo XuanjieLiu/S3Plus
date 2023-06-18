@@ -55,9 +55,6 @@ def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
     dig_num = int(a_con.size(1) / emb_dim)
     batch_size = a_con.size(0)
     sub_batch = int(batch_size / (dig_num + 1))
-    randperm_idx = torch.randperm(batch_size)
-    a_perm = a_con[randperm_idx, ...]
-    b_perm = b_con[randperm_idx, ...]
     a_list = []
     b_list = []
     for i in range(0, dig_num):
@@ -69,12 +66,12 @@ def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
                 a_mask_list.append(torch.zeros(emb_dim).to(DEVICE))
         a_mask = torch.concat(a_mask_list, dim=0)
         b_mask = torch.ones(a_con.size(1)).to(DEVICE) - a_mask
-        a_slice = a_perm[i*sub_batch:(i+1)*sub_batch, ...]
-        b_slice = b_perm[i * sub_batch:(i + 1) * sub_batch, ...]
+        a_slice = a_con[i*sub_batch:(i+1)*sub_batch, ...]
+        b_slice = b_con[i * sub_batch:(i + 1) * sub_batch, ...]
         a_list.append(a_slice.mul(a_mask) + b_slice.mul(b_mask))
         b_list.append(a_slice.mul(b_mask) + b_slice.mul(a_mask))
-    a_list.append(a_perm[dig_num * sub_batch:, ...])
-    b_list.append(b_perm[dig_num * sub_batch:, ...])
+    a_list.append(a_con[dig_num * sub_batch:, ...])
+    b_list.append(b_con[dig_num * sub_batch:, ...])
     a_switch = torch.concat(a_list)
     b_switch = torch.concat(b_list)
     return a_switch, b_switch
