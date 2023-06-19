@@ -65,14 +65,14 @@ exp_groups = [eg1, eg2, eg3]
 
 
 
-COMPARE_KEYS = ['plus_recon']
-COMPARE_KEYS_NAME = ['Plus Recon Loss']
+COMPARE_KEYS = ['loss_ED', 'plus_recon']
+COMPARE_KEYS_NAME = ['Self-recon', 'Plus Recon Loss']
 BEST_MEAN = 5
 IS_MAX_BETTER = True
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 10000
-Y_NAME = "Plus Recon Loss ↓"
+Y_NAME = "Recon Loss ↓"
 RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}(plus_recon).png"
 
 
