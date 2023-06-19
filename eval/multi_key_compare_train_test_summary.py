@@ -39,21 +39,21 @@ eg1 = ExpGroup(
     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocIn_[1-20]",
     exp_alias='w/ assoc, [1, 20], no-switch',
     sub_exp=[i for i in range(1, 21)],
-    record_name="Eval_record.txt",
+    record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]",
     exp_alias='w/ assoc, [1, 20], digit-switch',
     sub_exp=[i for i in range(1, 21)],
-    record_name="Eval_record.txt",
+    record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]_noAssoc",
     exp_alias='w/o assoc, [1, 20], digit-switch',
     sub_exp=[i for i in range(1, 21)],
-    record_name="Eval_record.txt",
+    record_name="plus_eval.txt",
 )
 
 
