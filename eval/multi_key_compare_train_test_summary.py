@@ -20,47 +20,49 @@ import numpy as np
 #     record_name="plus_eval.txt",
 # )
 
-# eg1 = ExpGroup(
-#     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[0-20]",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[0-20]_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-
-
 eg1 = ExpGroup(
     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocIn_[1-20]",
-    exp_alias='w/ assoc, [1, 20], no-switch',
+    # exp_alias='w/ associative loss',
+    exp_alias='Assoc in Batch',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]",
-    exp_alias='w/ assoc, [1, 20], digit-switch',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg3 = ExpGroup(
-    exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]_noAssoc",
-    exp_alias='w/o assoc, [1, 20], digit-switch',
+    exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocOut_[1-20]",
+    # exp_alias='w/o associative loss',
+    exp_alias='Assoc out Batch',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 
+# eg1 = ExpGroup(
+#     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocIn_[1-20]",
+#     exp_alias='w/ assoc, [1, 20], no-switch',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]",
+#     exp_alias='w/ assoc, [1, 20], digit-switch',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[1-20]_noAssoc",
+#     exp_alias='w/o assoc, [1, 20], digit-switch',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
 
 
-# exp_groups = [eg1, eg2]
-exp_groups = [eg1, eg2, eg3]
+
+
+exp_groups = [eg1, eg2]
+# exp_groups = [eg1, eg2, eg3]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
