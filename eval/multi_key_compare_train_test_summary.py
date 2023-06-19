@@ -64,7 +64,7 @@ eg3 = ExpGroup(
 exp_groups = [eg1, eg2, eg3]
 
 
-
+YTICKS = [i * 0.1 for i in range(0, 11)]
 COMPARE_KEYS = ['train_accu', 'eval_accu']
 COMPARE_KEYS_NAME = ['TrainSet', 'TestSet']
 BEST_MEAN = 5
@@ -105,4 +105,4 @@ if __name__ == '__main__':
     os.makedirs(OUTPUT_PATH, exist_ok=True)
     cg_list = gen_compare_groups(exp_groups)
     save_path = os.path.join(OUTPUT_PATH, RESULT_NAME)
-    plot_graph(cg_list, save_path)
+    plot_graph(cg_list, save_path, yticks=YTICKS)

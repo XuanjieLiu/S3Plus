@@ -17,7 +17,7 @@ class MultiKeyCompareGroup:
         assert len(keys) == len(values[0]), "The number of keys should be equal to the number of values."
 
 
-def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
+def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup, yticks=None):
     x = list(range(1, len(compare_group.keys)+1))
     y_list = compare_group.values
     y0_mean = float(np.mean([y[0] for y in y_list]))
@@ -30,18 +30,19 @@ def plot_sub_graph(ax: plt.Axes, compare_group: MultiKeyCompareGroup):
         i += 1
     ax.grid(True)
     ax.set(ylabel=compare_group.y_name)
-    ax.set_yticks([i * 0.1 for i in range(0, 11)])
+    if yticks is not None:
+        ax.set_yticks(yticks)
     ax.set_xticks(x, compare_group.keys)
     ax.set_title(compare_group.title)
 
 
-def plot_graph(groups: List[MultiKeyCompareGroup], save_path):
+def plot_graph(groups: List[MultiKeyCompareGroup], save_path, yticks=None):
     group_num = len(groups)
     fig, axs = plt.subplots(1, group_num, sharey="all", figsize=(group_num * 3+1, 5))
     if group_num == 1:
         axs = [axs]
     for i in range(group_num):
-        plot_sub_graph(axs[i], groups[i])
+        plot_sub_graph(axs[i], groups[i], yticks)
     for ax in axs.flat:
         ax.label_outer()
 
