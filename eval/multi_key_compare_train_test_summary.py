@@ -21,17 +21,15 @@ import numpy as np
 # )
 
 eg1 = ExpGroup(
-    exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocIn_[1-20]",
-    # exp_alias='w/ associative loss',
-    exp_alias='Assoc in Batch',
+    exp_name="2023.06.20_5vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[0-20]",
+    exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.06.18_10vq_Zc[2]_Zs[0]_edim8_plus0.02_switchOff_assocOut_[1-20]",
-    # exp_alias='w/o associative loss',
-    exp_alias='Assoc out Batch',
+    exp_name="2023.06.20_5vq_Zc[2]_Zs[0]_edim8_plus0.02_switch1dig_assocIn_[0-20]_noAssoc",
+    exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
