@@ -133,7 +133,7 @@ class VQvaePlusEval:
         self.isVAE = config['kld_loss_scalar'] > 0.00001
         self.model.eval()
 
-    def load_plusZ_eval_data(self):
+    def load_plusZ_eval_data(self, is_find_index=True):
         all_enc_z = []
         all_plus_z = []
         for batch_ndx, sample in enumerate(self.loader):
@@ -150,10 +150,16 @@ class VQvaePlusEval:
             label_b = [parse_label(x) for x in labels[1]]
             label_c = [parse_label(x) for x in labels[2]]
             plus_c = self.model.plus(za, zb)[0]
-            idx_z_a = self.model.find_indices(za, False)
-            idx_z_b = self.model.find_indices(zb, False)
-            idx_z_c = self.model.find_indices(zc, False)
-            idx_plus_c = self.model.find_indices(plus_c, False)
+            if is_find_index:
+                idx_z_a = self.model.find_indices(za, False)
+                idx_z_b = self.model.find_indices(zb, False)
+                idx_z_c = self.model.find_indices(zc, False)
+                idx_plus_c = self.model.find_indices(plus_c, False)
+            else:
+                idx_z_a = za
+                idx_z_b = zb
+                idx_z_c = zc
+                idx_plus_c = plus_c
             for i in range(0, za.size(0)):
                 enc_z_list.append(EncZ(label_a[i], idx_z_a[i]))
                 enc_z_list.append(EncZ(label_b[i], idx_z_b[i]))

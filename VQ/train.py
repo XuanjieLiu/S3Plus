@@ -215,6 +215,8 @@ class PlusTrainer:
                     self.plot_enc_z(epoch_num, self.eval_loader_1)
                     train_ks, train_accu = self.plot_plus_z(epoch_num, self.loader, self.train_result_path)
                     eval_ks, eval_accu = self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
+                    if self.latent_embedding_1 == 1 and self.embedding_dim == 1:
+                        self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path, "1Dz_value", False)
                     special_loss_counter.add_values([train_ks, train_accu, eval_ks, eval_accu])
                     special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
@@ -231,23 +233,25 @@ class PlusTrainer:
                                 )
         )
         z_eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')
-        vis_eval_path = os.path.join(self.eval_result_path, f'{epoch_num}_numVis.png')
-        enc_flat_z = [int(t.item()) for t in num_z]
-        plot_dec_img(
-            loaded_model=self.model,
-            dict_size=self.embeddings_num,
-            digit_num=self.latent_embedding_1,
-            emb_dim=self.embedding_dim,
-            save_path=vis_eval_path,
-            enc_flat_z=enc_flat_z,
-            enc_labels=num_labels
-        )
         plot_z_against_label(num_z, num_labels, z_eval_path, self.eval_help)
 
-    def plot_plus_z(self, epoch_num, data_loader, result_path):
+        if self.latent_embedding_1 == 2:
+            vis_eval_path = os.path.join(self.eval_result_path, f'{epoch_num}_numVis.png')
+            enc_flat_z = [int(t.item()) for t in num_z]
+            plot_dec_img(
+                loaded_model=self.model,
+                dict_size=self.embeddings_num,
+                digit_num=self.latent_embedding_1,
+                emb_dim=self.embedding_dim,
+                save_path=vis_eval_path,
+                enc_flat_z=enc_flat_z,
+                enc_labels=num_labels
+            )
+
+    def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z", is_find_index=True):
         plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data()
-        eval_path = os.path.join(result_path, f'{epoch_num}_plus_z')
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(is_find_index)
+        eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, self.eval_help)
         ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
         return ks, accu
