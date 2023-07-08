@@ -102,8 +102,12 @@ class PlusTrainer:
         self.checkpoint_interval = config['checkpoint_interval']
         self.max_iter_num = config['max_iter_num']
         self.embedding_dim = config['embedding_dim']
-        self.latent_code_1 = config['latent_embedding_1'] * self.embedding_dim
-        self.latent_embedding_1 = config['latent_embedding_1']
+        self.multi_num_embeddings = config['multi_num_embeddings']
+        if self.multi_num_embeddings is None:
+            self.latent_embedding_1 = config['latent_embedding_1']
+        else:
+            self.latent_embedding_1 = len(self.multi_num_embeddings)
+        self.latent_code_1 = self.latent_embedding_1 * self.embedding_dim
         self.sub_batch = int(self.batch_size / 3)
         self.sum_mse = nn.MSELoss(reduction='sum')
         self.mean_mse = nn.MSELoss(reduction='mean')
@@ -123,6 +127,7 @@ class PlusTrainer:
         self.plus_mse_scalar = config['plus_mse_scalar']
         self.is_switch_digital = config['is_switch_digital']
         self.is_assoc_within_batch = config['is_assoc_within_batch']
+        self.is_plot_zc_value = config['is_plot_zc_value']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -213,10 +218,10 @@ class PlusTrainer:
                 self.model.train()
                 if self.is_save_img:
                     self.plot_enc_z(epoch_num, self.eval_loader_1)
-                    train_ks, train_accu = self.plot_plus_z(epoch_num, self.loader, self.train_result_path)
-                    eval_ks, eval_accu = self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
-                    if self.latent_embedding_1 == 1 and self.embedding_dim == 1:
-                        self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path, "1Dz_value", False)
+                    train_ks, train_accu = self.plot_plus_idx(epoch_num, self.loader, self.train_result_path)
+                    eval_ks, eval_accu = self.plot_plus_idx(epoch_num, self.eval_loader_2, self.eval_result_path)
+                    if self.is_plot_zc_value:
+                        self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
                     special_loss_counter.add_values([train_ks, train_accu, eval_ks, eval_accu])
                     special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
@@ -241,20 +246,29 @@ class PlusTrainer:
             plot_dec_img(
                 loaded_model=self.model,
                 dict_size=self.embeddings_num,
-                digit_num=self.latent_embedding_1,
-                emb_dim=self.embedding_dim,
+                digit_num=2,
                 save_path=vis_eval_path,
                 enc_flat_z=enc_flat_z,
-                enc_labels=num_labels
+                enc_labels=num_labels,
+                dict_sizes=self.multi_num_embeddings
             )
 
-    def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z", is_find_index=True):
+    def plot_plus_idx(self, epoch_num, data_loader, result_path, result_name="plus_idx"):
         plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(is_find_index)
-        eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}')
-        plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, self.eval_help)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(True)
         ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+        eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}_ks_{ks}')
+        plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path,
+                                 is_scatter_lines=True, y_label="Emb idx")
         return ks, accu
+
+    def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):
+        plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(False)
+        n_row, n_col = self.eval_help.calc_subfigures_row_col()
+        eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}')
+        plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, n_row, n_col,
+                                 is_gird=True, sub_title='Emb dim', y_label="Dim value")
 
     def bi_plus_loss(self, z_all, imgs_c, vis_imgs: VisImgs = None):
         za, zb, zc = split_into_three(z_all)

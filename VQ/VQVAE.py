@@ -1,6 +1,6 @@
 import sys
 from os import path
-
+from typing import List
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), '../../'))
 
 import numpy as np
@@ -33,7 +33,7 @@ class VectorQuantizer(nn.Module):
 
     def forward(self, x):
         encoding_indices = self.get_code_flat_indices(x)
-        flat_quantized = self.quantize(encoding_indices)
+        flat_quantized = self.quantize_flat(encoding_indices)
         quantized = flat_quantized.view_as(x)
 
         # embedding loss: move the embeddings towards the encoder's output
@@ -71,9 +71,103 @@ class VectorQuantizer(nn.Module):
         return total.unsqueeze(-1)
 
 
-    def quantize(self, encoding_indices):
+    def quantize_flat(self, encoding_indices):
         """Returns embedding tensor for a batch of indices."""
         return self.embeddings(encoding_indices)
+
+
+class MultiVectorQuantizer(nn.Module):
+    """
+    VQ-VAE layer: Input any tensor to be quantized.
+    Args:
+        embedding_dim (int): the dimensionality of the tensors in the
+          quantized space. Inputs to the modules must be in this format as well.
+        num_embeddings (int): the number of vectors in the quantized space.
+        commitment_cost (float): scalar which controls the weighting of the loss terms (see
+          equation 4 in the paper - this variable is Beta).
+    """
+
+    def __init__(self, embedding_dim, num_embeddings, commitment_cost, embedding_cost, multi_num_embeddings=None):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.num_embeddings = num_embeddings
+        self.commitment_cost = commitment_cost
+        self.embedding_cost = embedding_cost
+        self.is_multiVQ = multi_num_embeddings is not None
+        self.num_embedding_list = multi_num_embeddings
+        # initialize embeddings
+        self.embeddings = nn.Embedding(self.num_embeddings, self.embedding_dim).to(DEVICE)
+        if self.is_multiVQ:
+            self.codebooks = [nn.Embedding(n, self.embedding_dim).to(DEVICE) for n in self.num_embedding_list]
+        self.mse_loss = nn.MSELoss()
+
+    def forward(self, x):
+        # encoding_indices = self.get_code_flat_indices(x)
+        # flat_quantized = self.quantize_flat(encoding_indices)
+        # quantized = flat_quantized.view_as(x)
+
+        indices = self.get_code_indices(x)
+        quantized = self.quantize(indices)
+        # embedding loss: move the embeddings towards the encoder's output
+        q_latent_loss = self.mse_loss(quantized, x.detach()) * self.embedding_cost
+        # commitment loss
+        e_latent_loss = self.mse_loss(x, quantized.detach()) * self.commitment_cost
+        loss = q_latent_loss + e_latent_loss
+
+        # Straight Through Estimator
+        quantized = x + (quantized - x).detach()
+
+        return quantized, loss
+
+    def get_code_flat_indices(self, x, codebook_idx=-1):
+        if codebook_idx == -1:
+            codebook = self.embeddings
+        else:
+            codebook = self.codebooks[codebook_idx]
+        flat_x = x.reshape(-1, self.embedding_dim)
+        # compute L2 distance
+        distances = (
+                torch.sum(flat_x ** 2, dim=1, keepdim=True) +
+                torch.sum(codebook.weight ** 2, dim=1) -
+                2. * torch.matmul(flat_x, codebook.weight.t())
+        )  # [N, M]
+        encoding_indices = torch.argmin(distances, dim=1)  # [N,]
+        return encoding_indices
+
+    def get_code_indices(self, x):
+        if self.is_multiVQ:
+            indices_list = []
+            for i in range(len(self.num_embedding_list)):
+                x_slice = x[..., i*self.embedding_dim:(i+1)*self.embedding_dim]
+                indices = self.get_code_flat_indices(x_slice, i)
+                indices_list.append(indices)
+            return torch.stack(indices_list, dim=1)
+        else:
+            flat_indices = self.get_code_flat_indices(x)
+            return flat_indices.reshape(x.size(0), -1)
+
+    def quantize_flat(self, encoding_indices, codebook_idx=-1):
+        if codebook_idx == -1:
+            codebook = self.embeddings
+        else:
+            codebook = self.codebooks[codebook_idx]
+        """Returns embedding tensor for a batch of indices."""
+        return codebook(encoding_indices)
+
+    def quantize(self, encoding_indices):
+        if self.is_multiVQ:
+            emb_list = []
+            for i in range(len(self.num_embedding_list)):
+                quantized = self.quantize_flat(encoding_indices[..., i], i)
+                emb_list.append(quantized)
+            return torch.cat(emb_list, dim=-1)
+        else:
+            batch_size = encoding_indices.size(0)
+            total_dim = encoding_indices.size(1) * self.embedding_dim
+            flat_indices = encoding_indices.reshape(-1)
+            flat_quantize = self.quantize_flat(flat_indices)
+            return flat_quantize.reshape(batch_size, total_dim)
+
 
 
 class Encoder(nn.Module):
@@ -163,14 +257,24 @@ class VQVAE(nn.Module):
         self.embeddings_num = config['embeddings_num']
         self.embedding_dim = config['embedding_dim']
         self.isVQStyle = config['isVQStyle']
-        self.latent_code_1 = config['latent_embedding_1'] * self.embedding_dim
+        self.multi_num_embeddings = config['multi_num_embeddings']
+        if self.multi_num_embeddings is None:
+            self.latent_embedding_1 = config['latent_embedding_1']
+        else:
+            self.latent_embedding_1 = len(self.multi_num_embeddings)
+        self.latent_code_1 = self.latent_embedding_1 * self.embedding_dim
         self.latent_code_2 = config['latent_embedding_2'] * self.embedding_dim if \
             self.isVQStyle else config['latent_code_2']
         self.commitment_scalar = config['commitment_scalar']
         self.embedding_scalar = config['embedding_scalar']
         self.latent_code_num = self.latent_code_1 + self.latent_code_2
         self.encoder = Encoder(self.latent_code_num, config['network_config']['enc_dec'], config['network_config']['enc_fc'])
-        self.vq_layer = VectorQuantizer(self.embedding_dim, self.embeddings_num, self.commitment_scalar, self.embedding_scalar)
+        self.vq_layer = MultiVectorQuantizer(
+            self.embedding_dim,
+            self.embeddings_num,
+            self.commitment_scalar,
+            self.embedding_scalar,
+            self.multi_num_embeddings)
         self.decoder = Decoder(self.latent_code_num, config['network_config']['enc_dec'])
         self.mse_loss = nn.MSELoss(reduction='mean')
         plus_unit = config['network_config']['plus']['plus_unit']
@@ -208,14 +312,26 @@ class VQVAE(nn.Module):
         x_recon = self.decoder(e)
         return x_recon
 
+    def flat_decimal_indices(self, indices):
+        base = 1
+        total = torch.zeros(indices.size(0)).to(DEVICE)
+        if self.multi_num_embeddings is not None:
+            times = self.multi_num_embeddings
+        else:
+            times = [self.embeddings_num for n in range(self.latent_embedding_1)]
+        for i in reversed(range(indices.size(-1))):
+            total += indices[..., i] * base
+            base *= times[i]
+        return total.unsqueeze(-1)
+
     def find_indices(self, z, need_split_style):
         if not need_split_style:
-            return self.vq_layer.flat_decimal_indices(self.vq_layer.get_code_indices(z))
+            return self.flat_decimal_indices(self.vq_layer.get_code_indices(z))
         z_c = z[..., 0:self.latent_code_1]
         z_s = z[..., self.latent_code_1:]
-        z_c_idx = self.vq_layer.flat_decimal_indices(self.vq_layer.get_code_indices(z_c))
+        z_c_idx = self.flat_decimal_indices(self.vq_layer.get_code_indices(z_c))
         if self.isVQStyle:
-            z_s_idx = self.vq_layer.flat_decimal_indices(self.vq_layer.get_code_indices(z_s))
+            z_s_idx = self.flat_decimal_indices(self.vq_layer.get_code_indices(z_s))
             return torch.cat((z_c_idx, z_s_idx), -1)
         else:
             return torch.cat((z_c_idx, z_s), -1)

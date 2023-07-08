@@ -10,6 +10,7 @@ CONFIG = {
     'multi_num_embeddings': None,
     'latent_code_2': 0,
     'embedding_dim': 8,
+    'is_plot_zc_value': True,
     'embeddings_num': 10,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
@@ -22,7 +23,7 @@ CONFIG = {
     'train_record_path': "Train_record.txt",
     'eval_record_path': "Eval_record.txt",
     'plus_accu_record_path': "plus_eval.txt",
-    'log_interval': 200,
+    'log_interval': 500,
     'eval_interval': 2000,
     'is_save_img': True,
     'batch_size': 128,
@@ -46,7 +47,7 @@ CONFIG = {
     'is_assoc_on_e': True,
     'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
-    'is_switch_digital': True,
+    'is_switch_digital': False,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,

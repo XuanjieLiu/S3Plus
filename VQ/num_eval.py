@@ -32,7 +32,7 @@ def plot_z_against_label(num_z, num_labels, eval_path, eval_helper: EvalHelper =
         axs[i].set_title(f'z{i + 1}')
         axs[i].set(xlabel='Num of Points on the card', xticks=range(0, 18))
         if eval_helper is not None:
-            eval_helper.draw_scatter_point_line(axs[i], i, x, y)
+            eval_helper.draw_scatter_point_line_or_grid(axs[i], i, x, y)
             eval_helper.set_axis(axs[i], i)
         else:
             axs[i].grid(True)

@@ -11,7 +11,7 @@ from dataloader_plus import Dataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *
-from eval_common import EvalHelper
+from eval_common import draw_scatter_point_line
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
@@ -21,8 +21,8 @@ matplotlib.use('AGG')
 MODEL_PATH = 'curr_model.pt'
 EVAL_ROOT = 'eval_z'
 
-
 MIN_KS_NUM = 1
+
 
 class EncZ:
     def __init__(self, label, z):
@@ -40,30 +40,69 @@ def parse_label(label):
     return int(label.split('.')[0].split('-')[1])
 
 
-def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
-    ks_mean, _ = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+# def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
+#     ks_mean, _ = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+#     dim_z = all_enc_z[0].z.size(0)
+#     fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
+#     if dim_z == 1:
+#         axs = [axs]
+#     enc_x = [ob.label for ob in all_enc_z]
+#     plus_x = [ob.label_c for ob in all_plus_z]
+#     for i in range(0, dim_z):
+#         enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
+#         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
+#         axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='Encoder output', facecolors='none', s=60)
+#         axs[i].scatter(plus_x, plus_y, edgecolors='red', label='Plus output', facecolors='none', s=20)
+#         axs[i].set(xlabel='Num of Points on the card', xticks=range(0, max(enc_x) + 1))
+#         if eval_helper is not None:
+#             eval_helper.draw_scatter_point_line(axs[i], i, [*enc_x, *plus_x], [*enc_y, *plus_y])
+#             eval_helper.set_axis(axs[i], i)
+#         else:
+#             axs[i].grid(True)
+#             axs[i].set_title(f"z_c ({i + 1})")
+#     # for ax in axs.flat:
+#     #     ax.label_outer()
+#     plt.legend()
+#     plt.savefig(f'{eval_path}_ks_{ks_mean}.png')
+#     plt.cla()
+#     plt.clf()
+#     plt.close()
+
+
+def plot_plusZ_against_label(
+        all_enc_z,
+        all_plus_z,
+        eval_path,
+        n_rows: int = 1,
+        n_cols: int = -1,
+        is_scatter_lines=False,
+        is_gird=False,
+        sub_title: str = '',
+        y_label: str = '',
+        sub_fig_size=5
+):
     dim_z = all_enc_z[0].z.size(0)
-    fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
-    if dim_z == 1:
-        axs = [axs]
+    n_row = n_rows
+    n_col = dim_z if n_cols == -1 else n_cols
+    fig, axs = plt.subplots(n_row, n_col, sharey='all', sharex='all',
+                            figsize=(n_col * sub_fig_size, n_row * sub_fig_size), squeeze=False)
     enc_x = [ob.label for ob in all_enc_z]
     plus_x = [ob.label_c for ob in all_plus_z]
     for i in range(0, dim_z):
         enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
-        axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='Encoder output', facecolors='none', s=60)
-        axs[i].scatter(plus_x, plus_y, edgecolors='red', label='Plus output', facecolors='none', s=20)
-        axs[i].set(xlabel='Num of Points on the card', xticks=range(0, max(enc_x) + 1))
-        if eval_helper is not None:
-            eval_helper.draw_scatter_point_line(axs[i], i, [*enc_x, *plus_x], [*enc_y, *plus_y])
-            eval_helper.set_axis(axs[i], i)
-        else:
-            axs[i].grid(True)
-            axs[i].set_title(f"z_c ({i + 1})")
-    # for ax in axs.flat:
-    #     ax.label_outer()
+        axs.flat[i].scatter(enc_x, enc_y, edgecolors='blue', label='Encoder output', facecolors='none', s=60)
+        axs.flat[i].scatter(plus_x, plus_y, edgecolors='red', label='Plus output', facecolors='none', s=20)
+        axs.flat[i].set(xlabel='Num of Points on the card', xticks=range(0, max(enc_x) + 1))
+        axs.flat[i].set(ylabel=y_label)
+        axs.flat[i].set_title(f"{sub_title} ({i + 1})")
+        axs.flat[i].grid(is_gird)
+        if is_scatter_lines:
+            draw_scatter_point_line(axs.flat[i], [*enc_x, *plus_x], [*enc_y, *plus_y])
+    for ax in axs.flat:
+        ax.label_outer()
     plt.legend()
-    plt.savefig(f'{eval_path}_ks_{ks_mean}.png')
+    plt.savefig(f'{eval_path}.png')
     plt.cla()
     plt.clf()
     plt.close()
@@ -91,7 +130,7 @@ class LabelKs:
         assert len(self.enc_z_list) != 0, f"enc_z_list of card {self.label} is empty."
         mode_enc = stats.mode(self.enc_z_list, keepdims=False)[0]
         correct = len(list(filter(lambda x: x == mode_enc, self.plus_z_list)))
-        accu = correct/total
+        accu = correct / total
         return accu
 
 
@@ -99,7 +138,7 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
     min_label = min(enc_z, key=lambda x: x.label).label
     max_label = max(enc_z, key=lambda x: x.label).label
     label_dict = {}
-    for i in range(min_label, max_label+1):
+    for i in range(min_label, max_label + 1):
         label_dict[i] = LabelKs(i)
     for item in enc_z:
         label_dict[item.label].enc_z_list.append(item.z.cpu().item())
@@ -172,7 +211,6 @@ class VQvaePlusEval:
     def eval(self, eval_path):
         all_enc_z, all_plus_z = self.load_plusZ_eval_data()
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path)
-
 
 # if __name__ == "__main__":
 #     os.makedirs(EVAL_ROOT, exist_ok=True)

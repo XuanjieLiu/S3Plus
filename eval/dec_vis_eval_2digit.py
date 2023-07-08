@@ -16,6 +16,7 @@ from shared import *
 import os
 from importlib import reload
 from VQ.num_eval import load_enc_eval_data
+from functools import reduce
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 RECORD_ROOT = os.path.join(CURR_DIR, "dec_vis_eval_2digit")
@@ -37,7 +38,7 @@ class ExpGroup:
         self.check_point = check_point
         result_name = f'{check_point}.{result_path}'
         self.result_path = os.path.join(RECORD_ROOT, result_name)
-        self.model, self.digit_num, self.emb_dim, self.dict_size, self.eval_loader_1 = self.init_model()
+        self.model, self.digit_num, self.emb_dim, self.dict_size, self.eval_loader_1, self.multi_num_embeddings = self.init_model()
 
     def init_model(self):
         tar_exp_path = os.path.join(self.exp_root, self.exp_name)
@@ -54,9 +55,10 @@ class ExpGroup:
         digit_num = t_config.CONFIG['latent_embedding_1']
         emb_dim = t_config.CONFIG['embedding_dim']
         dict_size = t_config.CONFIG['embeddings_num']
+        multi_num_embeddings = t_config['multi_num_embeddings']
         eval_set_1 = SingleImgDataset(t_config.CONFIG['eval_path_1'])
         eval_loader_1 = DataLoader(eval_set_1, batch_size=32)
-        return model, digit_num, emb_dim, dict_size, eval_loader_1
+        return model, digit_num, emb_dim, dict_size, eval_loader_1, multi_num_embeddings
 
     def run_eval(self):
         num_z, num_labels = load_enc_eval_data(
@@ -67,30 +69,38 @@ class ExpGroup:
             )
         )
         enc_flat_z = [int(t.item()) for t in num_z]
-        plot_dec_img(self.model, self.dict_size, self.digit_num, self.emb_dim, self.result_path, enc_flat_z, num_labels)
+        plot_dec_img(self.model, self.dict_size, self.digit_num, self.result_path, enc_flat_z, num_labels, self.multi_num_embeddings)
 
 
-def flat_idx_list(dict_size, digit_num):
-    total_decimal_num = list(range(0, pow(dict_size, digit_num)))
-    total_digit_num = [decimal_to_base(i, dict_size) for i in total_decimal_num]
+def idx_list(dict_size_list: List[int]):
+    total_decimal_num = list(range(0, reduce(lambda x, y: x * y, dict_size_list)))
+    total_digit_num = [decimal_to_base(i, dict_size_list[1]) for i in total_decimal_num]
     for i in range(0, len(total_digit_num)):
-        while len(total_digit_num[i]) < digit_num:
+        while len(total_digit_num[i]) < len(dict_size_list):
             total_digit_num[i] = f'0{total_digit_num[i]}'
     total_digit_num_list = [[int(i) for i in j] for j in total_digit_num]
-    flat_list = [num for sublist in total_digit_num_list for num in sublist]
-    return flat_list
+    return total_digit_num_list
 
 
-def plot_dec_img(loaded_model: VQVAE, dict_size: int, digit_num: int, emb_dim: int, save_path: str, enc_flat_z, enc_labels):
-    flat_idx = torch.tensor(flat_idx_list(dict_size, digit_num), dtype=torch.int).to(DEVICE)
-    flat_emb = loaded_model.vq_layer.quantize(flat_idx)
-    total_img = pow(dict_size, digit_num)
-    total_img_dim = digit_num * emb_dim
-    emb = flat_emb.reshape(total_img, total_img_dim).detach()
+def plot_dec_img(
+        loaded_model: VQVAE,
+        dict_size: int,
+        digit_num: int,
+        save_path: str,
+        enc_flat_z,
+        enc_labels,
+        dict_sizes: List[int] = None
+):
+    if dict_sizes is None:
+        dict_size_list = [dict_size for i in range(digit_num)]
+    else:
+        dict_size_list = dict_sizes
+    idx = torch.tensor(idx_list(dict_size_list), dtype=torch.int).to(DEVICE)
+    emb = loaded_model.vq_layer.quantize(idx).detach()
     imgs = loaded_model.batch_decode_from_z(emb).detach()
-    n_row = 1 if digit_num == 1 else dict_size
-    imgs2D = imgs.reshape(n_row, dict_size, *imgs.size()[1:])
-    print(flat_idx)
+    n_row = dict_size_list[0]
+    n_col = dict_size_list[1]
+    imgs2D = imgs.reshape(n_row, n_col, *imgs.size()[1:])
     tensor2imgs(imgs2D, save_path, enc_flat_z, enc_labels)
 
 
@@ -105,7 +115,7 @@ def tensor2imgs(imgs, save_path, enc_flat_z, enc_labels):
             axs[i, j].set(xlabel=f"{j}")
             axs[i, j].set_xticks([])
             axs[i, j].set_yticks([])
-            label_enc(i, j, axs[i, j], enc_flat_z, enc_labels, n_row)
+            label_enc(i, j, axs[i, j], enc_flat_z, enc_labels, n_col)
     for ax in axs.flat:
         ax.label_outer()
     plt.suptitle("View from decoder")
