@@ -54,28 +54,28 @@ from epoch_compare import EpochCompareGroup, plot_graph
 
 
 eg1 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim2_[0-20]",
-    exp_alias='10*10, 2dim',
+    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim2_[0-20]",
+    exp_alias='100*1, 2dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim8_[0-20]",
-    exp_alias='10*10, 8dim',
+    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim8_[0-20]",
+    exp_alias='100*1, 8dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim32_[0-20]",
-    exp_alias='10*10, 32dim',
+    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim32_[0-20]",
+    exp_alias='100*1, 32dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 eg4 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim128_[0-20]",
-    exp_alias='10*10, 128dim',
+    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim128_[0-20]",
+    exp_alias='100*1, 128dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
