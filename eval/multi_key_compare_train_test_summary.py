@@ -36,39 +36,34 @@ import numpy as np
 # exp_groups = [eg1, eg2]
 
 eg1 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim1_[0-20]",
-    exp_alias='10*10, 1dim',
+    exp_name="2023.07.07_[2,10]vq_Zc[2]_Zs[0]_edim1_switch_[1-20]",
+    exp_alias='2*10 (Two codebooks), 1dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim2_[0-20]",
-    exp_alias='10*10, 2dim',
+    exp_name="2023.07.07_[2,10]vq_Zc[2]_Zs[0]_edim2_switch_[1-20]",
+    exp_alias='2*10 (Two codebooks), 2dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim8_[0-20]",
-    exp_alias='10*10, 8dim',
+    exp_name="2023.07.07_[2,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]",
+    exp_alias='2*10 (Two codebooks), 8dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg4 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim32_[0-20]",
-    exp_alias='10*10, 32dim',
+    exp_name="2023.07.07_[2,10]vq_Zc[2]_Zs[0]_edim32_switch_[1-20]",
+    exp_alias='2*10 (Two codebooks), 32dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
-eg5 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim128_[0-20]",
-    exp_alias='10*10, 128dim',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-exp_groups = [eg1, eg2, eg3, eg4, eg5]
+
+exp_groups = [eg1, eg2, eg3, eg4]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
