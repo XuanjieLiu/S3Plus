@@ -36,7 +36,7 @@ import numpy as np
 # exp_groups = [eg1, eg2]
 
 eg1 = ExpGroup(
-    exp_name="22023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim1_switch_[1-20]",
+    exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim1_switch_[1-20]",
     exp_alias='10*10 (Two codebooks), 1dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
