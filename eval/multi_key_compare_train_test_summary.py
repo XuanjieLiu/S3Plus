@@ -35,34 +35,40 @@ import numpy as np
 # )
 # exp_groups = [eg1, eg2]
 
-
 eg1 = ExpGroup(
+    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim1_[0-20]",
+    exp_alias='100*1, 1dim',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg2 = ExpGroup(
     exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim2_[0-20]",
     exp_alias='100*1, 2dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
-eg2 = ExpGroup(
+eg3 = ExpGroup(
     exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim8_[0-20]",
     exp_alias='100*1, 8dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
-eg3 = ExpGroup(
+eg4 = ExpGroup(
     exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim32_[0-20]",
     exp_alias='100*1, 32dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
-eg4 = ExpGroup(
+eg5 = ExpGroup(
     exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim128_[0-20]",
     exp_alias='100*1, 128dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
-exp_groups = [eg1, eg2, eg3, eg4]
+exp_groups = [eg1, eg2, eg3, eg4, eg5]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
