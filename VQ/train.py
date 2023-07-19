@@ -128,6 +128,7 @@ class PlusTrainer:
         self.is_switch_digital = config['is_switch_digital']
         self.is_assoc_within_batch = config['is_assoc_within_batch']
         self.is_plot_zc_value = config['is_plot_zc_value']
+        self.is_plot_vis_num = config['is_plot_vis_num']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -240,7 +241,7 @@ class PlusTrainer:
         z_eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')
         plot_z_against_label(num_z, num_labels, z_eval_path, self.eval_help)
 
-        if self.latent_embedding_1 == 2:
+        if self.latent_embedding_1 == 2 and self.is_plot_vis_num:
             vis_eval_path = os.path.join(self.eval_result_path, f'{epoch_num}_numVis.png')
             enc_flat_z = [int(t.item()) for t in num_z]
             plot_dec_img(
