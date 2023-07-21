@@ -10,7 +10,7 @@ CONFIG = {
     'multi_num_embeddings': None,
     'latent_code_2': 0,
     'embedding_dim': 1,
-    'is_plot_zc_value': False,
+    'is_plot_zc_value': True,
     'embeddings_num': 10,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
