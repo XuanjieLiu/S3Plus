@@ -12,6 +12,7 @@ CONFIG = {
     'embedding_dim': 2,
     'is_plot_zc_value': True,
     'embeddings_num': 100,
+    'is_plot_vis_num': False,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
