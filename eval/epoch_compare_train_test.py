@@ -37,49 +37,50 @@ from epoch_compare import EpochCompareGroup, plot_graph
 
 
 
-# eg1 = ExpGroup(
-#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-# exp_groups = [eg1, eg2]
-
-
 eg1 = ExpGroup(
-    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim2_[0-20]",
-    exp_alias='100*1, 2dim',
+    exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]",
+    exp_alias='w/ associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim8_[0-20]",
-    exp_alias='100*1, 8dim',
+    exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]_noAssoc",
+    exp_alias='w/o associative loss',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
+exp_groups = [eg1, eg2]
 
-eg3 = ExpGroup(
-    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim32_[0-20]",
-    exp_alias='100*1, 32dim',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-eg4 = ExpGroup(
-    exp_name="2023.07.09_100vq_Zc[1]_Zs[0]_edim128_[0-20]",
-    exp_alias='100*1, 128dim',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-exp_groups = [eg1, eg2, eg3, eg4]
+# eg1 = ExpGroup(
+#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim1_switch_[1-20]",
+#     exp_alias='10*10 (Two codebooks), 1dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim2_switch_[1-20]",
+#     exp_alias='10*10 (Two codebooks), 2dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim8_switch_[1-20]",
+#     exp_alias='10*10 (Two codebooks), 8dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg4 = ExpGroup(
+#     exp_name="2023.07.09_[10,10]vq_Zc[2]_Zs[0]_edim32_switch_[1-20]",
+#     exp_alias='10*10 (Two codebooks), 32dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# exp_groups = [eg1, eg2, eg3, eg4]
 
 
 # KEYS = ['train_accu', 'eval_accu']
