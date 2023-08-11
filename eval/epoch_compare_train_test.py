@@ -38,28 +38,28 @@ from epoch_compare import EpochCompareGroup, plot_graph
 
 eg1 = ExpGroup(
     exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim1_[0-20]",
-    exp_alias='10*10 (Two codebooks), 1dim',
+    exp_alias='5*5*5, 1dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
     exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim2_[0-20]",
-    exp_alias='10*10 (Two codebooks), 2dim',
+    exp_alias='5*5*5, 2dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
     exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim8_[0-20]",
-    exp_alias='10*10 (Two codebooks), 8dim',
+    exp_alias='5*5*5, 8dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg4 = ExpGroup(
     exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim32_[0-20]",
-    exp_alias='10*10 (Two codebooks), 32dim',
+    exp_alias='5*5*5, 32dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
