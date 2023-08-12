@@ -57,11 +57,11 @@ CONFIG = {
             'first_ch_num': 16,
         },
         'enc_fc': {
-            'n_units': 512,
+            'n_units': 128,
             'n_hidden_layers': 2,
         },
         'plus': {
-            'plus_unit': 128,
+            'plus_unit': 512,
             'n_hidden_layers': 2,
         }
     },

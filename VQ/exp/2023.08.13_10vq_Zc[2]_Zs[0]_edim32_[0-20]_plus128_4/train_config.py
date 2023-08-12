@@ -58,11 +58,11 @@ CONFIG = {
         },
         'enc_fc': {
             'n_units': 128,
-            'n_hidden_layers': 4,
+            'n_hidden_layers': 2,
         },
         'plus': {
             'plus_unit': 128,
-            'n_hidden_layers': 2,
+            'n_hidden_layers': 4,
         }
     },
 }
