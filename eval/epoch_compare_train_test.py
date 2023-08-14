@@ -37,28 +37,40 @@ from epoch_compare import EpochCompareGroup, plot_graph
 # exp_groups = [eg1, eg2]
 
 eg1 = ExpGroup(
-    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus512_0",
-    exp_alias='plus net 512 * 0',
+    exp_name="2023.08.09_2vq_Zc[6]_Zs[0]_edim1_[0-20]",
+    exp_alias='2^6 (64)',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus512_1",
-    exp_alias='plus net 512 * 1',
+    exp_name="2023.08.09_2vq_Zc[7]_Zs[0]_edim1_[0-20]",
+    exp_alias='2^7 (128)',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus512_2",
-    exp_alias='plus net 512 * 2',
+    exp_name="2023.08.09_3vq_Zc[4]_Zs[0]_edim1_[0-20]",
+    exp_alias='3^4 (81)',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
+eg4 = ExpGroup(
+    exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim1_[0-20]",
+    exp_alias='5^3 (125)',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
 
-exp_groups = [eg1, eg2, eg3]
+eg5 = ExpGroup(
+    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim1_[0-20]",
+    exp_alias='10^2 (100)',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+exp_groups = [eg1, eg2, eg3, eg4, eg5]
 
 
 
