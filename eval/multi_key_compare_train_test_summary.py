@@ -36,36 +36,36 @@ import numpy as np
 # exp_groups = [eg1, eg2]
 
 eg1 = ExpGroup(
-    exp_name="2023.08.09_2vq_Zc[6]_Zs[0]_edim1_[0-20]",
-    exp_alias='2^6 (64)',
+    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus1024_0",
+    exp_alias='plus_net 1024_0',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.08.09_2vq_Zc[7]_Zs[0]_edim1_[0-20]",
-    exp_alias='2^7 (128)',
+    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus1024_1",
+    exp_alias='plus_net 1024_1',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.08.09_3vq_Zc[4]_Zs[0]_edim1_[0-20]",
-    exp_alias='3^4 (81)',
+    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus1024_2",
+    exp_alias='plus_net 1024_2',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg4 = ExpGroup(
-    exp_name="2023.08.09_5vq_Zc[3]_Zs[0]_edim1_[0-20]",
-    exp_alias='5^3 (125)',
+    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus1024_3",
+    exp_alias='plus_net 1024_3',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg5 = ExpGroup(
-    exp_name="2023.07.09_10vq_Zc[2]_Zs[0]_edim1_[0-20]",
-    exp_alias='10^2 (100)',
+    exp_name="2023.08.13_10vq_Zc[2]_Zs[0]_edim32_[0-20]_plus1024_4",
+    exp_alias='plus_net 1024_4',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
