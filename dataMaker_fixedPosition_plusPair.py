@@ -106,6 +106,10 @@ def sum_pairs(max_number):
         b = max_number - a
         yield a, b
 
+# def minus_pairs(max_number):
+#     for a in
+
+
 
 
 if __name__ == "__main__":
