@@ -2,17 +2,17 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)/train",
+    'train_data_path': f"{data_root}/multi_style_(4,4)_pairs_plus(0,20)/train",
     'eval_path_1': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'eval_path_2': f"{data_root}/single_style_pairs(0,20)/test",
-    'latent_embedding_1': 1,
+    'eval_path_2': f"{data_root}/multi_style_(4,4)_pairs_plus(0,20)/test",
+    'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
+    'latent_code_2': 12,
+    'embedding_dim': 12,
+    'is_plot_zc_value': False,
+    'embeddings_num': 10,
     'is_plot_vis_num': False,
-    'latent_code_2': 0,
-    'embedding_dim': 8,
-    'is_plot_zc_value': True,
-    'embeddings_num': 100,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
@@ -61,7 +61,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         },
         'plus': {
-            'plus_unit': 128,
+            'plus_unit': 1024,
             'n_hidden_layers': 2,
         }
     },

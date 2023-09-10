@@ -2,9 +2,10 @@ import random
 import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
-from typing import List
+from typing import List, Iterable
 from dataMaker_commonFunc import *
 from tqdm import tqdm
+import torch
 
 matplotlib.use('AGG')
 from scipy.spatial import distance
@@ -18,12 +19,15 @@ DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
 
 NUM_RAN = (0, 20)
-SINGLE_STYLE_DATA_ROOT = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_PLUS = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_MINUS = f'dataset/single_style_pairs_minus({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_MOD = f'dataset/single_style_pairs_mod({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_DIVISION = f'dataset/single_style_pairs_division({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_MARKERS = ['o']
 SINGLE_COLOR = ['blue']
 
 
-def draw_plus_data(i, j, mar, color, data_path):
+def draw_data(i, j, mar, color, data_path, compositional_func):
     os.makedirs(data_path, exist_ok=True)
     plot_a_scatter(
         POSITIONS[i],
@@ -35,24 +39,52 @@ def draw_plus_data(i, j, mar, color, data_path):
         save_dir=os.path.join(data_path, f'b-{j}'),
         marker=mar, color=color, is_fill=j != 0
     )
+    result = compositional_func(i, j)
+    print(f'i={i}, j={j}, k={result}')
     plot_a_scatter(
-        POSITIONS[i + j],
-        save_dir=os.path.join(data_path, f'c-{i + j}'),
-        marker=mar, color=color, is_fill=i+j != 0
+        POSITIONS[result],
+        save_dir=os.path.join(data_path, f'c-{result}'),
+        marker=mar, color=color, is_fill=result != 0
     )
 
 
-def make_train_dataset_n2(numbers, markers, colors, dataset_path):
-    data_root = os.path.join(dataset_path, 'train')
-    os.makedirs(data_root, exist_ok=True)
-    for i in numbers:
-        for j in range(i, numbers[-1]+1):
-            for mar in markers:
-                for color in colors:
-                    data_name = f'{i}-{j}-{MARK_NAME_SPACE[mar]}-{color}'
-                    data_path = os.path.join(data_root, data_name)
-                    os.makedirs(data_path, exist_ok=True)
-                    draw_plus_data(i, j, mar, color, data_path)
+def data_name_2_labels(data: Iterable):
+    return torch.LongTensor([int(x.split('.')[0].split('-')[1]) for x in data])
+
+
+def data_name_2_one_hot(data: Iterable, num_class=-1):
+    labels = data_name_2_labels(data)
+    return torch.nn.functional.one_hot(labels, num_class)
+
+
+def comp_plus(a, b):
+    return a + b
+
+
+def comp_minus(a, b):
+    return a - b
+
+
+def comp_mod(a, b):
+    return a % b
+
+
+def comp_division(a, b):
+    return int(a / b)
+
+
+
+# def make_train_dataset_n2(numbers, markers, colors, dataset_path):
+#     data_root = os.path.join(dataset_path, 'train')
+#     os.makedirs(data_root, exist_ok=True)
+#     for i in numbers:
+#         for j in range(i, numbers[-1]+1):
+#             for mar in markers:
+#                 for color in colors:
+#                     data_name = f'{i}-{j}-{MARK_NAME_SPACE[mar]}-{color}'
+#                     data_path = os.path.join(data_root, data_name)
+#                     os.makedirs(data_path, exist_ok=True)
+#                     draw_data(i, j, mar, color, data_path)
 
 
 class PairData:
@@ -64,10 +96,7 @@ class PairData:
         self.path = path
 
 
-def make_train_test_dataset_maxN(min_number, max_number, min_sample_num, sample_rate, markers, colors, data_root):
-    os.makedirs(data_root, exist_ok=True)
-    train_root = os.path.join(data_root, 'train')
-    test_root = os.path.join(data_root, 'test')
+def make_train_test_datapair_maxN(min_number, max_number, min_sample_num, sample_rate, markers, colors, pair_func):
     train_set = []
     test_set = []
     for mar in markers:
@@ -77,27 +106,46 @@ def make_train_test_dataset_maxN(min_number, max_number, min_sample_num, sample_
                 all_idx = [x for x in range(min_number, i+1)]
                 sample_num = min(i+1, max(min_sample_num, int(round(i * sample_rate, 0))))
                 train_idx = random.sample(all_idx, sample_num)
-                for a, b in sum_pairs(i):
+                for a, b in pair_func(i):
                     data.append(PairData(a, b, mar, color))
                 for x in all_idx:
                     if x in train_idx:
                         train_set.append(data[x])
                     else:
                         test_set.append(data[x])
-    render_dataset(train_set, train_root)
-    render_dataset(test_set, test_root)
+    return train_set, test_set
 
 
-def render_dataset(data_list: List[PairData], data_root: str):
+def make_train_test_datapair_division(min_number, max_number, sample_rate, markers, colors, pair_func):
+    train_set = []
+    test_set = []
+    for mar in markers:
+        for color in colors:
+            for i in range(min_number, max_number+1):
+                data = []
+                for a, b in pair_func(i):
+                    data.append(PairData(a, b, mar, color))
+                all_idx = range(0, len(data))
+                sample_num = int(round(len(all_idx) * sample_rate, 0))
+                train_idx = random.sample(all_idx, sample_num)
+                for x in all_idx:
+                    if x in train_idx:
+                        train_set.append(data[x])
+                    else:
+                        test_set.append(data[x])
+    return train_set, test_set
+
+
+def render_dataset(data_list: List[PairData], data_root: str, compositional_func):
     for data in tqdm(data_list, desc=data_root):
         a = data.a
         b = data.b
         color = data.color
         marker = data.marker
-        data_name = f'{a}-{b}-{marker}-{color}'
+        data_name = f'{a}-{b}-{MARK_NAME_SPACE[marker]}-{color}'
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
-        draw_plus_data(a, b, marker, color, data_path)
+        draw_data(a, b, marker, color, data_path, compositional_func)
 
 
 
@@ -106,12 +154,107 @@ def sum_pairs(max_number):
         b = max_number - a
         yield a, b
 
-# def minus_pairs(max_number):
-#     for a in
+def minus_pairs(max_number):
+    for a in range(0, max_number + 1):
+        yield max_number, a
+
+def mod_pairs(a):
+    min_div_num = 1
+    max_div_num = NUM_RAN[1] + 1
+    for i in range(min_div_num, max_div_num):
+        yield a, i
 
 
+def make_dataset_single_style_plus():
+    data_root = SINGLE_STYLE_DATA_ROOT_PLUS
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        3,
+        0.33,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        sum_pairs,
+
+    )
+    render_dataset(train_set, train_root, comp_plus)
+    render_dataset(test_set, test_root, comp_plus)
+
+
+def make_dataset_single_style_minus():
+    data_root = SINGLE_STYLE_DATA_ROOT_MINUS
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        3,
+        0.7,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        minus_pairs,
+    )
+    render_dataset(train_set, train_root, comp_minus)
+    render_dataset(test_set, test_root, comp_minus)
+
+def make_dataset_single_style_mod():
+    data_root = SINGLE_STYLE_DATA_ROOT_MOD
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_division(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        0.7,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        mod_pairs,
+    )
+    render_dataset(train_set, train_root, comp_mod)
+    render_dataset(test_set, test_root, comp_mod)
+
+def make_dataset_single_style_division():
+    data_root = SINGLE_STYLE_DATA_ROOT_DIVISION
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_division(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        0.7,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        mod_pairs,
+    )
+    render_dataset(train_set, train_root, comp_division)
+    render_dataset(test_set, test_root, comp_division)
+
+
+def make_dataset_multi_style_plus():
+    marks = ['s', 'o', 'v', 'd']
+    colors = ['purple', 'salmon', 'olive', 'blue']
+    data_root = f'dataset/multi_style_({len(marks)},{len(colors)})_pairs_plus({NUM_RAN[0]},{NUM_RAN[1]})'
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        3,
+        0.33,
+        marks,
+        colors,
+        sum_pairs,
+    )
+    render_dataset(train_set, train_root, comp_plus)
+    render_dataset(test_set, test_root, comp_plus)
 
 
 if __name__ == "__main__":
+    make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    make_train_test_dataset_maxN(NUM_RAN[0], NUM_RAN[1], 3, 0.33, SINGLE_MARKERS, SINGLE_COLOR, SINGLE_STYLE_DATA_ROOT)
+    # make_dataset_single_style_minus()
