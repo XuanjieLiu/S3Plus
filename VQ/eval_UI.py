@@ -1,5 +1,6 @@
 import tkinter
-
+from importlib import reload
+import sys
 from dataMaker_commonFunc import plot_a_scatter, POSITIONS
 from VQVAE import VQVAE
 from train_config12 import CONFIG
@@ -11,19 +12,35 @@ import torch
 from torchvision import transforms
 from shared import DEVICE
 
+EXP_path = '2023.09.10_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2'
+SUB_EXP = '1'
+MODEL_PATH = 'checkpoint_40000.pt'
 
+EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 RANGE = (3.0, -2.5)
 TICK_INTERVAL = 0.05
 CODE_LEN = CONFIG['latent_code_1']+CONFIG['latent_code_2']
-IMG_PATH = 'eval_decoder-ImgBuffer'
+IMG_PATH = 'eval_decoder_ImgBuffer'
 IGM_NAME = IMG_PATH + "/test.png"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MODEL_PATH = 'checkpoint_30000.pt'
-
 COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
 NUMBERS = range(1, 17)
-MARKERS = ['o', 'v', '*', 'd']
+MARKERS = ['o', 'v', 's', 'd']
+
+
+def find_config():
+    exp_path = os.path.join(EXP_ROOT_PATH, EXP_path)
+    os.chdir(exp_path)
+    sys.path.append(exp_path)
+    print(f'Exp path: {exp_path}')
+    t_config = __import__('train_config')
+    reload(t_config)
+    sys.path.pop()
+    print(t_config.CONFIG)
+    sub_exp_path = os.path.join(exp_path, SUB_EXP)
+    os.chdir(sub_exp_path)
+    return t_config.CONFIG
 
 
 def init_codes():

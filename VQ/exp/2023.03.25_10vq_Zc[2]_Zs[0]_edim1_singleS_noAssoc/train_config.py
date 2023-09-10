@@ -7,6 +7,7 @@ CONFIG = {
     'eval_path_2': f"{data_root}/single_style_pairs/test",
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
+    'multi_num_embeddings': None,
     'latent_code_2': 0,
     'embedding_dim': 1,
     'embeddings_num': 10,

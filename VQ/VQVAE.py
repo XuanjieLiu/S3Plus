@@ -344,6 +344,12 @@ class VQVAE(nn.Module):
         """从文件读取 tensor 对象"""
         return torch.load(path)
 
+    def index2z(self, idx):
+        if self.multi_num_embeddings is not None:
+            print("error. multi_num_embeddings not implemented")
+            exit(0)
+
+
 
     def forward(self, x):
         print("forward not implemented")
