@@ -116,6 +116,30 @@ def make_train_test_datapair_maxN(min_number, max_number, min_sample_num, sample
     return train_set, test_set
 
 
+def make_train_test_datapair_maxN_no_leak(min_number, max_number, min_sample_num, sample_rate, markers, colors, pair_func):
+    train_set = []
+    test_set = []
+    for i in range(min_number, max_number+1):
+        all_idx = []
+        base = 0
+        for a, b in pair_func(i):
+            all_idx.append(base)
+            base += 1
+        sample_num = min(i+1, max(min_sample_num, int(round(i * sample_rate, 0))))
+        train_idx = random.sample(all_idx, sample_num)
+        for mar in markers:
+            for color in colors:
+                data = []
+                for a, b in pair_func(i):
+                    data.append(PairData(a, b, mar, color))
+                for x in all_idx:
+                    if x in train_idx:
+                        train_set.append(data[x])
+                    else:
+                        test_set.append(data[x])
+    return train_set, test_set
+
+
 def make_train_test_datapair_division(min_number, max_number, sample_rate, markers, colors, pair_func):
     train_set = []
     test_set = []
@@ -237,11 +261,11 @@ def make_dataset_single_style_division():
 def make_dataset_multi_style_plus():
     marks = ['s', 'o', 'v', 'd']
     colors = ['purple', 'salmon', 'olive', 'blue']
-    data_root = f'dataset/multi_style_({len(marks)},{len(colors)})_pairs_plus({NUM_RAN[0]},{NUM_RAN[1]})'
+    data_root = f'dataset/multi_style_({len(marks)},{len(colors)})_realPairs_plus({NUM_RAN[0]},{NUM_RAN[1]})'
     os.makedirs(data_root, exist_ok=True)
     train_root = os.path.join(data_root, 'train')
     test_root = os.path.join(data_root, 'test')
-    train_set, test_set = make_train_test_datapair_maxN(
+    train_set, test_set = make_train_test_datapair_maxN_no_leak(
         NUM_RAN[0],
         NUM_RAN[1],
         3,

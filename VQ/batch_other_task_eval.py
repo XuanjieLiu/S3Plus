@@ -2,8 +2,7 @@ import sys
 import os
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
-from train import is_need_train
-from other_task_eval import OtherTask
+from other_task_eval import OtherTask, is_need_train
 
 if len(sys.argv) < 2:
     print("Usage: python myscript.py arg1 arg2 ...")

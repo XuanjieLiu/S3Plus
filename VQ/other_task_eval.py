@@ -14,6 +14,22 @@ from train import split_into_three
 from dataMaker_fixedPosition_plusPair import data_name_2_labels
 
 
+
+def name_appd(name: str, path:str):
+    return f'{name}_{path}'
+
+def is_need_train(train_config):
+    loss_counter = LossCounter([])
+    train_record_path = train_config['train_record_path']
+    task_name = task_name = train_config['task_name']
+    iter_num = loss_counter.load_iter_num(name_appd(task_name, train_record_path))
+    if train_config['max_iter_num'] > iter_num:
+        print("Continue training")
+        return True
+    else:
+        print("No more training is needed")
+        return False
+
 class OtherTask:
     def __init__(self, train_config, other_task_config):
         self.other_task_config = other_task_config
@@ -22,14 +38,15 @@ class OtherTask:
         self.latent_code_1 = self.pretrained.latent_code_1
         self.num_class = other_task_config['num_class']
         self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
-        self.fc_model_path = other_task_config['fc_model_path']
+        task_name = other_task_config['task_name']
+        self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
         train_set = Dataset(other_task_config['train_data_path'])
         eval_set = Dataset(other_task_config['eval_data_path'])
         self.batch_size = other_task_config['batch_size']
         self.train_loader = DataLoader(train_set, batch_size=self.batch_size)
         self.eval_loader = DataLoader(eval_set, batch_size=self.batch_size)
-        self.train_result_path = other_task_config['train_record_path']
-        self.eval_result_path = other_task_config['eval_record_path']
+        self.train_result_path = name_appd(task_name, other_task_config['train_record_path'])
+        self.eval_result_path = name_appd(task_name, other_task_config['eval_record_path'])
         self.learning_rate = other_task_config['learning_rate']
         self.max_iter_num = other_task_config['max_iter_num']
         self.log_interval = other_task_config['log_interval']
