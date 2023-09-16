@@ -17,7 +17,7 @@ CONFIG = {
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 12001,
+    'max_iter_num': 50001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'eval_result_path': 'EvalResults/',

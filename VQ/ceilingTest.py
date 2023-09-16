@@ -45,7 +45,7 @@ class DiyCodebook:
         for i in range(0, pow(self.dim_size, self.n_dim)):
             trans_num = decimal_to_base(i, self.dim_size)
             num_str = add_len(trans_num, self.n_dim)
-            
+
 
 
 
