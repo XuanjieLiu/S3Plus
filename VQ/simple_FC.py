@@ -14,14 +14,26 @@ class SimpleFC(nn.Module):
              nn.ReLU()],
             n_fc_layers - 1
         )
-        self.fc_net = nn.Sequential(
+        self.classify_fc_net = nn.Sequential(
             nn.Linear(input_dim, plus_unit),
             nn.ReLU(),
             *plus_hiddens,
             nn.Linear(plus_unit, output_dim),
         ) if n_fc_layers > 0 else nn.Linear(input_dim, output_dim)
 
-    def composition(self, z_a, z_b):
+        self.recon_fc_net = nn.Sequential(
+            nn.Linear(input_dim, plus_unit),
+            nn.ReLU(),
+            *plus_hiddens,
+            nn.Linear(plus_unit, int(input_dim/2)),
+        ) if n_fc_layers > 0 else nn.Linear(input_dim, int(input_dim/2))
+
+    def classify_composition(self, z_a, z_b):
         comb = torch.cat((z_a, z_b), dim=-1)
-        z_comp = self.fc_net(comb)
+        z_comp = self.classify_fc_net(comb)
+        return z_comp
+
+    def recon_composition(self, z_a, z_b):
+        comb = torch.cat((z_a, z_b), dim=-1)
+        z_comp = self.recon_fc_net(comb)
         return z_comp

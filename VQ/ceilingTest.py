@@ -6,14 +6,13 @@ from shared import *
 import os
 import random
 import sys
-
 from torch import optim
 from simple_FC import SimpleFC
 from dataloader_plus import Dataset
 from torch.utils.data import DataLoader
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
-
+from dataMaker_fixedPosition_plusPair import data_name_2_labels
 
 def decimal_to_base(n, base):
     if not 2 <= base <= 36:
@@ -98,7 +97,7 @@ def name_appd(name: str, path:str):
 def is_need_train(train_config):
     loss_counter = LossCounter([])
     train_record_path = train_config['train_record_path']
-    task_name = task_name = train_config['task_name']
+    task_name = train_config['task_name']
     iter_num = loss_counter.load_iter_num(name_appd(task_name, train_record_path))
     if train_config['max_iter_num'] > iter_num:
         print("Continue training")
@@ -107,27 +106,29 @@ def is_need_train(train_config):
         print("No more training is needed")
         return False
 
-class OtherTask:
-    def __init__(self, other_task_config):
-        self.other_task_config = other_task_config
-        self.num_dim = other_task_config['num_dim']
-        self.dim_size = other_task_config['dim_size']
+class CeilTester:
+    def __init__(self, ceiling_test_config):
+        self.other_task_config = ceiling_test_config
+        self.num_dim = ceiling_test_config['num_dim']
+        self.dim_size = ceiling_test_config['dim_size']
         self.diy_book = DiyCodebook(self.num_dim, self.dim_size)
-        self.num_class = other_task_config['num_class']
-        self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.num_dim*2, self.num_class).to(DEVICE)
-        task_name = other_task_config['task_name']
-        self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
-        train_set = Dataset(other_task_config['train_data_path'])
-        eval_set = Dataset(other_task_config['eval_data_path'])
-        self.batch_size = other_task_config['batch_size']
+        self.book = self.diy_book.choose_book[ceiling_test_config['book_type']]
+        self.num_class = ceiling_test_config['num_class']
+        self.simple_fc = SimpleFC(ceiling_test_config['fc_network_config'], self.num_dim * 2, self.num_class).to(DEVICE)
+        task_name = ceiling_test_config['task_name']
+        self.fc_model_path = name_appd(task_name, ceiling_test_config['fc_model_path'])
+        train_set = Dataset(ceiling_test_config['train_data_path'])
+        eval_set = Dataset(ceiling_test_config['eval_data_path'])
+        self.batch_size = ceiling_test_config['batch_size']
         self.train_loader = DataLoader(train_set, batch_size=self.batch_size)
         self.eval_loader = DataLoader(eval_set, batch_size=self.batch_size)
-        self.train_result_path = name_appd(task_name, other_task_config['train_record_path'])
-        self.eval_result_path = name_appd(task_name, other_task_config['eval_record_path'])
-        self.learning_rate = other_task_config['learning_rate']
-        self.max_iter_num = other_task_config['max_iter_num']
-        self.log_interval = other_task_config['log_interval']
+        self.train_result_path = name_appd(task_name, ceiling_test_config['train_record_path'])
+        self.eval_result_path = name_appd(task_name, ceiling_test_config['eval_record_path'])
+        self.learning_rate = ceiling_test_config['learning_rate']
+        self.max_iter_num = ceiling_test_config['max_iter_num']
+        self.log_interval = ceiling_test_config['log_interval']
         self.CE_loss = torch.nn.CrossEntropyLoss(reduction='mean')
+        self.MSE_loss = torch.nn.MSELoss(reduction='mean')
 
     def resume(self):
         if os.path.exists(self.fc_model_path):
@@ -136,25 +137,15 @@ class OtherTask:
         else:
             print("New FC model is initialized")
 
-    def load_pretrained(self):
-        pretrained = VQVAE(self.train_config).to(DEVICE)
-        pretrained_path = self.other_task_config['pretrained_path']
-        if os.path.exists(pretrained_path):
-            pretrained.load_state_dict(pretrained.load_tensor(pretrained_path))
-            print(f"Pretrained Model is loaded")
-            return pretrained
-        else:
-            print("No pretrained parameters")
-            exit()
-
     def train(self):
-        self.load_pretrained()
         self.simple_fc.train()
         self.resume()
-        train_loss_counter = LossCounter(['loss_z',
-                                          'accu'], self.train_result_path)
-        eval_loss_counter = LossCounter(['loss_z',
-                                         'accu'], self.eval_result_path)
+        train_loss_counter = LossCounter(['loss_classify',
+                                          'accu',
+                                          'loss_recon'], self.train_result_path)
+        eval_loss_counter = LossCounter(['loss_classify',
+                                         'accu',
+                                         'loss_recon'], self.eval_result_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_result_path)
         optimizer = optim.Adam(self.simple_fc.parameters(), lr=self.learning_rate)
         for epoch_num in range(start_epoch, self.max_iter_num):
@@ -168,16 +159,18 @@ class OtherTask:
 
     def fc_comp(self, sample):
         data, labels = sample
-        tensor_y = data_name_2_labels(labels[2]).to(DEVICE)
-        sizes = data[0].size()
-        data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
-        e_all, e_q_loss, z_all = self.pretrained.batch_encode_to_z(data_all)
-        e_content = e_all[..., 0:self.latent_code_1]
-        ec_a, ec_b, ec_c = split_into_three(e_content)
-        ec_ab = self.simple_fc.composition(ec_a, ec_b)
-        loss = self.CE_loss(ec_ab, tensor_y)
-        accu = (ec_ab.argmax(1) == tensor_y).float().mean().item()
-        return ec_ab, tensor_y, loss, accu
+        label_a = data_name_2_labels(labels[0]).to(DEVICE)
+        label_b = data_name_2_labels(labels[1]).to(DEVICE)
+        label_y = data_name_2_labels(labels[2]).to(DEVICE)
+        tensor_a = self.book[label_a, ...]
+        tensor_b = self.book[label_b, ...]
+        tensor_y = self.book[label_y, ...]
+        classify_ab = self.simple_fc.classify_composition(tensor_a, tensor_b)
+        recon_ab = self.simple_fc.recon_composition(tensor_a, tensor_b)
+        loss_classify = self.CE_loss(classify_ab, label_y)
+        loss_recon = self.MSE_loss(recon_ab, tensor_y)
+        accu = (classify_ab.argmax(1) == label_y).float().mean().item()
+        return classify_ab, label_y, loss_classify, loss_recon, accu
 
     def one_epoch(self, epoch_num, loss_counter: LossCounter, data_loader,
                   is_log, optimizer: torch.optim.Optimizer = None):
@@ -185,12 +178,14 @@ class OtherTask:
             print(f'Epoch: {epoch_num}')
             if optimizer is not None:
                 optimizer.zero_grad()
-            ec_ab, tensor_y, loss, accu = self.fc_comp(sample)
+            ec_ab, tensor_y, loss_classify, loss_recon, accu = self.fc_comp(sample)
             loss_counter.add_values([
-                loss.item(),
-                accu
+                loss_classify.item(),
+                accu,
+                loss_recon.item()
             ])
             if optimizer is not None:
+                loss = loss_classify + loss_recon
                 loss.backward()
                 optimizer.step()
         if is_log:
@@ -199,7 +194,8 @@ class OtherTask:
 
 
 if __name__ == "__main__":
-    diy_codebook = DiyCodebook(3, 4)
+    matplotlib.use('tkagg')
+    diy_codebook = DiyCodebook(2, 10)
     print(diy_codebook.dim_points)
     print(diy_codebook.linear_book)
-    diy_codebook.plot_book(diy_codebook.random_book, 4)
+    diy_codebook.plot_book(diy_codebook.linear_book, 2)

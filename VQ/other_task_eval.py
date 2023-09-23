@@ -97,7 +97,7 @@ class OtherTask:
         e_all, e_q_loss, z_all = self.pretrained.batch_encode_to_z(data_all)
         e_content = e_all[..., 0:self.latent_code_1]
         ec_a, ec_b, ec_c = split_into_three(e_content)
-        ec_ab = self.simple_fc.composition(ec_a, ec_b)
+        ec_ab = self.simple_fc.classify_composition(ec_a, ec_b)
         loss = self.CE_loss(ec_ab, tensor_y)
         accu = (ec_ab.argmax(1) == tensor_y).float().mean().item()
         return ec_ab, tensor_y, loss, accu
