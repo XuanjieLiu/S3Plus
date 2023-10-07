@@ -51,6 +51,7 @@ class OtherTask:
         self.max_iter_num = other_task_config['max_iter_num']
         self.log_interval = other_task_config['log_interval']
         self.CE_loss = torch.nn.CrossEntropyLoss(reduction='mean')
+        self.MSE_loss = torch.nn.MSELoss(reduction='mean')
 
     def resume(self):
         if os.path.exists(self.fc_model_path):
@@ -75,9 +76,11 @@ class OtherTask:
         self.simple_fc.train()
         self.resume()
         train_loss_counter = LossCounter(['loss_z',
-                                          'accu'], self.train_result_path)
+                                          'accu',
+                                          'loss_recon'], self.train_result_path)
         eval_loss_counter = LossCounter(['loss_z',
-                                         'accu'], self.eval_result_path)
+                                         'accu',
+                                         'loss_recon'], self.eval_result_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_result_path)
         optimizer = optim.Adam(self.simple_fc.parameters(), lr=self.learning_rate)
         for epoch_num in range(start_epoch, self.max_iter_num):
@@ -97,10 +100,12 @@ class OtherTask:
         e_all, e_q_loss, z_all = self.pretrained.batch_encode_to_z(data_all)
         e_content = e_all[..., 0:self.latent_code_1]
         ec_a, ec_b, ec_c = split_into_three(e_content)
-        ec_ab = self.simple_fc.classify_composition(ec_a, ec_b)
-        loss = self.CE_loss(ec_ab, tensor_y)
-        accu = (ec_ab.argmax(1) == tensor_y).float().mean().item()
-        return ec_ab, tensor_y, loss, accu
+        classify_ab = self.simple_fc.classify_composition(ec_a, ec_b)
+        recon_ab = self.simple_fc.recon_composition(ec_a, ec_b)
+        loss_classify = self.CE_loss(classify_ab, tensor_y)
+        loss_recon = self.MSE_loss(recon_ab, ec_c.detach())
+        accu = (classify_ab.argmax(1) == tensor_y).float().mean().item()
+        return classify_ab, tensor_y, loss_classify, loss_recon, accu
 
     def one_epoch(self, epoch_num, loss_counter: LossCounter, data_loader,
                   is_log, optimizer: torch.optim.Optimizer = None):
@@ -108,13 +113,14 @@ class OtherTask:
             print(f'Epoch: {epoch_num}')
             if optimizer is not None:
                 optimizer.zero_grad()
-            ec_ab, tensor_y, loss, accu = self.fc_comp(sample)
+            ec_ab, tensor_y, loss_classify, loss_recon, accu = self.fc_comp(sample)
             loss_counter.add_values([
-                loss.item(),
-                accu
+                loss_classify.item(),
+                accu,
+                loss_recon.item()
             ])
             if optimizer is not None:
-                loss.backward()
+                loss_classify.backward()
                 optimizer.step()
         if is_log:
             print(loss_counter.make_record(epoch_num))

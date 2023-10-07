@@ -62,7 +62,7 @@ CONFIG = {
         },
         'plus': {
             'plus_unit': 1024,
-            'n_hidden_layers': 1,
+            'n_hidden_layers': 2,
         }
     },
 }
