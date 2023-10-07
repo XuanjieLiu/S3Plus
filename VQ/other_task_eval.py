@@ -21,7 +21,7 @@ def name_appd(name: str, path:str):
 def is_need_train(train_config):
     loss_counter = LossCounter([])
     train_record_path = train_config['train_record_path']
-    task_name = task_name = train_config['task_name']
+    task_name = train_config['task_name']
     iter_num = loss_counter.load_iter_num(name_appd(task_name, train_record_path))
     if train_config['max_iter_num'] > iter_num:
         print("Continue training")
