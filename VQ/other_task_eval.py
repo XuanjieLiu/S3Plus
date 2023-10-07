@@ -37,7 +37,9 @@ class OtherTask:
         self.pretrained = self.load_pretrained()
         self.latent_code_1 = self.pretrained.latent_code_1
         self.num_class = other_task_config['num_class']
-        self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
+        self.simple_fc = None
+        self.load_pretrained()
+        # self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
         task_name = other_task_config['task_name']
         self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
         train_set = Dataset(other_task_config['train_data_path'])
@@ -58,6 +60,7 @@ class OtherTask:
             self.simple_fc.load_state_dict(torch.load(self.fc_model_path))
             print(f"FC Model is loaded")
         else:
+            self.simple_fc = SimpleFC(self.other_task_config['fc_network_config'], self.latent_code_1 * 2, self.num_class).to(DEVICE)
             print("New FC model is initialized")
 
     def load_pretrained(self):
@@ -72,9 +75,8 @@ class OtherTask:
             exit()
 
     def train(self):
-        self.load_pretrained()
-        self.simple_fc.train()
         self.resume()
+        self.simple_fc.train()
         train_loss_counter = LossCounter(['loss_z',
                                           'accu',
                                           'loss_recon'], self.train_result_path)
