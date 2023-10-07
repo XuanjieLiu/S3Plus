@@ -28,9 +28,9 @@ for exp_num in EXP_NUM_LIST:
         print(pretrained_config.CONFIG)
         print(other_task_config.CONFIG)
         sub_exp_path = os.path.join(exp_path, exp_num)
-        print(f'Sub-Exp path: {sub_exp_path}')
-        os.chdir(sub_exp_path)
         for i in range(0, len(other_task_config.CONFIG)):
+            print(f'Sub-Exp path: {sub_exp_path}')
+            os.chdir(sub_exp_path)
             other_task = OtherTask(pretrained_config.CONFIG, other_task_config.CONFIG[i])
             for j in OTHER_TASK_EXP_NUM_LIST:
                 sub_sub_exp_path = os.path.join(sub_exp_path, j)
