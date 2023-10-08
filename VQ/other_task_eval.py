@@ -56,11 +56,12 @@ class OtherTask:
         self.MSE_loss = torch.nn.MSELoss(reduction='mean')
 
     def resume(self):
+        self.simple_fc = SimpleFC(self.other_task_config['fc_network_config'], self.latent_code_1 * 2,
+                                  self.num_class).to(DEVICE)
         if os.path.exists(self.fc_model_path):
             self.simple_fc.load_state_dict(torch.load(self.fc_model_path))
             print(f"FC Model is loaded")
         else:
-            self.simple_fc = SimpleFC(self.other_task_config['fc_network_config'], self.latent_code_1 * 2, self.num_class).to(DEVICE)
             print("New FC model is initialized")
 
     def load_pretrained(self):
@@ -122,7 +123,8 @@ class OtherTask:
                 loss_recon.item()
             ])
             if optimizer is not None:
-                loss_classify.backward()
+                loss = loss_classify + loss_recon
+                loss.backward()
                 optimizer.step()
         if is_log:
             print(loss_counter.make_record(epoch_num))

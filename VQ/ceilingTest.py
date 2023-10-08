@@ -44,9 +44,11 @@ class DiyCodebook:
         self.dim_points = self.init_dim_points()
         self.linear_book = self.init_linear_book()
         self.random_book = self.init_random_book()
+        self.collapse_book = self.init_collapse_book()
         self.choose_book = {
             'linear': self.linear_book,
-            'random': self.random_book
+            'random': self.random_book,
+            'collapse': self.collapse_book
         }
 
     def init_dim_points(self):
@@ -73,6 +75,19 @@ class DiyCodebook:
         rand_idx = torch.randperm(self.linear_book.size(0))
         rand_book = self.linear_book[rand_idx, ...]
         return rand_book
+
+    def init_collapse_book(self, collapse_value=None):
+        if collapse_value is None:
+            book_item = torch.Tensor([random.random(), random.random()])
+        else:
+            assert len(collapse_value) == self.n_dim, \
+                f"the dim of collapse_value should be equal to {self.n_dim}, but got {len(collapse_value)}"
+            book_item = collapse_value
+        book = []
+        for i in range(0, pow(self.dim_size, self.n_dim)):
+            book.append(book_item)
+        book_tensor = torch.stack(book)
+        return book_tensor.to(DEVICE)
 
     def plot_book(self, book, n_row):
         n_col = self.dim_size
@@ -195,7 +210,7 @@ class CeilTester:
 
 if __name__ == "__main__":
     matplotlib.use('tkagg')
-    diy_codebook = DiyCodebook(2, 10)
+    diy_codebook = DiyCodebook(2, 5)
     print(diy_codebook.dim_points)
     print(diy_codebook.linear_book)
-    diy_codebook.plot_book(diy_codebook.linear_book, 2)
+    diy_codebook.plot_book(diy_codebook.collapse_book, 2)
