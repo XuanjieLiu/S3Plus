@@ -8,50 +8,105 @@ import numpy as np
 
 
 
+# eg1 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc8",
+#     exp_alias='fc 8',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_8_1_linear_eval_record.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc16",
+#     exp_alias='fc 16',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_16_1_linear_eval_record.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc32",
+#     exp_alias='fc 32',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_32_1_linear_eval_record.txt",
+# )
+#
+# eg4 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc128",
+#     exp_alias='fc 128',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_128_1_linear_eval_record.txt",
+# )
+#
+# eg5 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc1024",
+#     exp_alias='fc 1024',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_1024_1_linear_eval_record.txt",
+# )
+
 eg1 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc8",
-    exp_alias='fc 8',
+    exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_noPlus",
+    exp_alias='No Plus (book_size=10, emb_num=2, emb_dim=1)',
     sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_8_1_linear_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc16",
-    exp_alias='fc 16',
+    exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_noAssoc",
+    exp_alias='w/o assoc (book_size=10, emb_num=2, emb_dim=1)',
     sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_16_1_linear_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc32",
-    exp_alias='fc 32',
+    exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1",
+    exp_alias='w/ (book_size=10, emb_num=2, emb_dim=1)',
     sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_32_1_linear_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
 )
 
 eg4 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc128",
-    exp_alias='fc 128',
+    exp_name="2023.09.24_100vq_Zc[1]_Zs[0]_edim2_[0-20]_noPlus",
+    exp_alias='No Plus (book_size=100, emb_num=1, emb_dim=2)',
     sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_128_1_linear_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
 )
 
 eg5 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc1024",
-    exp_alias='fc 1024',
+    exp_name="2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_noAssoc",
+    exp_alias='w/o assoc (book_size=100, emb_num=1, emb_dim=2)',
     sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_1024_1_linear_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
 )
-exp_groups = [eg1, eg2, eg3, eg4, eg5]
+
+eg6 = ExpGroup(
+    exp_name="2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1",
+    exp_alias='w/ assoc (book_size=100, emb_num=1, emb_dim=2)',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="minus_16_1_eval_record.txt",
+)
+exp_groups = [eg1, eg2, eg3, eg4, eg5, eg6]
 
 
-
+# eg1 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc16",
+#     exp_alias='FC: 16×1, Linear Repr',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_16_1_linear_eval_record.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc16",
+#     exp_alias='FC: 16×1, Random Repr',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_16_1_random_eval_record.txt",
+# )
+# exp_groups = [eg1, eg2]
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
 IS_MAX_BETTER = [True, False]
 OUTPUT_PATH = "train_test_summary/"
-EXTREME_NUM = 10
+EXTREME_NUM = 1
 ITER_AFTER = 2000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}_{len(exp_groups)}.png"
