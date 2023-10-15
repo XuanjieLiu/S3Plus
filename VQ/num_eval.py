@@ -47,7 +47,7 @@ def plot_z_against_label(num_z, num_labels, eval_path=None, eval_helper: EvalHel
         plt.close()
 
 
-def plot_num_position_in_two_dim_repr(num_z, num_labels, eval_path=None):
+def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
     assert len(num_z[0]) == 2, f"The representation dimension of a number should be two, but got {len(num_z[0])} instead."
     sorted_label = sorted(num_labels)
     sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
@@ -57,10 +57,10 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, eval_path=None):
     for i in range(0, len(num_z)):
         plt.scatter(X[i], Y[i], marker=f'${sorted_label[i]}$', s=60)
     plt.plot(X, Y, linestyle='dashed', linewidth=0.5)
-    if eval_path is None:
+    if result_path is None:
         plt.show()
     else:
-        plt.savefig(eval_path)
+        plt.savefig(result_path)
         plt.cla()
         plt.clf()
         plt.close()
@@ -89,8 +89,12 @@ class MumEval:
         self.batch_size = config['batch_size']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         self.model = VQVAE(config).to(DEVICE)
-        self.model.load_state_dict(self.model.load_tensor(model_path))
+        if model_path is not None:
+            self.reload_model(model_path)
         self.model.eval()
+
+    def reload_model(self, model_path):
+        self.model.load_state_dict(self.model.load_tensor(model_path))
 
     def num_eval_multi_dim(self):
         num_z, num_labels = load_enc_eval_data(
@@ -102,14 +106,14 @@ class MumEval:
         eval_helper = EvalHelper(self.config)
         plot_z_against_label(num_z, num_labels, eval_helper=eval_helper)
 
-    def num_eval_two_dim(self):
+    def num_eval_two_dim(self, result_path=None):
         num_z, num_labels = load_enc_eval_data(
             self.loader,
             lambda x:
                 self.model.batch_encode_to_z(x)[0]
         )
         num_z = num_z.cpu().detach().numpy()
-        plot_num_position_in_two_dim_repr(num_z, num_labels)
+        plot_num_position_in_two_dim_repr(num_z, num_labels, result_path)
 
 
 
