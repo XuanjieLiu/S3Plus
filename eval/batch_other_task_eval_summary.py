@@ -9,10 +9,10 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 
 eg1 = ExpGroup(
-    exp_name="2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_noAssoc",
+    exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_noAssoc",
     exp_alias='fc 16',
     sub_exp=[i for i in range(1, 21)],
-    record_name="minus_16_1_eval_record.txt",
+    record_name="minus_16_1.1_eval_record.txt",
     is_load_record=False
 )
 
@@ -75,13 +75,31 @@ def summary_a_group(eg: ExpGroup):
         loss_counter = LossCounter(COMPARE_KEYS, summary_path)
         mean_values = []
         for j in range(0, len(COMPARE_KEYS)):
-            mean_value = np.mean([value[j] for value in cg_list[i].values])
-            mean_values.append(mean_value)
+            values = [item[j] for item in cg_list[i].values]
+            mean = np.mean(values)
+            std = np.std(values)
+            mean_values.append(mean)
         loss_counter.add_values(mean_values)
         loss_counter.record_and_clear(RECORD_PATH_DEFAULT, 10000)
     print('aaa')
 
 
+def summary_an_exp(eg: ExpGroup):
+    sub_eg_list = group_to_subgroups(eg)
+    cg_list = gen_compare_groups(sub_eg_list)
+    all_result = [[] for i in range(0, len(COMPARE_KEYS))]
+    for i in range(0, len(cg_list)):
+        for j in range(0, len(COMPARE_KEYS)):
+            values = [item[j] for item in cg_list[i].values]
+            all_result[j].extend(values)
+    for j in range(0, len(COMPARE_KEYS)):
+        values = all_result[j]
+        mean = np.mean(values)
+        std = np.std(values)
+        print(f'{COMPARE_KEYS_NAME[j]}: {round(mean, ndigits=2)} ± {round(std, ndigits=2)}')
+    print('aaa')
+
+
 
 if __name__ == '__main__':
-    summary_a_group(eg1)
+    summary_an_exp(eg1)
