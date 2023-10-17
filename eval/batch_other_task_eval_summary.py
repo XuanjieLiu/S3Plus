@@ -94,8 +94,8 @@ def summary_an_exp(eg: ExpGroup):
             all_result[j].extend(values)
     for j in range(0, len(COMPARE_KEYS)):
         values = all_result[j]
-        mean = np.mean(values)
-        std = np.std(values)
+        mean = float(np.mean(values))
+        std = float(np.std(values))
         print(f'{COMPARE_KEYS_NAME[j]}: {round(mean, ndigits=2)} ± {round(std, ndigits=2)}')
     print('aaa')
 

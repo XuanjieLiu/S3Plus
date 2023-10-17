@@ -8,41 +8,41 @@ import numpy as np
 
 
 
-eg1 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc8",
-    exp_alias='fc 8',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_8_1_linear_eval_record.txt",
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc16",
-    exp_alias='fc 16',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_16_1_linear_eval_record.txt",
-)
-
-eg3 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc32",
-    exp_alias='fc 32',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_32_1_linear_eval_record.txt",
-)
-
-eg4 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc128",
-    exp_alias='fc 128',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_128_1_linear_eval_record.txt",
-)
-
-eg5 = ExpGroup(
-    exp_name="2023.09.18_ceilingTest_book10_fc1024",
-    exp_alias='fc 1024',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_1024_1_linear_eval_record.txt",
-)
-exp_groups = [eg1, eg2, eg3, eg4, eg5]
+# eg1 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc8",
+#     exp_alias='fc 8',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_8_1_linear_eval_record.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc16",
+#     exp_alias='fc 16',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_16_1_linear_eval_record.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc32",
+#     exp_alias='fc 32',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_32_1_linear_eval_record.txt",
+# )
+#
+# eg4 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc128",
+#     exp_alias='fc 128',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_128_1_linear_eval_record.txt",
+# )
+#
+# eg5 = ExpGroup(
+#     exp_name="2023.09.18_ceilingTest_book10_fc1024",
+#     exp_alias='fc 1024',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="book10_minus_1024_1_linear_eval_record.txt",
+# )
+# exp_groups = [eg1, eg2, eg3, eg4, eg5]
 
 
 # eg1 = ExpGroup(
@@ -89,20 +89,20 @@ exp_groups = [eg1, eg2, eg3, eg4, eg5]
 # exp_groups = [eg1, eg2, eg3, eg4, eg5, eg6]
 
 
-# eg1 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc16",
-#     exp_alias='FC: 16×1, Linear Repr',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_16_1_linear_eval_record.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc16",
-#     exp_alias='FC: 16×1, Random Repr',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_16_1_random_eval_record.txt",
-# )
-# exp_groups = [eg1, eg2]
+eg1 = ExpGroup(
+    exp_name="2023.09.18_ceilingTest_book10_fc16",
+    exp_alias='FC: 16×1, Linear Repr',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="book10_minus_16_1_linear_eval_record.txt",
+)
+
+eg2 = ExpGroup(
+    exp_name="2023.09.18_ceilingTest_book10_fc16",
+    exp_alias='FC: 16×1, Random Repr',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="book10_minus_16_1_random_eval_record.txt",
+)
+exp_groups = [eg1, eg2]
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
@@ -148,8 +148,8 @@ if __name__ == '__main__':
         print(f'Exp: {cg.title}')
         for i in range(0, len(cg.keys)):
             values = [item[i] for item in cg.values]
-            mean = np.mean(values)
-            std = np.std(values)
-            print(f'{cg.keys[i]}: {mean} ± {std}')
+            mean = float(np.mean(values))
+            std = float(np.std(values))
+            print(f'{cg.keys[i]}: {round(mean, ndigits=2)} ± {round(std, ndigits=2)}')
         print('\n')
 
