@@ -20,6 +20,7 @@ from visual_imgs import VisImgs
 from eval_common import EvalHelper
 from eval.dec_vis_eval_2digit import plot_dec_img
 
+
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
     scale = t_range[1] - t_range[0]
     if is_std_normal:
@@ -81,13 +82,14 @@ class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
         dataset = Dataset(config['train_data_path'])
-        eval_set_1 = SingleImgDataset(config['eval_path_1'])
-        eval_set_2 = Dataset(config['eval_path_2'])
+        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
+        plus_eval_set = Dataset(config['plus_eval_set_path'])
         self.batch_size = config['batch_size']
         self.min_loss_scalar = config['min_loss_scalar']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
-        self.eval_loader_1 = DataLoader(eval_set_1, batch_size=self.batch_size)
-        self.eval_loader_2 = DataLoader(eval_set_2, batch_size=self.batch_size)
+        self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=self.batch_size)
+        self.plus_eval_loader = DataLoader(plus_eval_set, batch_size=self.batch_size)
+        self.plus_eval_loader_2 = self.init_plus_eval_loader_2(config, 'plus_eval_set_path_2')
         self.model = VQVAE(config).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -129,6 +131,13 @@ class PlusTrainer:
         self.is_assoc_within_batch = config['is_assoc_within_batch']
         self.is_plot_zc_value = config['is_plot_zc_value']
         self.is_plot_vis_num = config['is_plot_vis_num']
+
+    def init_plus_eval_loader_2(self, config, key):
+        if config[key] is None:
+            print(f"Key {key} is None")
+            return None
+        else:
+            return DataLoader(Dataset(config[key]), batch_size=self.batch_size)
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -190,20 +199,13 @@ class PlusTrainer:
         os.makedirs(self.eval_result_path, exist_ok=True)
         self.model.train()
         self.resume()
-        train_loss_counter = LossCounter(['loss_ED',
-                                          'VQ_C',
-                                          'plus_recon',
-                                          'plus_z',
-                                          'loss_oper'], self.train_record_path)
-        eval_loss_counter = LossCounter(['loss_ED',
-                                          'VQ_C',
-                                          'plus_recon',
-                                          'plus_z',
-                                          'loss_oper'], self.eval_record_path)
-        special_loss_counter = LossCounter(['train_ks',
-                                            'train_accu',
-                                            'eval_ks',
-                                            'eval_accu'], self.plus_accu_record_path)
+        loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
+        train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
+        eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
+        special_loss_counter_keys = ['train_ks', 'train_accu', 'eval_ks', 'eval_accu']
+        if self.plus_eval_loader_2 is not None:
+            special_loss_counter_keys.extend(['eval_ks_2', 'eval_accu_2'])
+        special_loss_counter = LossCounter(special_loss_counter_keys, self.plus_accu_record_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(start_epoch))
@@ -215,16 +217,23 @@ class PlusTrainer:
             # scheduler.step()
             if is_log:
                 self.model.eval()
-                self.one_epoch(epoch_num, eval_loss_counter, self.eval_loader_2, True, eval_vis_img, None)
+                self.one_epoch(epoch_num, eval_loss_counter, self.plus_eval_loader, True, eval_vis_img, None)
                 self.model.train()
                 if self.is_save_img:
-                    self.plot_enc_z(epoch_num, self.eval_loader_1)
+                    self.plot_enc_z(epoch_num, self.single_img_eval_loader)
                     train_ks, train_accu = self.plot_plus_idx(epoch_num, self.loader, self.train_result_path)
-                    eval_ks, eval_accu = self.plot_plus_idx(epoch_num, self.eval_loader_2, self.eval_result_path)
-                    if self.is_plot_zc_value:
-                        self.plot_plus_z(epoch_num, self.eval_loader_2, self.eval_result_path)
-                    special_loss_counter.add_values([train_ks, train_accu, eval_ks, eval_accu])
+                    eval_ks, eval_accu = self.plot_plus_idx(epoch_num, self.plus_eval_loader, self.eval_result_path, "plus_idx")
+                    loss_values = [train_ks, train_accu, eval_ks, eval_accu]
+                    if self.plus_eval_loader_2 is not None:
+                        eval_ks_2, eval_accu_2 = self.plot_plus_idx(epoch_num, self.plus_eval_loader_2, self.eval_result_path, "plus_idx_2")
+                        loss_values.extend([eval_ks_2, eval_accu_2])
+                    special_loss_counter.add_values(loss_values)
                     special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
+                    if self.is_plot_zc_value:
+                        self.plot_plus_z(epoch_num, self.plus_eval_loader, self.eval_result_path, 'plus_z')
+                        if self.plus_eval_loader_2 is not None:
+                            self.plot_plus_z(epoch_num, self.plus_eval_loader_2, self.eval_result_path, 'plus_z_2')
+
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')
 

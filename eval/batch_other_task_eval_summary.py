@@ -9,10 +9,26 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 
 eg1 = ExpGroup(
-    exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_noAssoc",
-    exp_alias='fc 16',
+    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_noPlus",
+    exp_alias='no plus',
     sub_exp=[i for i in range(1, 21)],
-    record_name="minus_16_1.1_eval_record.txt",
+    record_name="minus_16_1_eval_record.txt",
+    is_load_record=False
+)
+
+eg2 = ExpGroup(
+    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_noAssoc",
+    exp_alias='w/o assoc',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="minus_16_1_eval_record.txt",
+    is_load_record=False
+)
+
+eg3 = ExpGroup(
+    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2",
+    exp_alias='w/ assoc',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="minus_16_1_eval_record.txt",
     is_load_record=False
 )
 
@@ -97,7 +113,6 @@ def summary_an_exp(eg: ExpGroup):
         mean = float(np.mean(values))
         std = float(np.std(values))
         print(f'{COMPARE_KEYS_NAME[j]}: {round(mean, ndigits=2)} ± {round(std, ndigits=2)}')
-    print('aaa')
 
 
 

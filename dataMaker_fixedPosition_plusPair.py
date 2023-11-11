@@ -140,6 +140,23 @@ def make_train_test_datapair_maxN_no_leak(min_number, max_number, min_sample_num
     return train_set, test_set
 
 
+def make_plusone_triple_datapair_maxN_no_leak(min_number, max_number, markers, colors, pair_func):
+    train_set = []
+    test_set_1 = []
+    test_set_2 = []
+    for i in range(min_number, max_number+1):
+        for mar in markers:
+            for color in colors:
+                for a, b in pair_func(i):
+                    if a == 1:
+                        train_set.append(PairData(a, b, mar, color))
+                    elif b == 1:
+                        test_set_2.append(PairData(a, b, mar, color))
+                    else:
+                        test_set_1.append(PairData(a, b, mar, color))
+    return train_set, test_set_1, test_set_2
+
+
 def make_train_test_datapair_division(min_number, max_number, sample_rate, markers, colors, pair_func):
     train_set = []
     test_set = []
@@ -172,11 +189,15 @@ def render_dataset(data_list: List[PairData], data_root: str, compositional_func
         draw_data(a, b, marker, color, data_path, compositional_func)
 
 
+def sum_pairs(min_number):
+    def func(max_number):
+        for a in range(min_number, max_number + 1):
+            b = max_number - a
+            if b < min_number:
+                continue
+            yield a, b
+    return func
 
-def sum_pairs(max_number):
-    for a in range(0, max_number+1):
-        b = max_number - a
-        yield a, b
 
 def minus_pairs(max_number):
     for a in range(0, max_number + 1):
@@ -201,8 +222,7 @@ def make_dataset_single_style_plus():
         0.33,
         SINGLE_MARKERS,
         SINGLE_COLOR,
-        sum_pairs,
-
+        sum_pairs(NUM_RAN[0]),
     )
     render_dataset(train_set, train_root, comp_plus)
     render_dataset(test_set, test_root, comp_plus)
@@ -272,13 +292,36 @@ def make_dataset_multi_style_plus():
         0.33,
         marks,
         colors,
-        sum_pairs,
+        sum_pairs(NUM_RAN[0]),
     )
     render_dataset(train_set, train_root, comp_plus)
     render_dataset(test_set, test_root, comp_plus)
 
 
+def make_dataset_single_style_plus_one_triple_set():
+    marks = ['o']
+    colors = ['blue']
+    start = 1
+    end = 20
+    data_root = f'dataset/single_style_plus_one_triple_set({start},{end})'
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root_1 = os.path.join(data_root, 'test_1')
+    test_root_2 = os.path.join(data_root, 'test_2')
+    train_set, test_set_1, test_set_2 = make_plusone_triple_datapair_maxN_no_leak(
+        start,
+        end,
+        marks,
+        colors,
+        sum_pairs(start),
+    )
+    render_dataset(train_set, train_root, comp_plus)
+    render_dataset(test_set_1, test_root_1, comp_plus)
+    render_dataset(test_set_2, test_root_2, comp_plus)
+
+
 if __name__ == "__main__":
-    make_dataset_multi_style_plus()
+    make_dataset_single_style_plus_one_triple_set()
+    # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
     # make_dataset_single_style_minus()

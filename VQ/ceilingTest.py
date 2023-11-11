@@ -14,6 +14,7 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
 from dataMaker_fixedPosition_plusPair import data_name_2_labels
 
+MAX_NUM = 10000
 def decimal_to_base(n, base):
     if not 2 <= base <= 36:
         raise ValueError("Base must be between 2 and 36")
@@ -36,20 +37,42 @@ def add_len(n: str, len_to_be: int):
     return s
 
 
+def find_identical_tensor_in_tensor_list(tensor_list, tensor):
+    for i in range(0, len(tensor_list)):
+        if torch.equal(tensor_list[i], tensor):
+            return i
+    return -1
+
+
 class DiyCodebook:
-    def __init__(self, n_dim, dim_size, v_range=(-1., 1.)):
+    def __init__(self, n_dim, dim_size, v_range=(-1., 1.), num_class=None):
         self.n_dim = n_dim
         self.dim_size = dim_size
+        self.num_class = self.set_num_class(num_class)
         self.v_range = v_range
         self.dim_points = self.init_dim_points()
-        self.linear_book = self.init_linear_book()
-        self.random_book = self.init_random_book()
+        self.linear_book = self.init_linear_book(self.num_class)
+        self.limited_random_book = self.init_limited_random_book()
+        self.random_book = self.init_no_repeat_random_book()
         self.collapse_book = self.init_collapse_book()
         self.choose_book = {
             'linear': self.linear_book,
             'random': self.random_book,
-            'collapse': self.collapse_book
+            'collapse': self.collapse_book,
+            'limited_random': self.limited_random_book,
         }
+
+    def set_num_class(self, num_class):
+        if num_class is None:
+            n = pow(self.dim_size, self.n_dim)
+            assert n <= MAX_NUM, \
+                f"num_class is {n}, which is too large, set to no more than {MAX_NUM}"
+            print(f"num_class is set to {n}")
+        else:
+            assert num_class <= pow(self.dim_size, self.n_dim) and num_class <= MAX_NUM, \
+                f"num_class should be less than {min(pow(self.dim_size, self.n_dim), MAX_NUM)}, but got {num_class}"
+            n = num_class
+        return n
 
     def init_dim_points(self):
         interval = (self.v_range[1] - self.v_range[0]) / (self.dim_size - 1)
@@ -60,9 +83,9 @@ class DiyCodebook:
             points.append(base)
         return points
 
-    def init_linear_book(self):
+    def init_linear_book(self, num_class):
         book = []
-        for i in range(0, pow(self.dim_size, self.n_dim)):
+        for i in range(0, num_class):
             trans_num = decimal_to_base(i, self.dim_size)
             num_str = add_len(trans_num, self.n_dim)
             num_quan = [self.dim_points[int(s)] for s in num_str]
@@ -71,20 +94,55 @@ class DiyCodebook:
         book_tensor = torch.stack(book)
         return book_tensor.to(DEVICE)
 
-    def init_random_book(self):
+    def init_limited_random_book(self):
         rand_idx = torch.randperm(self.linear_book.size(0))
         rand_book = self.linear_book[rand_idx, ...]
         return rand_book
 
+    def init_no_repeat_random_book(self):
+        possible_n_num = pow(self.dim_size, self.n_dim)
+        if possible_n_num < MAX_NUM:
+            return self.init_no_repeat_random_book_with_low_dim_book()
+        else:
+            return self.init_no_repeat_random_book_with_high_dim_book()
+
+    def init_no_repeat_random_book_with_high_dim_book(self):
+        print("Init no repeat random book with high dim book")
+        book = []
+        while len(book) < self.num_class:
+            num_quan = [random.choice(self.dim_points) for _ in range(0, self.n_dim)]
+            num_tensor = torch.Tensor(num_quan)
+            if find_identical_tensor_in_tensor_list(book, num_tensor) == -1:
+                book.append(num_tensor)
+        book_tensor = torch.stack(book)
+        return book_tensor.to(DEVICE)
+
+    def init_no_repeat_random_book_with_low_dim_book(self):
+        print("Init no repeat random book with low dim book")
+        possible_n_num = pow(self.dim_size, self.n_dim)
+        full_linear_book = self.init_linear_book(possible_n_num)
+        random_book = random.sample(full_linear_book.tolist(), self.num_class)
+        book_tensor = torch.Tensor(random_book)
+        return book_tensor.to(DEVICE)
+
+    def init_repeatable_random_book(self):
+        book = []
+        for i in range(0, self.num_class):
+            num_quan = [random.choice(self.dim_points) for _ in range(0, self.n_dim)]
+            num_tensor = torch.Tensor(num_quan)
+            book.append(num_tensor)
+        book_tensor = torch.stack(book)
+        return book_tensor.to(DEVICE)
+
     def init_collapse_book(self, collapse_value=None):
         if collapse_value is None:
-            book_item = torch.Tensor([random.random(), random.random()])
+            book_item = torch.Tensor([random.random() for _ in range(0, self.n_dim)])
         else:
             assert len(collapse_value) == self.n_dim, \
                 f"the dim of collapse_value should be equal to {self.n_dim}, but got {len(collapse_value)}"
             book_item = collapse_value
         book = []
-        for i in range(0, pow(self.dim_size, self.n_dim)):
+        for i in range(0, self.num_class):
             book.append(book_item)
         book_tensor = torch.stack(book)
         return book_tensor.to(DEVICE)
@@ -121,12 +179,13 @@ def is_need_train(train_config):
         print("No more training is needed")
         return False
 
+
 class CeilTester:
     def __init__(self, ceiling_test_config):
         self.other_task_config = ceiling_test_config
         self.num_dim = ceiling_test_config['num_dim']
         self.dim_size = ceiling_test_config['dim_size']
-        self.diy_book = DiyCodebook(self.num_dim, self.dim_size)
+        self.diy_book = DiyCodebook(self.num_dim, self.dim_size, num_class=ceiling_test_config['num_class'])
         self.book = self.diy_book.choose_book[ceiling_test_config['book_type']]
         self.num_class = ceiling_test_config['num_class']
         self.simple_fc = SimpleFC(ceiling_test_config['fc_network_config'], self.num_dim * 2, self.num_class).to(DEVICE)
@@ -210,7 +269,7 @@ class CeilTester:
 
 if __name__ == "__main__":
     matplotlib.use('tkagg')
-    diy_codebook = DiyCodebook(2, 5)
+    diy_codebook = DiyCodebook(24, 10, (-1., 1.), 25)
     print(diy_codebook.dim_points)
     print(diy_codebook.linear_book)
-    diy_codebook.plot_book(diy_codebook.collapse_book, 2)
+    diy_codebook.plot_book(diy_codebook.linear_book, 2)

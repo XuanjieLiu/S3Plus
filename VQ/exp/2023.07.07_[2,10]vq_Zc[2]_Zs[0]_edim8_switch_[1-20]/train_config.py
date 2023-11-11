@@ -3,8 +3,8 @@ import os
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
     'train_data_path': f"{data_root}/single_style_pairs(1,20)/train",
-    'eval_path_1': f"{data_root}/(1,20)-FixedPos-oneStyle",
-    'eval_path_2': f"{data_root}/single_style_pairs(1,20)/test",
+    'single_img_eval_set_path': f"{data_root}/(1,20)-FixedPos-oneStyle",
+    'plus_eval_set_path': f"{data_root}/single_style_pairs(1,20)/test",
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': [2, 10],

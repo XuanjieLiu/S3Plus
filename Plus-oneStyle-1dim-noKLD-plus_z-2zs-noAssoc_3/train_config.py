@@ -4,7 +4,7 @@ import os
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset')
 CONFIG = {
     'train_data_path': f"{data_root}/PlusPair-(1,7)-FixedPos-oneStyle/train",
-    'eval_path_1': f"{data_root}/(0,20)-FixedPos-oneStyle",
+    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
     'latent_code_1': 1,
     'latent_code_2': 0,
     'kld_loss_scalar': 0.0,

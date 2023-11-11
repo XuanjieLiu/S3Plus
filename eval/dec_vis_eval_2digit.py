@@ -56,7 +56,7 @@ class ExpGroup:
         emb_dim = t_config.CONFIG['embedding_dim']
         dict_size = t_config.CONFIG['embeddings_num']
         multi_num_embeddings = t_config.CONFIG['multi_num_embeddings']
-        eval_set_1 = SingleImgDataset(t_config.CONFIG['eval_path_1'])
+        eval_set_1 = SingleImgDataset(t_config.CONFIG['single_img_eval_set_path'])
         eval_loader_1 = DataLoader(eval_set_1, batch_size=32)
         return model, digit_num, emb_dim, dict_size, eval_loader_1, multi_num_embeddings
 

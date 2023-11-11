@@ -50,7 +50,7 @@ def split_into_three(tensor):
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         dataset = Dataset(config['train_data_path'])
-        eval_set_1 = SingleImgDataset(config['eval_path_1'])
+        eval_set_1 = SingleImgDataset(config['single_img_eval_set_path'])
         self.batch_size = config['batch_size']
         self.min_loss_scalar = config['min_loss_scalar']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
