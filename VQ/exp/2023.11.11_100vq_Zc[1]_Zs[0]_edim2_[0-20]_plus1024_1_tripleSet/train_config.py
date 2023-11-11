@@ -2,7 +2,7 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)/train",
+    'train_data_path': f"{data_root}/single_style_plus_one_triple_set(1,20)/train",
     'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
     'plus_eval_set_path': f"{data_root}/single_style_plus_one_triple_set(1,20)/test_1",
     'plus_eval_set_path_2': f"{data_root}/single_style_plus_one_triple_set(1,20)/test_2",
