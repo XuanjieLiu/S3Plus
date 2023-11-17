@@ -18,9 +18,8 @@ DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
 
-NUM_RAN = (0, 20)
+NUM_RAN = (1, 20)
 SINGLE_STYLE_DATA_ROOT_PLUS = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
-SINGLE_STYLE_DATA_ROOT_MINUS = f'dataset/single_style_pairs_minus({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_MOD = f'dataset/single_style_pairs_mod({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_DIVISION = f'dataset/single_style_pairs_division({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_MARKERS = ['o']
@@ -103,11 +102,13 @@ def make_train_test_datapair_maxN(min_number, max_number, min_sample_num, sample
         for color in colors:
             for i in range(min_number, max_number+1):
                 data = []
-                all_idx = [x for x in range(min_number, i+1)]
-                sample_num = min(i+1, max(min_sample_num, int(round(i * sample_rate, 0))))
-                train_idx = random.sample(all_idx, sample_num)
                 for a, b in pair_func(i):
                     data.append(PairData(a, b, mar, color))
+                if len(data) == 0:
+                    continue
+                all_idx = range(0, len(data))
+                sample_num = min(len(data), max(min_sample_num, int(round(i * sample_rate, 0))))
+                train_idx = random.sample(all_idx, sample_num)
                 for x in all_idx:
                     if x in train_idx:
                         train_set.append(data[x])
@@ -213,9 +214,14 @@ def sum_pairs(min_number):
     return func
 
 
-def minus_pairs(max_number):
-    for a in range(0, max_number + 1):
-        yield max_number, a
+def minus_pairs(min_number):
+    def func(max_number):
+        for a in range(min_number, max_number + 1):
+            if max_number - a < min_number:
+                continue
+            yield max_number, a
+    return func
+
 
 def mod_pairs(a):
     min_div_num = 1
@@ -243,18 +249,20 @@ def make_dataset_single_style_plus():
 
 
 def make_dataset_single_style_minus():
-    data_root = SINGLE_STYLE_DATA_ROOT_MINUS
+    min_num = 1
+    max_num = 20
+    data_root = f'dataset/single_style_pairs_minus({min_num},{max_num})'
     os.makedirs(data_root, exist_ok=True)
     train_root = os.path.join(data_root, 'train')
     test_root = os.path.join(data_root, 'test')
     train_set, test_set = make_train_test_datapair_maxN(
-        NUM_RAN[0],
-        NUM_RAN[1],
+        min_num,
+        max_num,
         3,
-        0.7,
+        0.6,
         SINGLE_MARKERS,
         SINGLE_COLOR,
-        minus_pairs,
+        minus_pairs(min_num),
     )
     render_dataset(train_set, train_root, comp_minus)
     render_dataset(test_set, test_root, comp_minus)
@@ -274,6 +282,7 @@ def make_dataset_single_style_mod():
     )
     render_dataset(train_set, train_root, comp_mod)
     render_dataset(test_set, test_root, comp_mod)
+
 
 def make_dataset_single_style_division():
     data_root = SINGLE_STYLE_DATA_ROOT_DIVISION
@@ -355,7 +364,7 @@ def make_dataset_single_style_plus_one_double_set():
 
 
 if __name__ == "__main__":
-    make_dataset_single_style_plus_one_double_set()
+    # make_dataset_single_style_plus_one_double_set()
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    # make_dataset_single_style_minus()
+    make_dataset_single_style_minus()

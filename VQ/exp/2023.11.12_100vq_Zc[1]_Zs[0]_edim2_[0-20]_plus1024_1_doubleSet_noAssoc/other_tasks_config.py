@@ -4,8 +4,8 @@ data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../..
 CONFIG = [
     {
         'task_name': "minus_16_1",
-        'train_data_path': f"{data_root}/single_style_pairs_minus(0,20)/train",
-        'eval_data_path': f"{data_root}/single_style_pairs_minus(0,20)/test",
+        'train_data_path': f"{data_root}/single_style_pairs_minus(1,20)/train",
+        'eval_data_path': f"{data_root}/single_style_pairs_minus(1,20)/test",
         'batch_size': 128,
         'train_record_path': "train_record.txt",
         'eval_record_path': "eval_record.txt",
@@ -21,8 +21,8 @@ CONFIG = [
         'learning_rate': 1e-3,
     }, {
         'task_name': "minus_16_1.1",
-        'train_data_path': f"{data_root}/single_style_pairs_minus(0,20)/train",
-        'eval_data_path': f"{data_root}/single_style_pairs_minus(0,20)/test",
+        'train_data_path': f"{data_root}/single_style_pairs_minus(1,20)/train",
+        'eval_data_path': f"{data_root}/single_style_pairs_minus(1,20)/test",
         'batch_size': 128,
         'train_record_path': "train_record.txt",
         'eval_record_path': "eval_record.txt",
