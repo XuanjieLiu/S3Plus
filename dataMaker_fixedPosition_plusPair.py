@@ -172,6 +172,21 @@ def make_plusone_double_datapair_maxN_no_leak(min_number, max_number, markers, c
     return train_set, test_set
 
 
+def make_plus_half_double_datapair_maxN_no_leak(min_number, max_number, markers, colors, pair_func):
+    train_set = []
+    test_set = []
+    for i in range(min_number, max_number+1):
+        for mar in markers:
+            for color in colors:
+                for a, b in pair_func(i):
+                    half = int(i / 2)
+                    if a == half or b == half:
+                        train_set.append(PairData(a, b, mar, color))
+                    else:
+                        test_set.append(PairData(a, b, mar, color))
+    return train_set, test_set
+
+
 def make_train_test_datapair_division(min_number, max_number, sample_rate, markers, colors, pair_func):
     train_set = []
     test_set = []
@@ -363,8 +378,28 @@ def make_dataset_single_style_plus_one_double_set():
     render_dataset(test_set_1, test_root, comp_plus)
 
 
+def make_dataset_single_style_plus_half_double_set():
+    marks = ['o']
+    colors = ['blue']
+    start = 1
+    end = 20
+    data_root = f'dataset/single_style_plus_half_double_set({start},{end})'
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set_1,  = make_plus_half_double_datapair_maxN_no_leak(
+        start,
+        end,
+        marks,
+        colors,
+        sum_pairs(start),
+    )
+    render_dataset(train_set, train_root, comp_plus)
+    render_dataset(test_set_1, test_root, comp_plus)
+
+
 if __name__ == "__main__":
     # make_dataset_single_style_plus_one_double_set()
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    make_dataset_single_style_minus()
+    make_dataset_single_style_plus_half_double_set()
