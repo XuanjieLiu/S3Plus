@@ -17,16 +17,16 @@ eg1 = ExpGroup(
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_noAssoc",
-    exp_alias='w/o assoc',
+    exp_name="2023.11.12_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_doubleSet",
+    exp_alias='w/ assoc',
     sub_exp=[i for i in range(1, 21)],
     record_name="minus_16_1_eval_record.txt",
     is_load_record=False
 )
 
 eg3 = ExpGroup(
-    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2",
-    exp_alias='w/ assoc',
+    exp_name="2023.11.12_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_doubleSet_noAssoc",
+    exp_alias='w/0 assoc',
     sub_exp=[i for i in range(1, 21)],
     record_name="minus_16_1_eval_record.txt",
     is_load_record=False
@@ -117,4 +117,4 @@ def summary_an_exp(eg: ExpGroup):
 
 
 if __name__ == '__main__':
-    summary_an_exp(eg1)
+    summary_an_exp(eg2)
