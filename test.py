@@ -31,7 +31,10 @@ import numpy as np
 # for item in y:
 #     print(item.a)
 
-x=int(3/2)
-print(x)
-y = random.sample(range(0, 1), 1)
-print(y)
+d = {
+    '1': 1,
+    '2': 2,
+    '1.4': 1.5,
+}
+
+print(d[str(1.4)])

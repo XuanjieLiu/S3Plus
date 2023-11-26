@@ -4,6 +4,23 @@ import os
 from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision import transforms
+from shared import DEVICE
+
+
+def load_enc_eval_data(loader, encode_func):
+    num_labels = []
+    num_z = None
+    for batch_ndx, sample in enumerate(loader):
+        data, labels = sample
+        data = data.to(DEVICE)
+        num = [int(label.split('-')[0]) for label in labels]
+        z = encode_func(data)
+        num_labels.extend(num)
+        if num_z is None:
+            num_z = z
+        else:
+            num_z = torch.cat((num_z, z), dim=0)
+    return num_z, num_labels
 
 
 class SingleImgDataset(torch.utils.data.Dataset):

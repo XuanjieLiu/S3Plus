@@ -1,17 +1,10 @@
 import sys
 import os
 from importlib import reload
-from typing import List
-import torch.nn as nn
-import torch
 from torch.utils.data import DataLoader
-from torchvision.utils import save_image
-import torch.optim as optim
-from dataloader import SingleImgDataset
-from loss_counter import LossCounter
+from dataloader import SingleImgDataset, load_enc_eval_data
 from VQ.VQVAE import VQVAE
 from shared import *
-import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from VQ.eval_common import EvalHelper
@@ -66,20 +59,6 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
         plt.close()
 
 
-def load_enc_eval_data(loader, encode_func):
-    num_labels = []
-    num_z = None
-    for batch_ndx, sample in enumerate(loader):
-        data, labels = sample
-        data = data.to(DEVICE)
-        num = [int(label.split('-')[0]) for label in labels]
-        z = encode_func(data)
-        num_labels.extend(num)
-        if num_z is None:
-            num_z = z
-        else:
-            num_z = torch.cat((num_z, z), dim=0)
-    return num_z, num_labels
 
 
 class MumEval:

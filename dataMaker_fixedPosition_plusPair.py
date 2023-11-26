@@ -48,7 +48,11 @@ def draw_data(i, j, mar, color, data_path, compositional_func):
 
 
 def data_name_2_labels(data: Iterable):
-    return torch.LongTensor([int(x.split('.')[0].split('-')[1]) for x in data])
+    return torch.LongTensor([data_name_2_num(x) for x in data])
+
+
+def data_name_2_num(name: str):
+    return int(name.split('.')[0].split('-')[1])
 
 
 def data_name_2_one_hot(data: Iterable, num_class=-1):

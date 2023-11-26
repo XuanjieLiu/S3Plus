@@ -11,11 +11,11 @@ from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
 from dataloader_plus import Dataset
-from dataloader import SingleImgDataset
+from dataloader import SingleImgDataset, load_enc_eval_data
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from VQVAE import VQVAE
 from shared import *
-from num_eval import plot_z_against_label, load_enc_eval_data
+from num_eval import plot_z_against_label
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
 from eval.dec_vis_eval_2digit import plot_dec_img
