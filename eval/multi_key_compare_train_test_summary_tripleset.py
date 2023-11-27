@@ -17,7 +17,7 @@ eg1 = ExpGroup(
 
 eg2 = ExpGroup(
     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
-    exp_alias='w/0 assoc, 10 vq, 2 emb, 1dim',
+    exp_alias='w/o assoc, 10 vq, 2 emb, 1dim',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
