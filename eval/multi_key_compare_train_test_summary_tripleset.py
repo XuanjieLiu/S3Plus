@@ -54,7 +54,7 @@ RESULT_NAME_1 = f"triple_train2comm_{'.'.join(COMPARE_KEYS_1)}_{eg1.exp_name}_{l
 
 COMPARE_KEYS_2 = ['eval_accu_2', 'eval_accu']
 COMPARE_KEYS_NAME_2 = ['Comm.TestSet', 'Assoc.TestSet']
-RESULT_NAME_2 = f"triple_set_2_{'.'.join(COMPARE_KEYS_2)}_{eg1.exp_name}_{len(exp_groups)}.png"
+RESULT_NAME_2 = f"triple_comm2assoc_{'.'.join(COMPARE_KEYS_2)}_{eg1.exp_name}_{len(exp_groups)}.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup, compare_keys, compare_keys_name):
