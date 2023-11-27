@@ -47,13 +47,13 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 10000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
-COMPARE_KEYS_1 = ['train_accu', 'eval_accu']
-COMPARE_KEYS_NAME_1 = ['TrainSet', 'TestSet_1']
-RESULT_NAME_1 = f"triple_set_1_{'.'.join(COMPARE_KEYS_1)}_{eg1.exp_name}_{len(exp_groups)}.png"
+COMPARE_KEYS_1 = ['train_accu', 'eval_accu_2']
+COMPARE_KEYS_NAME_1 = ['TrainSet', 'Comm.TestSet']
+RESULT_NAME_1 = f"triple_train2comm_{'.'.join(COMPARE_KEYS_1)}_{eg1.exp_name}_{len(exp_groups)}.png"
 
 
-COMPARE_KEYS_2 = ['eval_accu', 'eval_accu_2']
-COMPARE_KEYS_NAME_2 = ['TestSet_1', 'TestSet_2']
+COMPARE_KEYS_2 = ['eval_accu_2', 'eval_accu']
+COMPARE_KEYS_NAME_2 = ['Comm.TestSet', 'Assoc.TestSet']
 RESULT_NAME_2 = f"triple_set_2_{'.'.join(COMPARE_KEYS_2)}_{eg1.exp_name}_{len(exp_groups)}.png"
 
 
