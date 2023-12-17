@@ -5,6 +5,7 @@ CONFIG = {
     'train_data_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/train",
     'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
     'plus_eval_set_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test",
+    'plus_eval_set_path_2': None,
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
