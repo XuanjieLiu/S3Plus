@@ -32,7 +32,7 @@ CONFIG = {
     'is_commutative_train': False,
     'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.02,
+    'associative_z_loss_scalar': 0.,
     'plus_mse_scalar': -1,
     'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
