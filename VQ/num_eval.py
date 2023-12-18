@@ -64,6 +64,13 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
 class MumEval:
     def __init__(self, config, model_path, data_set_path):
         self.config = config
+        self.embedding_dim = config['embedding_dim']
+        self.multi_num_embeddings = config['multi_num_embeddings']
+        if self.multi_num_embeddings is None:
+            self.latent_embedding_1 = config['latent_embedding_1']
+        else:
+            self.latent_embedding_1 = len(self.multi_num_embeddings)
+        self.latent_code_1 = self.latent_embedding_1 * self.embedding_dim
         dataset = SingleImgDataset(data_set_path)
         self.batch_size = config['batch_size']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -92,7 +99,8 @@ class MumEval:
                 self.model.batch_encode_to_z(x)[0]
         )
         num_z = num_z.cpu().detach().numpy()
-        plot_num_position_in_two_dim_repr(num_z, num_labels, result_path)
+        num_z_c = num_z[:, :self.latent_code_1]
+        plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_path)
 
 
 
@@ -100,9 +108,9 @@ if __name__ == "__main__":
     matplotlib.use('tkagg')
     DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
-    EXP_NAME = '2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1'
-    SUB_EXP = 16
-    CHECK_POINT = 'checkpoint_60000.pt'
+    EXP_NAME = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
+    SUB_EXP = 1
+    CHECK_POINT = 'checkpoint_10000.pt'
     exp_path = os.path.join(EXP_ROOT_PATH, EXP_NAME)
     sys.path.append(exp_path)
     os.chdir(exp_path)
