@@ -110,7 +110,7 @@ if __name__ == "__main__":
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
     EXP_NAME = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
     SUB_EXP = 1
-    CHECK_POINT = 'checkpoint_10000.pt'
+    CHECK_POINT = 'curr_model.pt'
     exp_path = os.path.join(EXP_ROOT_PATH, EXP_NAME)
     sys.path.append(exp_path)
     os.chdir(exp_path)
