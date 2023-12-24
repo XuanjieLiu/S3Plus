@@ -1,9 +1,10 @@
 import sys
 import os
 from typing import List
+sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from loss_counter import read_record
 
-sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
+
 
 
 class ExpGroup:
