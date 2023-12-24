@@ -1,41 +1,40 @@
 import sys
 import os
 from load_batch_record import ExpGroup
+
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from multi_key_compare import MultiKeyCompareGroup
 import numpy as np
 from typing import List
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
-
-eg1 = ExpGroup(
-    exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_noPlus",
-    exp_alias='no plus',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="minus_16_1_eval_record.txt",
-    is_load_record=False
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.11.12_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_doubleSet",
-    exp_alias='w/ assoc',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="minus_16_1_eval_record.txt",
-    is_load_record=False
-)
-
-eg3 = ExpGroup(
-    exp_name="2023.11.12_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_doubleSet_noAssoc",
-    exp_alias='w/0 assoc',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="minus_16_1_eval_record.txt",
-    is_load_record=False
-)
+group_list = [
+    # ExpGroup(
+    #     exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_noPlus",
+    #     exp_alias='no plus',
+    #     sub_exp=[i for i in range(1, 21)],
+    #     record_name="minus_16_1_eval_record.txt",
+    #     is_load_record=False
+    # ),
+    ExpGroup(
+        exp_name="2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair",
+        exp_alias='w/ assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair_noAssoc",
+        exp_alias='w/o assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+]
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp')
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
@@ -44,6 +43,7 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 10
 ITER_AFTER = 2000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
+
 
 def exp_group2compare_group(exp_group: ExpGroup):
     y_list = []
@@ -71,6 +71,7 @@ def gen_compare_groups(exp_groups: List[ExpGroup]):
         compare_groups.append(exp_group2compare_group(eg))
     return compare_groups
 
+
 def group_to_subgroups(eg: ExpGroup):
     sub_eg_list = []
     for other_task in EXP_NUM_LIST:
@@ -83,24 +84,10 @@ def group_to_subgroups(eg: ExpGroup):
         sub_eg_list.append(sub_eg)
     return sub_eg_list
 
-def summary_a_group(eg: ExpGroup):
-    sub_eg_list = group_to_subgroups(eg)
-    cg_list = gen_compare_groups(sub_eg_list)
-    for i in range(0, len(cg_list)):
-        summary_path = os.path.join(EXP_ROOT_PATH, sub_eg_list[i].exp_name, eg.record_name)
-        loss_counter = LossCounter(COMPARE_KEYS, summary_path)
-        mean_values = []
-        for j in range(0, len(COMPARE_KEYS)):
-            values = [item[j] for item in cg_list[i].values]
-            mean = np.mean(values)
-            std = np.std(values)
-            mean_values.append(mean)
-        loss_counter.add_values(mean_values)
-        loss_counter.record_and_clear(RECORD_PATH_DEFAULT, 10000)
-    print('aaa')
-
 
 def summary_an_exp(eg: ExpGroup):
+    exp_dir = os.path.join(EXP_ROOT_PATH, eg.exp_name)
+    print(f'Exp path: {exp_dir}')
     sub_eg_list = group_to_subgroups(eg)
     cg_list = gen_compare_groups(sub_eg_list)
     all_result = [[] for i in range(0, len(COMPARE_KEYS))]
@@ -108,13 +95,24 @@ def summary_an_exp(eg: ExpGroup):
         for j in range(0, len(COMPARE_KEYS)):
             values = [item[j] for item in cg_list[i].values]
             all_result[j].extend(values)
+    results_str = []
     for j in range(0, len(COMPARE_KEYS)):
         values = all_result[j]
         mean = float(np.mean(values))
         std = float(np.std(values))
-        print(f'{COMPARE_KEYS_NAME[j]}: {round(mean, ndigits=2)} ± {round(std, ndigits=2)}')
+        result = f'{COMPARE_KEYS_NAME[j]}: {mean:.4f} ± {std:.4f}'
+        results_str.append(result)
+        print(result)
+    log_result(exp_dir, results_str)
 
+
+def log_result(exp_dir, results_str):
+    result_path = os.path.join(exp_dir, 'other_task_summary_result.txt')
+    with open(result_path, 'w') as f:
+        for result in results_str:
+            f.write(result + '\n')
 
 
 if __name__ == '__main__':
-    summary_an_exp(eg2)
+    for eg in group_list:
+        summary_an_exp(eg)

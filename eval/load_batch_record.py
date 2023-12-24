@@ -28,7 +28,6 @@ class ExpGroup:
         sub_record = []
         for sub_exp in self.sub_exps:
             sub_record_path = os.path.join(self.exp_path, sub_exp, self.record_name)
-            print(sub_record_path)
             sub_record.append(read_record(sub_record_path))
         return sub_record
 
