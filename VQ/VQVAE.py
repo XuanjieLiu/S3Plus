@@ -324,12 +324,14 @@ class VQVAE(nn.Module):
             base *= times[i]
         return total.unsqueeze(-1)
 
-    def find_indices(self, z, need_split_style):
-        if not need_split_style:
+    def find_indices(self, z, input_has_z_s=False, output_cat_z_s=False):
+        if not input_has_z_s:
             return self.flat_decimal_indices(self.vq_layer.get_code_indices(z))
         z_c = z[..., 0:self.latent_code_1]
         z_s = z[..., self.latent_code_1:]
         z_c_idx = self.flat_decimal_indices(self.vq_layer.get_code_indices(z_c))
+        if not output_cat_z_s:
+            return z_c_idx
         if self.isVQStyle:
             z_s_idx = self.flat_decimal_indices(self.vq_layer.get_code_indices(z_s))
             return torch.cat((z_c_idx, z_s_idx), -1)

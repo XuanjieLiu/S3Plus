@@ -82,15 +82,15 @@ class MumEval:
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
 
-    def num_eval_multi_dim(self):
-        num_z, num_labels = load_enc_eval_data(
-                                    self.loader,
-                                    lambda x: self.model.find_indices(
-                                          self.model.batch_encode_to_z(x)[0], True
-                                    )
-        )
-        eval_helper = EvalHelper(self.config)
-        plot_z_against_label(num_z, num_labels, eval_helper=eval_helper)
+    # def num_eval_multi_dim(self):
+    #     num_z, num_labels = load_enc_eval_data(
+    #                                 self.loader,
+    #                                 lambda x: self.model.find_indices(
+    #                                       self.model.batch_encode_to_z(x)[0], True
+    #                                 )
+    #     )
+    #     eval_helper = EvalHelper(self.config)
+    #     plot_z_against_label(num_z, num_labels, eval_helper=eval_helper)
 
     def num_eval_two_dim(self, result_path=None):
         num_z, num_labels = load_enc_eval_data(

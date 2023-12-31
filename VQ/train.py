@@ -244,7 +244,7 @@ class PlusTrainer:
                                 data_loader,
                                 lambda x: self.model.find_indices(
                                     self.model.batch_encode_to_z(x)[0],
-                                    True
+                                    True, True
                                 )
         )
         z_eval_path = os.path.join(self.train_result_path, f'{epoch_num}_z.png')

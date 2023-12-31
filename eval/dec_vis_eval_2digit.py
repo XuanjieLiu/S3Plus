@@ -65,7 +65,7 @@ class ExpGroup:
             self.eval_loader_1,
             lambda x: self.model.find_indices(
                 self.model.batch_encode_to_z(x)[0],
-                True
+                False
             )
         )
         enc_flat_z = [int(t.item()) for t in num_z]

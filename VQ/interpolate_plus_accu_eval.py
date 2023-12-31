@@ -51,7 +51,7 @@ class InterpolatePlusAccuEval:
     def __init__(self, config, model: VQVAE=None, data_set_path=None):
         self.config = config
         self.model = VQVAE(config).to(DEVICE) if model is None else model
-        self.is_loaded = False
+        self.model.eval()
         self.data_set_path = data_set_path if data_set_path is not None else config['single_img_eval_set_path']
         single_img_eval_set = SingleImgDataset(self.data_set_path)
         self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=32)
@@ -97,7 +97,6 @@ class InterpolatePlusAccuEval:
 
     def model_reload(self, checkpoint_path):
         self.model.load_state_dict(self.model.load_tensor(checkpoint_path))
-        self.is_loaded = True
         print('Model loaded from {}'.format(checkpoint_path))
 
     def init_num_dict(self):
@@ -155,9 +154,9 @@ if __name__ == "__main__":
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
     EXP_NAME = '2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1'
     SUB_EXP = 16
-    CHECK_CHECK_POINT = './checkpoint_60000.pt'
+    CHECK_POINT = './checkpoint_60000.pt'
     exp_path = os.path.join(EXP_ROOT_PATH, EXP_NAME)
-    check_point_path = os.path.join(exp_path, str(SUB_EXP), CHECK_CHECK_POINT)
+    check_point_path = os.path.join(exp_path, str(SUB_EXP), CHECK_POINT)
     sys.path.append(exp_path)
     os.chdir(exp_path)
     print(f'Exp path: {exp_path}')

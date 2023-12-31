@@ -286,6 +286,7 @@ def make_dataset_single_style_minus():
     render_dataset(train_set, train_root, comp_minus)
     render_dataset(test_set, test_root, comp_minus)
 
+
 def make_dataset_single_style_mod():
     data_root = SINGLE_STYLE_DATA_ROOT_MOD
     os.makedirs(data_root, exist_ok=True)
