@@ -41,7 +41,7 @@ COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
 IS_MAX_BETTER = [True, False]
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 10
-ITER_AFTER = 10000
+ITER_AFTER = 9000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 
 
