@@ -131,6 +131,7 @@ class PlusTrainer:
         self.is_assoc_within_batch = config['is_assoc_within_batch']
         self.is_plot_zc_value = config['is_plot_zc_value']
         self.is_plot_vis_num = config['is_plot_vis_num']
+        self.is_symm_assoc = config['is_symm_assoc']
 
     def init_plus_eval_loader_2(self, config, key):
         if config[key] is None:
@@ -264,8 +265,8 @@ class PlusTrainer:
             )
 
     def plot_plus_idx(self, epoch_num, data_loader, result_path, result_name="plus_idx"):
-        plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(True)
+        plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, True)
         ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
         eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}_ks_{ks}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path,
@@ -273,8 +274,8 @@ class PlusTrainer:
         return ks, accu
 
     def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):
-        plus_eval = VQvaePlusEval(self.config, data_loader, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(False)
+        plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, False)
         n_row, n_col = self.eval_help.calc_subfigures_row_col()
         eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, n_row, n_col,
@@ -353,15 +354,29 @@ class PlusTrainer:
     def associative_loss(self, z_a, z_b, z_c):
         e_ab, e_q_loss_ab, z_ab = self.model.plus(z_a, z_b)
         e_abc1, e_q_loss_abc1, z_abc1 = self.model.plus(e_ab, z_c)
-        e_bc, e_q_loss_bc, z_bc = self.model.plus(z_b, z_c)
-        e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(z_a, e_bc)
+        if self.is_symm_assoc:
+            e_ac, e_q_loss_ac, z_ac = self.model.plus(z_a, z_c)
+            e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(e_ac, z_b)
+            e_q_loss_12 = e_q_loss_ac
+        else:
+            e_bc, e_q_loss_bc, z_bc = self.model.plus(z_b, z_c)
+            e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(z_a, e_bc)
+            e_q_loss_12 = e_q_loss_bc
         assoc_plus_loss = torch.zeros(1)[0].to(DEVICE)
         if self.config['is_assoc_on_e']:
             assoc_plus_loss += self.mean_mse(e_abc1, e_abc2) * self.associative_z_loss_scalar
         if self.config['is_assoc_on_z']:
             assoc_plus_loss += self.mean_mse(z_abc1, z_abc2) * self.associative_z_loss_scalar
-        e_q_loss = self.VQPlus_eqLoss_scalar * (e_q_loss_ab + e_q_loss_abc1 + e_q_loss_bc + e_q_loss_abc2)
+        e_q_loss = self.VQPlus_eqLoss_scalar * (e_q_loss_ab + e_q_loss_abc1 + e_q_loss_12 + e_q_loss_abc2)
         return assoc_plus_loss + e_q_loss
+
+    def symm_assoc_loss(self, z_a, z_b, z_c):
+        e_ab, e_q_loss_ab, z_ab = self.model.plus(z_a, z_b)
+        e_abc1, e_q_loss_abc1, z_abc1 = self.model.plus(e_ab, z_c)
+        e_ac, e_q_loss_ac, z_ac = self.model.plus(z_a, z_c)
+        e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(e_ac, z_b)
+
+
 
     def operation_loss_z(self, z_all_content):
         za, zb, zc = split_into_three(z_all_content)

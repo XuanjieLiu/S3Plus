@@ -12,8 +12,51 @@ matplotlib.use('AGG')
 import os
 
 
-def load_data_pairs_from_dataset(dataset_name):
-    dataset_path = os.path.join(DATA_ROOT, dataset_name)
+TRAIN_MARKERS = ['s', 'o', 'v', 'd']
+NEW_MARKERS = ['^', 'X', 'p', 'D']
+
+TRAIN_COLORS = ['purple', 'salmon',  'olive', 'blue']
+NEW_COLORS = ['red', 'green', 'black', 'yellow']
+
+
+NEW_SHAPE_TRAIN_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newShape/train',
+    NEW_MARKERS,
+    TRAIN_COLORS,
+]
+
+NEW_SHAPE_TEST_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newShape/test',
+    NEW_MARKERS,
+    TRAIN_COLORS,
+]
+
+NEW_COLOR_TRAIN_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newColor/train',
+    TRAIN_MARKERS,
+    NEW_COLORS,
+]
+
+NEW_COLOR_TEST_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newColor/test',
+    TRAIN_MARKERS,
+    NEW_COLORS,
+]
+
+NEW_SHAPE_COLOR_TRAIN_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newShapeColor/train',
+    NEW_MARKERS,
+    NEW_COLORS,
+]
+
+NEW_SHAPE_COLOR_TEST_CONF = [
+    f'{DATA_ROOT}/multi_style_realPairs_plus_eval_newShapeColor/test',
+    NEW_MARKERS,
+    NEW_COLORS,
+]
+
+
+def load_data_pairs_from_dataset(dataset_path):
     files_name = os.listdir(dataset_path)
     tuples = [(int(name.split('-')[0]), int(name.split('-')[1])) for name in files_name]
     no_duplicate_tuples = remove_duplicate_binary_tuple(tuples)
@@ -29,7 +72,7 @@ def remove_duplicate_binary_tuple(tuple_list):
     return new_list
 
 
-def make_dataset_datapair_from_tuple_list(tuple_list, markers, colors, data_root: str, compositional_func):
+def make_dataset_datapair_from_tuple_list(tuple_list, data_root: str, markers, colors,  compositional_func=comp_plus):
     datapairs = []
     for t in tuple_list:
         for mar in markers:
@@ -41,11 +84,15 @@ def make_dataset_datapair_from_tuple_list(tuple_list, markers, colors, data_root
 
 
 if __name__ == "__main__":
-    a = (2, 1)
-    b = (1, 2)
-    c = (2, 1)
-    print(a==b)
-    print(a==c)
-    dataset_path = "multi_style_(4,4)_realPairs_plus(0,20)/test"
-    print(load_data_pairs_from_dataset(dataset_path))
+    data_set_path = "multi_style_(4,4)_realPairs_plus(0,20)"
+    test_path = os.path.join(DATA_ROOT, data_set_path, 'test')
+    train_path = os.path.join(DATA_ROOT, data_set_path, 'train')
+    test_tuples = load_data_pairs_from_dataset(test_path)
+    train_tuples = load_data_pairs_from_dataset(train_path)
+    make_dataset_datapair_from_tuple_list(train_tuples, *NEW_SHAPE_TRAIN_CONF)
+    make_dataset_datapair_from_tuple_list(test_tuples, *NEW_SHAPE_TEST_CONF)
+    make_dataset_datapair_from_tuple_list(train_tuples, *NEW_COLOR_TRAIN_CONF)
+    make_dataset_datapair_from_tuple_list(test_tuples, *NEW_COLOR_TEST_CONF)
+    make_dataset_datapair_from_tuple_list(train_tuples, *NEW_SHAPE_COLOR_TRAIN_CONF)
+    make_dataset_datapair_from_tuple_list(test_tuples, *NEW_SHAPE_COLOR_TEST_CONF)
 

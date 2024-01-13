@@ -351,9 +351,24 @@ class VQVAE(nn.Module):
             print("error. multi_num_embeddings not implemented")
             exit(0)
 
-
-
     def forward(self, x):
-        print("forward not implemented")
-        return 0
+        sizes = x[0].size()
+        data_all = torch.stack(x, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
+        e_all, e_q_loss, z_all = self.batch_encode_to_z(data_all)
+        recon = self.batch_decode_from_z(e_all)
+        recon_a, recon_b, recon_c = split_into_three(recon)
+        e_a, e_b, e_c = split_into_three(e_all)
+        z_s = e_a[..., self.latent_code_1:]
+        ea_content = e_a[..., 0:self.latent_code_1]
+        eb_content = e_b[..., 0:self.latent_code_1]
+        e_ab_content, e_q_loss, z_ab_content = self.plus(ea_content, eb_content)
+        e_ab = torch.cat((e_ab_content, z_s), -1)
+        recon_ab = self.batch_decode_from_z(e_ab)
+        return recon_a, recon_b, recon_c, recon_ab, e_a, e_b, e_c, e_ab
+
+
+def split_into_three(tensor):
+    sizes = [3, int(tensor.size(0) / 3), *tensor.size()[1:]]
+    new_tensor = tensor.reshape(*sizes)
+    return new_tensor[0], new_tensor[1], new_tensor[2]
 

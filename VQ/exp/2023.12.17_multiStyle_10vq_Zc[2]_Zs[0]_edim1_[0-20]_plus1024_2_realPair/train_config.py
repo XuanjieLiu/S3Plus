@@ -50,6 +50,7 @@ CONFIG = {
     'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
+    'is_symm_assoc': False,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,

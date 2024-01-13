@@ -160,22 +160,26 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
 
 
 class VQvaePlusEval:
-    def __init__(self, config, data_loader: DataLoader, model_path=None, loaded_model: VQVAE = None):
-        self.loader = data_loader
+    def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.zc_dim = config['latent_embedding_1'] * config['embedding_dim']
-        assert model_path is not None or loaded_model is not None, "model_path and loaded_model cannot both be None"
         if loaded_model is not None:
             self.model = loaded_model
+        elif model_path is not None:
+            self.model = VQVAE(config).to(DEVICE)
+            self.reload_model(model_path)
+            print(f"Model is loaded from {model_path}")
         else:
             self.model = VQVAE(config).to(DEVICE)
-            self.model.load_state_dict(self.model.load_tensor(model_path))
-        self.isVAE = config['kld_loss_scalar'] > 0.00001
+            print("No model is loaded")
         self.model.eval()
 
-    def load_plusZ_eval_data(self, is_find_index=True):
+    def reload_model(self, model_path):
+        self.model.load_state_dict(self.model.load_tensor(model_path))
+
+    def load_plusZ_eval_data(self, data_loader: DataLoader, is_find_index=True):
         all_enc_z = []
         all_plus_z = []
-        for batch_ndx, sample in enumerate(self.loader):
+        for batch_ndx, sample in enumerate(data_loader):
             enc_z_list = []
             plus_z_list = []
             data, labels = sample
@@ -208,8 +212,8 @@ class VQvaePlusEval:
             all_plus_z.extend(plus_z_list)
         return all_enc_z, all_plus_z
 
-    def eval(self, eval_path):
-        all_enc_z, all_plus_z = self.load_plusZ_eval_data()
+    def eval(self, eval_path, dataloader: DataLoader):
+        all_enc_z, all_plus_z = self.load_plusZ_eval_data(dataloader)
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path)
 
 # if __name__ == "__main__":

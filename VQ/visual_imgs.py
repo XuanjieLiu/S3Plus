@@ -9,8 +9,10 @@ matplotlib.use('AGG')
 
 
 class VisImgs:
-    def __init__(self, save_path):
+    def __init__(self, save_path=None):
         self.save_path = save_path
+        if save_path is not None:
+            os.makedirs(save_path, exist_ok=True)
         self.gt_a = torch.ones(3, 10, 10)
         self.gt_b = torch.ones(3, 10, 10)
         self.gt_c = torch.ones(3, 10, 10)
@@ -52,7 +54,10 @@ class VisImgs:
             ax.set_xticks([])
             ax.set_yticks([])
 
-        save_path = os.path.join(self.save_path, name)
+        if self.save_path is not None:
+            save_path = os.path.join(self.save_path, name)
+        else:
+            save_path = name
         plt.savefig(save_path)
         plt.cla()
         plt.clf()

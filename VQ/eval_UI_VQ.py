@@ -11,9 +11,9 @@ import torch
 from torchvision import transforms
 from shared import DEVICE
 
-EXP_path = '2023.09.10_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2'
+EXP_path = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
 SUB_EXP = '1'
-MODEL_PATH = 'checkpoint_40000.pt'
+MODEL_PATH = 'checkpoint_10000.pt'
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 RANGE = (3.0, -2.5)
@@ -22,9 +22,9 @@ IMG_PATH = 'eval_decoder_ImgBuffer'
 IGM_NAME = IMG_PATH + "/test.png"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue']
-NUMBERS = range(1, 17)
-MARKERS = ['o', 'v', 's', 'd']
+COLORS_TRAIN = ['purple', 'salmon',  'olive', 'blue', 'red', 'green', 'black', 'yellow']
+NUMBERS = range(0, 21)
+MARKERS = ['o', 'v', 's', 'd', '^', 'X', 'p', 'D']
 
 
 def find_config():
@@ -64,6 +64,7 @@ def read_a_data_from_disk(data_path):
     img_tensor = transform(img).unsqueeze(0)
     return img_tensor
 
+
 class TestUI:
     def __init__(self, win, config):
         os.makedirs(IMG_PATH, exist_ok=True)
@@ -78,7 +79,7 @@ class TestUI:
         # Init encoder eval
         enc_frame_1 = Frame(win)
         enc_frame_1.pack(side=LEFT)
-        self.eval_enc_1 = EvalEncoder(enc_frame_1, self.vae, 1, config)
+        self.eval_enc_1 = EvalEncoder(enc_frame_1, self.vae, 1, config, self.eval_dec.update_scales_by_z)
         # Init plus eval
         plus_frame = Frame(win)
         plus_frame.pack(side=LEFT)
@@ -128,11 +129,12 @@ class EvalPlus:
 
 
 class EvalEncoder:
-    def __init__(self, win, vae, idx, config):
+    def __init__(self, win, vae, idx, config, after_menu_select: callable = None):
         z_s_dim = config['latent_code_2']
         n_emb = config['latent_embedding_1']
-        codebook_size = config['embeddings_num']
-        self.code_len = codebook_size * n_emb + z_s_dim
+        emb_dim = config['embedding_dim']
+        self.z_c_dim = n_emb * emb_dim
+        self.code_len = self.z_c_dim + z_s_dim
         self.img_name = f"enc_{idx}.png"
         self.img_path = os.path.join(IMG_PATH, self.img_name)
         self.vae = vae
@@ -145,7 +147,7 @@ class EvalEncoder:
         z_list_frame = Frame(win)
         z_list_frame.pack(side=TOP)
         self.z_var_list = self.init_z_list(z_list_frame)
-
+        self.after_menu_select = after_menu_select
 
 
     def init_z_list(self, win):
@@ -154,7 +156,8 @@ class EvalEncoder:
             z_var = tkinter.StringVar()
             z_var.set(str(0.0))
             z_var_list.append(z_var)
-            z_name_label = Label(win, text=f'z{i+1}: ')
+            label_text = f'z_c {i+1}: ' if i < self.z_c_dim else f'z_s {i-self.z_c_dim+1}: '
+            z_name_label = Label(win, text=label_text)
             z_name_label.grid(row=i, column=0)
             z_value_label = Label(win, textvariable=z_var)
             z_value_label.grid(row=i, column=1)
@@ -164,7 +167,6 @@ class EvalEncoder:
         for i in range(self.code_len):
             z_value = str(round(z[i].item(), 3))
             self.z_var_list[i].set(z_value)
-
 
     def init_menu_list(self, win):
         # Init labels
@@ -197,11 +199,12 @@ class EvalEncoder:
         num = int(self.num_var.get())
         color = self.color_var.get()
         shape = self.shape_var.get()
-        plot_a_scatter(POSITIONS[num], self.img_path, shape, color)
+        plot_a_scatter(POSITIONS[num], self.img_path, shape, color, num != 0)
         load_img(self.card, self.img_path)
         img_tensor = read_a_data_from_disk(self.img_path).to(DEVICE)
-        z = self.vae.batch_encode_to_z(img_tensor)[1][0].cpu().detach()
-        self.update_z_list(z)
+        z = self.vae.batch_encode_to_z(img_tensor)[0][0]
+        self.update_z_list(z.cpu().detach())
+        self.after_menu_select(z.unsqueeze(0))
 
 
 class EvalDecoder:
@@ -221,7 +224,20 @@ class EvalDecoder:
         self.label.pack(side=BOTTOM)
         self.decoder_config = config['network_config']['enc_dec']
 
-
+    def update_scales_by_z(self, z):
+        idx_z = self.vae.find_indices(z, True, True).cpu().detach()[0]
+        z_c = [int(n) for n in str(int(idx_z[0].item()))]
+        if len(z_c) == 1:
+            z_c = [0, *z_c]
+        z_s = idx_z[1:]
+        for i in range(self.n_emb):
+            self.z_c_code[i] = z_c[i]
+            self.z_c_scale_list[i].set(z_c[i])
+        for i in range(len(z_s)):
+            self.z_s_code[i] = z_s[i].item()
+            self.z_s_scale_list[i].set(float(z_s[i].item()))
+        self.recon_img()
+        self.load_img()
 
     def on_z_s_scale_move(self, value, index):
         self.z_s_code[index] = float(value)
@@ -234,6 +250,7 @@ class EvalDecoder:
         self.z_c_scale_list[index].set(int(value))
         self.recon_img()
         self.load_img()
+
 
     def recon_img(self):
         img_channel = self.decoder_config['img_channel']
@@ -267,10 +284,10 @@ class EvalDecoder:
         for i in range(0, self.n_emb):
             scale = Scale(
                 win,
-                variable=IntVar(value=self.z_s_code[i]),
+                variable=IntVar(value=self.z_c_code[i]),
                 command=lambda value, index=i: self.on_z_c_scale_move(value, index),
                 from_=0,
-                to=self.codebook_size,
+                to=self.codebook_size-1,
                 resolution=1,
                 length=600,
                 tickinterval=1
@@ -295,8 +312,6 @@ class EvalDecoder:
             scale.pack(side=LEFT)
             scale_list.append(scale)
         return scale_list
-
-
 
 
 if __name__ == "__main__":

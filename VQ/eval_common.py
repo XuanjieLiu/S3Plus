@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib import collections as matcoll
 
 
+
 def calc_real_digit_num(latent_embedding_1, multi_num_embeddings):
     if multi_num_embeddings is None:
         return latent_embedding_1
