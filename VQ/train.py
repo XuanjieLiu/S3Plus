@@ -370,14 +370,6 @@ class PlusTrainer:
         e_q_loss = self.VQPlus_eqLoss_scalar * (e_q_loss_ab + e_q_loss_abc1 + e_q_loss_12 + e_q_loss_abc2)
         return assoc_plus_loss + e_q_loss
 
-    def symm_assoc_loss(self, z_a, z_b, z_c):
-        e_ab, e_q_loss_ab, z_ab = self.model.plus(z_a, z_b)
-        e_abc1, e_q_loss_abc1, z_abc1 = self.model.plus(e_ab, z_c)
-        e_ac, e_q_loss_ac, z_ac = self.model.plus(z_a, z_c)
-        e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(e_ac, z_b)
-
-
-
     def operation_loss_z(self, z_all_content):
         za, zb, zc = split_into_three(z_all_content)
         loss = torch.zeros(1)[0].to(DEVICE)
