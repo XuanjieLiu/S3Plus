@@ -8,36 +8,64 @@ import numpy as np
 
 
 
+# eg1 = ExpGroup(
+#     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
+#     exp_alias='w/ assoc, 10 vq, 2 emb, 1dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
+#     exp_alias='w/o assoc, 10 vq, 2 emb, 1dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg3 = ExpGroup(
+#     exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet",
+#     exp_alias='w/ assoc, 100 vq, 1 emb, 2dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg4 = ExpGroup(
+#     exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_noAssoc",
+#     exp_alias='w/o assoc, 100 vq, 1 emb, 2dim',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+#
+# exp_groups = [eg1, eg2, eg3, eg4]
+
+
 eg1 = ExpGroup(
     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
-    exp_alias='w/ assoc, 10 vq, 2 emb, 1dim',
+    exp_alias='w/ assoc',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
+
 
 eg2 = ExpGroup(
-    exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
-    exp_alias='w/o assoc, 10 vq, 2 emb, 1dim',
+    exp_name="2024.01.14_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
+    exp_alias='w/ symm',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
+
 
 eg3 = ExpGroup(
-    exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet",
-    exp_alias='w/ assoc, 100 vq, 1 emb, 2dim',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg4 = ExpGroup(
-    exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_noAssoc",
-    exp_alias='w/o assoc, 100 vq, 1 emb, 2dim',
+    exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
+    exp_alias='w/o assoc or symm',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 
-exp_groups = [eg1, eg2, eg3, eg4]
+
+exp_groups = [eg1, eg2, eg3]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
