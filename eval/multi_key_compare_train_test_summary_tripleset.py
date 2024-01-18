@@ -87,7 +87,7 @@ BEST_MEAN = 5
 IS_MAX_BETTER = True
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
-ITER_AFTER = 10000
+ITER_AFTER = 20000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 COMPARE_KEYS_1 = ['train_accu', 'eval_accu_2']
 COMPARE_KEYS_NAME_1 = ['TrainSet', 'Comm.TestSet']
