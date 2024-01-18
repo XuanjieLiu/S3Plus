@@ -9,14 +9,14 @@ import numpy as np
 eg1 = ExpGroup(
     exp_name="2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_doubleSet",
     exp_alias='w/ assoc',
-    sub_exp=[i for i in range(1, 6)],
+    sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
     exp_name="2024.01.17_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symm",
     exp_alias='w/ symm',
-    sub_exp=[i for i in range(1, 6)],
+    sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
