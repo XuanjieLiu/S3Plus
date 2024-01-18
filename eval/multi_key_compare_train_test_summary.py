@@ -6,33 +6,33 @@ from load_batch_record import ExpGroup
 from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
-# eg1 = ExpGroup(
-#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 6)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 6)],
-#     record_name="plus_eval.txt",
-# )
-
 eg1 = ExpGroup(
-    exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair",
-    exp_alias='w/ associative loss',
-    sub_exp=[i for i in range(1, 21)],
+    exp_name="2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_doubleSet",
+    exp_alias='w/ assoc',
+    sub_exp=[i for i in range(1, 6)],
     record_name="plus_eval.txt",
 )
 
 eg2 = ExpGroup(
-    exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair_noAssoc",
-    exp_alias='w/o associative loss',
-    sub_exp=[i for i in range(1, 21)],
+    exp_name="2024.01.17_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symm",
+    exp_alias='w/ symm',
+    sub_exp=[i for i in range(1, 6)],
     record_name="plus_eval.txt",
 )
+
+# eg1 = ExpGroup(
+#     exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair",
+#     exp_alias='w/ associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
+#
+# eg2 = ExpGroup(
+#     exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair_noAssoc",
+#     exp_alias='w/o associative loss',
+#     sub_exp=[i for i in range(1, 21)],
+#     record_name="plus_eval.txt",
+# )
 exp_groups = [eg1, eg2]
 
 
@@ -43,7 +43,7 @@ BEST_MEAN = 5
 IS_MAX_BETTER = True
 OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
-ITER_AFTER = 9000
+ITER_AFTER = 20000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}_{len(exp_groups)}.png"
 

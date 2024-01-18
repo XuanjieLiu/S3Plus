@@ -49,14 +49,28 @@ eg1 = ExpGroup(
 
 
 eg2 = ExpGroup(
-    exp_name="2024.01.14_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
+    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
+    exp_alias='w/o symm & commu',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
+eg3 = ExpGroup(
+    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm",
     exp_alias='w/ symm',
     sub_exp=[i for i in range(1, 21)],
     record_name="plus_eval.txt",
 )
 
+eg4 = ExpGroup(
+    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commu",
+    exp_alias='w/o commu',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
 
-eg3 = ExpGroup(
+
+eg5 = ExpGroup(
     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
     exp_alias='w/o assoc or symm',
     sub_exp=[i for i in range(1, 21)],
@@ -65,7 +79,7 @@ eg3 = ExpGroup(
 
 
 
-exp_groups = [eg1, eg2, eg3]
+exp_groups = [eg1, eg2, eg3, eg4, eg5]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
