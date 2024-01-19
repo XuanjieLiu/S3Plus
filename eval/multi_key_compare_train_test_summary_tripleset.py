@@ -11,19 +11,19 @@ import numpy as np
 exp_groups = [
     ExpGroup(
         exp_name="2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_assocCommu",
-        exp_alias='w/o assoc & commu',
+        exp_alias='w/ assoc & commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
     ExpGroup(
         exp_name="2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
-        exp_alias='w/o symm & assoc',
+        exp_alias='w/ symm & assoc',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
     ExpGroup(
         exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
-        exp_alias='w/o symm & commu',
+        exp_alias='w/ symm & commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
