@@ -1,12 +1,11 @@
 import sys
 import os
+
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from typing import List
 from load_batch_record import ExpGroup
 from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
-
-
 
 # eg1 = ExpGroup(
 #     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
@@ -39,47 +38,51 @@ import numpy as np
 #
 # exp_groups = [eg1, eg2, eg3, eg4]
 
+exp_groups = [
+    ExpGroup(
+        exp_name="2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_assocCommu",
+        exp_alias='w/o assoc & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
+        exp_alias='w/o symm & assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
+        exp_alias='w/o symm & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
+        exp_alias='w/ assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm",
+        exp_alias='w/ symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commu",
+        exp_alias='w/ commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
+        exp_alias='w/ nothing',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+]
 
-eg1 = ExpGroup(
-    exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
-    exp_alias='w/ assoc',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-
-eg2 = ExpGroup(
-    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
-    exp_alias='w/o symm & commu',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg3 = ExpGroup(
-    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm",
-    exp_alias='w/ symm',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-eg4 = ExpGroup(
-    exp_name="2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commu",
-    exp_alias='w/o commu',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-
-eg5 = ExpGroup(
-    exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
-    exp_alias='w/o assoc or symm',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-
-
-exp_groups = [eg1, eg2, eg3, eg4, eg5]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
@@ -92,7 +95,6 @@ Y_NAME = "Plus Accuracy (max=1.0) ↑"
 COMPARE_KEYS_1 = ['train_accu', 'eval_accu_2']
 COMPARE_KEYS_NAME_1 = ['TrainSet', 'Comm.TestSet']
 RESULT_NAME_1 = f"triple_train2comm_{'.'.join(COMPARE_KEYS_1)}_{eg1.exp_name}_{len(exp_groups)}.png"
-
 
 COMPARE_KEYS_2 = ['eval_accu_2', 'eval_accu']
 COMPARE_KEYS_NAME_2 = ['Comm.TestSet', 'Assoc.TestSet']

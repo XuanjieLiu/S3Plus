@@ -20,6 +20,13 @@ eg2 = ExpGroup(
     record_name="plus_eval.txt",
 )
 
+eg3 = ExpGroup(
+    exp_name="2024.01.18_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symmAssoc",
+    exp_alias='w/ symm & assoc',
+    sub_exp=[i for i in range(1, 21)],
+    record_name="plus_eval.txt",
+)
+
 # eg1 = ExpGroup(
 #     exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair",
 #     exp_alias='w/ associative loss',
@@ -33,7 +40,7 @@ eg2 = ExpGroup(
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="plus_eval.txt",
 # )
-exp_groups = [eg1, eg2]
+exp_groups = [eg1, eg2, eg3]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
