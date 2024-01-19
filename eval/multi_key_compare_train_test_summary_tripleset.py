@@ -7,36 +7,6 @@ from load_batch_record import ExpGroup
 from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
-# eg1 = ExpGroup(
-#     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
-#     exp_alias='w/ assoc, 10 vq, 2 emb, 1dim',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
-#     exp_alias='w/o assoc, 10 vq, 2 emb, 1dim',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg3 = ExpGroup(
-#     exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet",
-#     exp_alias='w/ assoc, 100 vq, 1 emb, 2dim',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg4 = ExpGroup(
-#     exp_name="2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_noAssoc",
-#     exp_alias='w/o assoc, 100 vq, 1 emb, 2dim',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-#
-# exp_groups = [eg1, eg2, eg3, eg4]
 
 exp_groups = [
     ExpGroup(
@@ -84,7 +54,6 @@ exp_groups = [
 ]
 
 
-
 YTICKS = [i * 0.1 for i in range(0, 11)]
 BEST_MEAN = 5
 IS_MAX_BETTER = True
@@ -94,11 +63,11 @@ ITER_AFTER = 20000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
 COMPARE_KEYS_1 = ['train_accu', 'eval_accu_2']
 COMPARE_KEYS_NAME_1 = ['TrainSet', 'Comm.TestSet']
-RESULT_NAME_1 = f"triple_train2comm_{'.'.join(COMPARE_KEYS_1)}_{eg1.exp_name}_{len(exp_groups)}.png"
+RESULT_NAME_1 = f"triple_train2comm_{'.'.join(COMPARE_KEYS_1)}_{exp_groups[0].exp_name}_{len(exp_groups)}.png"
 
 COMPARE_KEYS_2 = ['eval_accu_2', 'eval_accu']
 COMPARE_KEYS_NAME_2 = ['Comm.TestSet', 'Assoc.TestSet']
-RESULT_NAME_2 = f"triple_comm2assoc_{'.'.join(COMPARE_KEYS_2)}_{eg1.exp_name}_{len(exp_groups)}.png"
+RESULT_NAME_2 = f"triple_comm2assoc_{'.'.join(COMPARE_KEYS_2)}_{exp_groups[0].exp_name}_{len(exp_groups)}.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup, compare_keys, compare_keys_name):
