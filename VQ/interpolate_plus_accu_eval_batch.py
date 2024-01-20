@@ -8,13 +8,16 @@ from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT
 
 
 
-CHECK_POINT = 'checkpoint_50000.pt'
+CHECK_POINT = 'checkpoint_40000.pt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    '2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet',
-    '2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc',
-    '2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet',
-    '2023.11.23_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_noAssoc',
+    "2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_assocCommu",
+    "2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
+    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
+    "2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
+    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm",
+    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commu",
+    "2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
 ]
 ITP_PLUS_RECORD_PATH_ALL = 'interpolate_plus_accu_all.txt'
 ITP_PLUS_RECORD_PATH_TRAIN = 'interpolate_plus_accu_train.txt'
