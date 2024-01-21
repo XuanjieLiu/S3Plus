@@ -6,41 +6,40 @@ from load_batch_record import ExpGroup
 from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
-eg1 = ExpGroup(
-    exp_name="2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_doubleSet",
-    exp_alias='w/ assoc',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
 
-eg2 = ExpGroup(
-    exp_name="2024.01.17_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symm",
-    exp_alias='w/ symm',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
+exp_groups = [
+    ExpGroup(
+        exp_name="2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_doubleSet",
+        exp_alias='w/ assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.20_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_assocCommu",
+        exp_alias='w/ assoc & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.17_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symm",
+        exp_alias='w/ symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.20_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symmCommu",
+        exp_alias='w/ symm & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.01.18_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symmAssoc",
+        exp_alias='w/ symm & assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    )
+]
 
-eg3 = ExpGroup(
-    exp_name="2024.01.18_2023.11.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_plusOneSet_symmAssoc",
-    exp_alias='w/ symm & assoc',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="plus_eval.txt",
-)
-
-# eg1 = ExpGroup(
-#     exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair",
-#     exp_alias='w/ associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.09.16_multiStyle_10vq_Zc[2]_Zs[0]_edim12_[0-20]_plus1024_2_realPair_noAssoc",
-#     exp_alias='w/o associative loss',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="plus_eval.txt",
-# )
-exp_groups = [eg1, eg2, eg3]
 
 
 YTICKS = [i * 0.1 for i in range(0, 11)]
@@ -52,7 +51,7 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 5
 ITER_AFTER = 20000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
-RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}_{len(exp_groups)}.png"
+RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{exp_groups[0].exp_name}_{len(exp_groups)}.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup):
