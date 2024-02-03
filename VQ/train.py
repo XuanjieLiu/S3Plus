@@ -133,6 +133,7 @@ class PlusTrainer:
         self.is_plot_vis_num = config['is_plot_vis_num']
         self.is_symm_assoc = config['is_symm_assoc']
         self.is_pure_assoc = config['is_pure_assoc']
+        self.is_commutative_all = config['is_commutative_all']
 
     def init_plus_eval_loader_2(self, config, key):
         if config[key] is None:
@@ -319,7 +320,15 @@ class PlusTrainer:
             z_loss = torch.zeros(1)[0]
         return recon_loss, z_loss + e_q_loss * self.VQPlus_eqLoss_scalar
 
-    def commutative_z_loss(self, z_a, z_b):
+    def commutative_z_loss(self, z_1, z_2):
+        if self.is_commutative_all:
+            z_all = torch.concat([z_1, z_2], dim=0)
+            idx_1 = torch.randperm(z_all.size(0))
+            z_perm = z_all[idx_1, ...]
+            z_a = z_perm[:z_1.size(0), ...]
+            z_b = z_perm[z_1.size(0):, ...]
+        else:
+            z_a, z_b = z_1, z_2
         e_ab, e_q_loss_ab, z_ab = self.model.plus(z_a, z_b)
         e_ba, e_q_loss_ba, z_ba = self.model.plus(z_b, z_a)
         if self.plus_by_embedding:

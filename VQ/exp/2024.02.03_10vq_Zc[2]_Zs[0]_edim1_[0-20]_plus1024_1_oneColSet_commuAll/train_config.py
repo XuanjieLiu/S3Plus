@@ -2,10 +2,10 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_plus_one_double_set(1,20)/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/single_style_plus_one_double_set(1,20)/test",
-    'plus_eval_set_path_2': None,
+    'train_data_path': f"{data_root}/single_style_plus_one_triple_set(1,20)/train",
+    'single_img_eval_set_path': f"{data_root}/(1,20)-FixedPos-oneStyle",
+    'plus_eval_set_path': f"{data_root}/single_style_plus_one_triple_set(1,20)/test_1",
+    'plus_eval_set_path_2': f"{data_root}/single_style_plus_one_triple_set(1,20)/test_2",
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -18,7 +18,7 @@ CONFIG = {
     'checkpoint_interval': 2000,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 60001,
+    'max_iter_num': 50001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'eval_result_path': 'EvalResults/',
@@ -30,10 +30,10 @@ CONFIG = {
     'is_save_img': True,
     'batch_size': 128,
     'is_commutative_train': True,
-    'is_commutative_all': True,  # 'is_commutative_train' should be True
+    'is_commutative_all': True,
     'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.02,
-    'associative_z_loss_scalar': 0.02,
+    'associative_z_loss_scalar': 0.0,
     'plus_mse_scalar': -1,
     'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
@@ -51,7 +51,7 @@ CONFIG = {
     'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_symm_assoc': False,
+    'is_symm_assoc': True,
     'is_pure_assoc': True,
     'network_config': {
         'enc_dec': {
