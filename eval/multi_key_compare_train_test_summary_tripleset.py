@@ -10,25 +10,25 @@ import numpy as np
 
 exp_groups = [
     ExpGroup(
-        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocSymmCommuAll",
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
         exp_alias='w/ assoc & symm & commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
     ExpGroup(
-        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocCommuAll",
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
         exp_alias='w/ assoc & commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
     ExpGroup(
-        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_SymmCommuAll",
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_SymmCommuAll",
         exp_alias='w/ symm & commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),
     ExpGroup(
-        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commuAll",
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
         exp_alias='w/ commu',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
