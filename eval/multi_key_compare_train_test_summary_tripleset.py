@@ -16,6 +16,12 @@ exp_groups = [
         record_name="plus_eval.txt",
     ),
     ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymm",
+        exp_alias='w/ assoc & symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
         exp_alias='w/ assoc & commu',
         sub_exp=[i for i in range(1, 21)],
@@ -28,8 +34,26 @@ exp_groups = [
         record_name="plus_eval.txt",
     ),
     ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
+        exp_alias='w/ symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
+        exp_alias='w/ assoc',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
         exp_alias='w/ commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="plus_eval.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
+        exp_alias='w/ nothing',
         sub_exp=[i for i in range(1, 21)],
         record_name="plus_eval.txt",
     ),

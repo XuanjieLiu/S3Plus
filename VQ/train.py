@@ -15,7 +15,7 @@ from dataloader import SingleImgDataset, load_enc_eval_data
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from VQVAE import VQVAE
 from shared import *
-from num_eval import plot_z_against_label
+from two_dim_num_vis import plot_z_against_label
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
 from eval.dec_vis_eval_2digit import plot_dec_img

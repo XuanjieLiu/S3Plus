@@ -15,7 +15,7 @@ from VQ.VQVAE import VQVAE
 from shared import *
 import os
 from importlib import reload
-from VQ.num_eval import load_enc_eval_data
+from VQ.two_dim_num_vis import load_enc_eval_data
 from functools import reduce
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
