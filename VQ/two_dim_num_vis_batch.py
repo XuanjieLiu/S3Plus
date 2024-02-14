@@ -11,13 +11,13 @@ CHECK_POINT = 'checkpoint_50000.pt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
-    "2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymm",
     "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
     "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_SymmCommuAll",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
     "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
 ]
 
 
