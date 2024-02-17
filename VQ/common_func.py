@@ -52,6 +52,7 @@ def load_config_from_exp_name(exp_name, exp_root=EXP_ROOT, config_name='train_co
     sys.path.pop()
     return t_config.CONFIG
 
+
 def record_num_list(record_path, accu_list, exp_num_list=None):
     if exp_num_list is None:
         exp_num_list = [str(i) for i in range(1, 21)]
