@@ -74,6 +74,16 @@ class Records:
         search_list.sort(reverse=reverse)
         return search_list[0:num_extreme]
 
+    def filter_Y_by_X_nums(self, X_nums):
+        idx_list = []
+        filtered_X = []
+        for i in range(len(self.X)):
+            if self.X[i] in X_nums:
+                idx_list.append(i)
+                filtered_X.append(self.X[i])
+        filtered_Y = [self.Y[i] for i in idx_list]
+        return filtered_X, filtered_Y
+
 
 def read_record(path: str):
     with open(path, 'r') as f:
@@ -87,6 +97,37 @@ def read_record(path: str):
         records[name] = Records(name, X, Y)
     return records
 
+
+def find_min_nums_idxs(list: List[float]):
+    min_num = min(list)
+    min_idxs = [i for i in range(len(list)) if list[i] == min_num]
+    return min_idxs
+
+
+def find_optimal_checkpoint(record, keys, check_points_num=None):
+    filtered_idx = []
+    filtered_checkpoints = []
+    for key in keys:
+        if check_points_num is not None and len(check_points_num) != 0:
+            filtered_X, filtered_Y = record[key].filter_Y_by_X_nums(check_points_num)
+        else:
+            filtered_X, filtered_Y = record[key].X, record[key].Y
+        if len(filtered_idx) != 0:
+            filtered_Y = [filtered_Y[i] for i in filtered_idx]
+        min_idxs = find_min_nums_idxs(filtered_Y)
+        if len(filtered_idx) == 0:
+            filtered_idx = min_idxs
+        else:
+            filtered_idx = [filtered_idx[i] for i in min_idxs]
+            filtered_checkpoints = [filtered_X[i] for i in filtered_idx]
+    optimal_checkpoint_num = filtered_checkpoints[-1]
+    return optimal_checkpoint_num
+
+
 if __name__ == '__main__':
-    path = "VQ/exp/2023.03.19_10vq_Zc[2]_Zs[0]_edim1_singleS/1/plus_eval.txt"
-    read_record(path)
+    check_points_num = [n*2000 for n in range(50)]
+    keys = ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED']
+    path = "VQ/exp/2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll/2/Train_record.txt"
+    record = read_record(path)
+    filtered_checkpoints = find_optimal_checkpoint(record, keys, check_points_num)
+    print(filtered_checkpoints)
