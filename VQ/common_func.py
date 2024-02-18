@@ -34,9 +34,9 @@ def find_optimal_checkpoint_num_by_train_config(
     train_config,
     keys=None,
 ):
-    record_name = train_config.CONFIG['train_record_path']
-    checkpoint_interval = train_config.CONFIG['checkpoint_interval']
-    max_iter_num = train_config.CONFIG['max_iter_num']
+    record_name = train_config['train_record_path']
+    checkpoint_interval = train_config['checkpoint_interval']
+    max_iter_num = train_config['max_iter_num']
     check_points_num = int(max_iter_num / checkpoint_interval)
     check_points = [checkpoint_interval * i for i in range(check_points_num)]
     return find_optimal_checkpoint_num(sub_exp_path, record_name, keys, check_points)

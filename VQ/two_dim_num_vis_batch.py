@@ -3,11 +3,10 @@ import os
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 from two_dim_num_vis import MumEval
-from common_func import load_config_from_exp_name, EXP_ROOT
+from common_func import load_config_from_exp_name, EXP_ROOT, find_optimal_checkpoint_num_by_train_config
 
 DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(1,20)-FixedPos-oneStyle')
 RESULT_DIR_NAME = 'two_dim_z_vis'
-CHECK_POINT = 'checkpoint_50000.pt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
@@ -29,9 +28,12 @@ def batch_eval():
         config = load_config_from_exp_name(exp_name)
         evaler = MumEval(config, None, DATASET_PATH)
         for sub_exp in EXP_NUM_LIST:
-            checkpoint_path = os.path.join(exp_path, sub_exp, CHECK_POINT)
+            sub_exp_path = os.path.join(exp_path, sub_exp)
+            optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+            check_point_name = f'checkpoint_{optimal_checkpoint_num}.pt'
+            checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
-            result_path = os.path.join(result_dir, f'{sub_exp}_{CHECK_POINT}.png')
+            result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}.png')
             evaler.num_eval_two_dim(result_path)
 
 

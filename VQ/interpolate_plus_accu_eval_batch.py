@@ -4,20 +4,20 @@ import numpy as np
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 from interpolate_plus_accu_eval import InterpolatePlusAccuEval
-from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT
+from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT, find_optimal_checkpoint_num_by_train_config
 
 
 
-CHECK_POINT = 'checkpoint_40000.pt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_assocCommu",
-    "2024.01.18_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmAssoc",
-    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symmCommu",
-    "2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet",
-    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm",
-    "2024.01.17_2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commu",
-    "2023.11.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_noAssoc",
+    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymm",
+    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
+    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_SymmCommuAll",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
+    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
+    "2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
 ]
 ITP_PLUS_RECORD_PATH_ALL = 'interpolate_plus_accu_all.txt'
 ITP_PLUS_RECORD_PATH_TRAIN = 'interpolate_plus_accu_train.txt'
@@ -32,7 +32,9 @@ if __name__ == "__main__":
         accu_all_list = []
         accu_train_list = []
         for sub_exp in EXP_NUM_LIST:
-            checkpoint_path = os.path.join(exp_path, sub_exp, CHECK_POINT)
+            sub_exp_path = os.path.join(exp_path, sub_exp)
+            optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+            checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
             accu_all, accu_train = evaler.eval(checkpoint_path)
             accu_all_list.append(accu_all)
             accu_train_list.append(accu_train)
