@@ -9,23 +9,58 @@ from typing import List
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 group_list = [
-    # ExpGroup(
-    #     exp_name="2023.08.14_10vq_Zc[2]_Zs[0]_edim12_[0-20]_noPlus",
-    #     exp_alias='no plus',
-    #     sub_exp=[i for i in range(1, 21)],
-    #     record_name="minus_16_1_eval_record.txt",
-    #     is_load_record=False
-    # ),
     ExpGroup(
-        exp_name="2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair",
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
+        exp_alias='w/ assoc & symm & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymm",
+        exp_alias='w/ assoc & symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
+        exp_alias='w/ assoc & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_SymmCommuAll",
+        exp_alias='w/ symm & commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
+        exp_alias='w/ symm',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
         exp_alias='w/ assoc',
         sub_exp=[i for i in range(1, 21)],
         record_name="minus_16_1.1_eval_record.txt",
         is_load_record=False
     ),
     ExpGroup(
-        exp_name="2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair_noAssoc",
-        exp_alias='w/o assoc',
+        exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
+        exp_alias='w/ commu',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="minus_16_1.1_eval_record.txt",
+        is_load_record=False
+    ),
+    ExpGroup(
+        exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
+        exp_alias='w/ nothing',
         sub_exp=[i for i in range(1, 21)],
         record_name="minus_16_1.1_eval_record.txt",
         is_load_record=False
