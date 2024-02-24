@@ -34,10 +34,14 @@ def batch_statistic():
             for i in range(len(EVAL_KEYS)):
                 key = EVAL_KEYS[i]
                 if key in eval_record.keys():
-                    value = eval_record[key].find_Y_value_by_X(optimal_checkpoint_num)[1][0]
+                    value = eval_record[key].filter_Y_by_X_nums([optimal_checkpoint_num])[1][0]
                     record_lists[i].append(value)
         for i in range(len(EVAL_KEYS)):
             key = EVAL_KEYS[i]
             results_path = os.path.join(exp_path, f'statistic_{key}.txt')
             record_num_list(results_path, record_lists[i], EXP_NUM_LIST)
+
+
+if __name__ == "__main__":
+    batch_statistic()
 
