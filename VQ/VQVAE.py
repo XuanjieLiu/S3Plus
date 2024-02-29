@@ -344,7 +344,7 @@ class VQVAE(nn.Module):
 
     def load_tensor(self, path):
         """从文件读取 tensor 对象"""
-        return torch.load(path)
+        return torch.load(path).to(DEVICE)
 
     def index2z(self, idx):
         if self.multi_num_embeddings is not None:
