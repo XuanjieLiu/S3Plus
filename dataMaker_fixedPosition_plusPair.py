@@ -76,6 +76,24 @@ def comp_division(a, b):
     return int(a / b)
 
 
+def gen_pairs_list(min_number, max_number, pair_func):
+    all_idx = []
+    for i in range(min_number, max_number + 1):
+        pair_list = []
+        for a, b in pair_func(i):
+            pair_list.append((a, b))
+        if len(pair_list) != 0:
+            all_idx.append(pair_list)
+    return all_idx
+
+
+def pair_list2set(pair_list, markers, colors):
+    pair_set = []
+    for mar in markers:
+        for color in colors:
+            for pair in pair_list:
+                pair_set.append(PairData(pair[0], pair[1], mar, color))
+    return pair_set
 
 # def make_train_dataset_n2(numbers, markers, colors, dataset_path):
 #     data_root = os.path.join(dataset_path, 'train')
@@ -159,6 +177,33 @@ def make_plusone_triple_datapair_maxN_no_leak(min_number, max_number, markers, c
                         test_set_2.append(PairData(a, b, mar, color))
                     else:
                         test_set_1.append(PairData(a, b, mar, color))
+    return train_set, test_set_1, test_set_2
+
+
+def make_random_one_shot_triple_datapair_no_leak(min_number, max_number, markers, colors, pair_func):
+    assert min_number >= 1, 'min_number should be greater than 1'
+    train_pairs = []
+    test_pairs_1 = []
+    test_pairs_2 = []
+    all_idx = gen_pairs_list(min_number, max_number, pair_func)
+    for pair_list in all_idx:
+        train_idx = random.randint(0, len(pair_list) - 1)
+        sample = pair_list[train_idx]
+        a, b = sample
+        if a == b:
+            test_2_idx = -1
+        else:
+            test_2_idx = len(pair_list) - 1 - train_idx
+        for i in range(0, len(pair_list)):
+            if i == train_idx:
+                train_pairs.append(pair_list[i])
+            elif i == test_2_idx:
+                test_pairs_2.append(pair_list[i])
+            else:
+                test_pairs_1.append(pair_list[i])
+    train_set = pair_list2set(train_pairs, markers, colors)
+    test_set_1 = pair_list2set(test_pairs_1, markers, colors)
+    test_set_2 = pair_list2set(test_pairs_2, markers, colors)
     return train_set, test_set_1, test_set_2
 
 
@@ -403,8 +448,29 @@ def make_dataset_single_style_plus_half_double_set():
     render_dataset(test_set_1, test_root, comp_plus)
 
 
+def make_dataset_single_style_plus_random_one_shot_triple():
+    marks = ['o']
+    colors = ['blue']
+    start = 1
+    end = 20
+    data_root = f'dataset/single_style_plus_random_one_shot_triple_set({start},{end})'
+    train_root = os.path.join(data_root, 'train')
+    test_root_1 = os.path.join(data_root, 'test_1')
+    test_root_2 = os.path.join(data_root, 'test_2')
+    train_set, test_set_1, test_set_2 = make_random_one_shot_triple_datapair_no_leak(
+        start,
+        end,
+        marks,
+        colors,
+        sum_pairs(start),
+    )
+    render_dataset(train_set, train_root, comp_plus)
+    render_dataset(test_set_1, test_root_1, comp_plus)
+    render_dataset(test_set_2, test_root_2, comp_plus)
+
+
 if __name__ == "__main__":
     # make_dataset_single_style_plus_one_double_set()
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    make_dataset_single_style_plus_half_double_set()
+    make_dataset_single_style_plus_random_one_shot_triple()

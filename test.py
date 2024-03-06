@@ -31,10 +31,16 @@ import numpy as np
 # for item in y:
 #     print(item.a)
 
-d = {
-    '1': 1,
-    '2': 2,
-    '1.4': 1.5,
-}
+# d = {
+#     '1': 1,
+#     '2': 2,
+#     '1.4': 1.5,
+# }
+#
+# print(d[str(1.4)])
 
-print(d[str(1.4)])
+a = [1,2,3,4,5]
+# print(a[-3])
+# print(a[2])
+for i in range(10):
+    print(random.randint(0,3))
