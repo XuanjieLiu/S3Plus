@@ -10,14 +10,14 @@ from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT, fi
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocCommuAll",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocSymmCommuAll",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_commuAll",
-    "2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_SymmCommuAll",
-    "2024.02.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Assoc",
-    "2024.02.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocSymm",
-    "2024.02.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Symm",
-    "2024.02.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocCommuAll",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocSymmCommuAll",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_commuAll",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_SymmCommuAll",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Assoc",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocSymm",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Symm",
+    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Nothing",
 ]
 ITP_PLUS_RECORD_PATH_ALL = 'interpolate_plus_accu_all.txt'
 ITP_PLUS_RECORD_PATH_TRAIN = 'interpolate_plus_accu_train.txt'
