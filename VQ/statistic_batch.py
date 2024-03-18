@@ -10,7 +10,7 @@ EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocCommuAll",
     "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocSymmCommuAll",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_commuAll",
+    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_CommuAll",
     "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_SymmCommuAll",
     "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Assoc",
     "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocSymm",
