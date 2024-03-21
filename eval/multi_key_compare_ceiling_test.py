@@ -117,7 +117,7 @@ exp_groups = [eg1, eg2]
 #     sub_exp=[i for i in range(1, 21)],
 #     record_name="book10_minus_1024_1_random_eval_record.txt",
 # )
-exp_groups = [eg1, eg2]
+# exp_groups = [eg1, eg2]
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
