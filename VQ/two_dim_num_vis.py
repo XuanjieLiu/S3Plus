@@ -8,6 +8,7 @@ from shared import *
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from VQ.eval_common import EvalHelper
+from matplotlib import collections as matcoll
 
 matplotlib.use('AGG')
 
@@ -49,6 +50,7 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
     Y = [item[1] for item in sorted_num_z]
     for i in range(0, len(num_z)):
         plt.scatter(X[i], Y[i], marker=f'${sorted_label[i]}$', s=60)
+        draw_scatter_gird(plt.gca(), X[i], Y[i])
     plt.plot(X, Y, linestyle='dashed', linewidth=0.5)
     if result_path is None:
         plt.show()
@@ -58,6 +60,13 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
         plt.clf()
         plt.close()
 
+
+def draw_scatter_gird(ax: plt.Axes, x, y):
+    horizontal_line = [(0, y), (x, y)]
+    vertical_line = [(x, 0), (x, y)]
+    lines = [horizontal_line, vertical_line]
+    linecoll = matcoll.LineCollection(lines, linewidths=0.2)
+    ax.add_collection(linecoll)
 
 
 

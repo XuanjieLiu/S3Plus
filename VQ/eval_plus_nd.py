@@ -16,6 +16,7 @@ import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from scipy import stats
+from common_func import parse_label
 
 matplotlib.use('AGG')
 MODEL_PATH = 'curr_model.pt'
@@ -36,8 +37,6 @@ class PlusZ:
         self.label_c = label_a + label_b
 
 
-def parse_label(label):
-    return int(label.split('.')[0].split('-')[1])
 
 
 # def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):

@@ -3,14 +3,13 @@ import os
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 from other_task_eval import OtherTask, is_need_train
-from common_func import find_optimal_checkpoint_num_by_train_config
+from common_func import find_optimal_checkpoint_num_by_train_config, EXP_ROOT
 
 if len(sys.argv) < 2:
     print("Usage: python myscript.py arg1 arg2 ...")
     sys.exit()
 
-EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
-sys.path.append(EXP_ROOT_PATH)
+sys.path.append(EXP_ROOT)
 EXP_NAME_LIST = sys.argv[1:]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
@@ -18,7 +17,7 @@ OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 
 for exp_num in EXP_NUM_LIST:
     for exp_name in EXP_NAME_LIST:
-        exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
+        exp_path = os.path.join(EXP_ROOT, exp_name)
         os.chdir(exp_path)
         sys.path.append(exp_path)
         print(f'Exp path: {exp_path}')

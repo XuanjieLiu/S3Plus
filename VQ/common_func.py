@@ -2,7 +2,6 @@ import sys
 import os
 import numpy as np
 from loss_counter import read_record, find_optimal_checkpoint
-
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 
@@ -63,3 +62,7 @@ def record_num_list(record_path, accu_list, exp_num_list=None):
         f.write(f'Std accu: {std_accu}\n')
         for i in range(len(accu_list)):
             f.write(f'Exp {exp_num_list[i]}: {accu_list[i]}\n')
+
+def parse_label(label):
+    return int(label.split('.')[0].split('-')[1])
+

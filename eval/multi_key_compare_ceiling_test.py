@@ -7,117 +7,28 @@ from multi_key_compare import MultiKeyCompareGroup, plot_graph
 import numpy as np
 
 
-
-# eg1 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc8",
-#     exp_alias='fc 8',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_8_1_linear_eval_record.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc16",
-#     exp_alias='fc 16',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_16_1_linear_eval_record.txt",
-# )
-#
-# eg3 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc32",
-#     exp_alias='fc 32',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_32_1_linear_eval_record.txt",
-# )
-#
-# eg4 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc128",
-#     exp_alias='fc 128',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_128_1_linear_eval_record.txt",
-# )
-#
-# eg5 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc1024",
-#     exp_alias='fc 1024',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_1024_1_linear_eval_record.txt",
-# )
-# exp_groups = [eg1, eg2, eg3, eg4, eg5]
+exp_groups = [
+    ExpGroup(
+        exp_name="2024.03.23_ceilingTest_book2_fc1024_16_dim8",
+        exp_alias='FC: 1024×1, Linear Repr',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="book2_minus_1024_1_linear_eval_record.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.03.23_ceilingTest_book2_fc1024_16_dim8",
+        exp_alias='FC: 16×1, Linear Repr',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="book2_minus_1024_1_linear_eval_record.txt",
+    ),
+    ExpGroup(
+        exp_name="2024.03.23_ceilingTest_book2_fc1024_16_dim8",
+        exp_alias='FC: 16×1, Random Repr',
+        sub_exp=[i for i in range(1, 21)],
+        record_name="book2_minus_16_1_random_eval_record.txt",
+    )
+]
 
 
-# eg1 = ExpGroup(
-#     exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_noPlus",
-#     exp_alias='No Plus (book_size=10, emb_num=2, emb_dim=1)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_noAssoc",
-#     exp_alias='w/o assoc (book_size=10, emb_num=2, emb_dim=1)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-#
-# eg3 = ExpGroup(
-#     exp_name="2023.09.24_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1",
-#     exp_alias='w/ (book_size=10, emb_num=2, emb_dim=1)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-#
-# eg4 = ExpGroup(
-#     exp_name="2023.09.24_100vq_Zc[1]_Zs[0]_edim2_[0-20]_noPlus",
-#     exp_alias='No Plus (book_size=100, emb_num=1, emb_dim=2)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-#
-# eg5 = ExpGroup(
-#     exp_name="2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_noAssoc",
-#     exp_alias='w/o assoc (book_size=100, emb_num=1, emb_dim=2)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-#
-# eg6 = ExpGroup(
-#     exp_name="2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1",
-#     exp_alias='w/ assoc (book_size=100, emb_num=1, emb_dim=2)',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="minus_16_1_eval_record.txt",
-# )
-# exp_groups = [eg1, eg2, eg3, eg4, eg5, eg6]
-
-
-eg1 = ExpGroup(
-    exp_name="2023.11.17_ceilingTest_edim2_[1_20]_fc16_1",
-    exp_alias='FC: 16×1, Linear Repr',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_16_1_linear_eval_record.txt",
-)
-
-eg2 = ExpGroup(
-    exp_name="2023.11.17_ceilingTest_edim2_[1_20]_fc16_1",
-    exp_alias='FC: 16×1, Random Repr',
-    sub_exp=[i for i in range(1, 21)],
-    record_name="book10_minus_16_1_random_eval_record.txt",
-)
-exp_groups = [eg1, eg2]
-
-# eg1 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc1024_dim24",
-#     exp_alias='fc1024, 24dim, linear',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_1024_1_linear_eval_record.txt",
-# )
-#
-# eg2 = ExpGroup(
-#     exp_name="2023.09.18_ceilingTest_book10_fc1024_dim24",
-#     exp_alias='fc1024, 24dim, random',
-#     sub_exp=[i for i in range(1, 21)],
-#     record_name="book10_minus_1024_1_random_eval_record.txt",
-# )
-# exp_groups = [eg1, eg2]
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']
@@ -126,7 +37,6 @@ OUTPUT_PATH = "train_test_summary/"
 EXTREME_NUM = 1
 ITER_AFTER = 2000
 Y_NAME = "Plus Accuracy (max=1.0) ↑"
-RESULT_NAME = f"{'.'.join(COMPARE_KEYS)}_{eg1.exp_name}_{len(exp_groups)}.png"
 
 
 def exp_group2compare_group(exp_group: ExpGroup):

@@ -134,6 +134,7 @@ class PlusTrainer:
         self.is_symm_assoc = config['is_symm_assoc']
         self.is_pure_assoc = config['is_pure_assoc']
         self.is_commutative_all = config['is_commutative_all']
+        self.is_full_symm = config['is_full_symm']
 
     def init_plus_eval_loader_2(self, config, key):
         if config[key] is None:
@@ -363,30 +364,37 @@ class PlusTrainer:
 
     def associative_loss(self, z_a, z_b, z_c):
         e_ab, e_q_loss_ab, z_ab = self.model.plus(z_a, z_b)
-        e_abc1, e_q_loss_abc1, z_abc1 = self.model.plus(e_ab, z_c)
+        e_abc_1, e_q_loss_abc_1, z_abc_1 = self.model.plus(e_ab, z_c)
         # symm_assoc
         e_ac, e_q_loss_ac, z_ac = self.model.plus(z_a, z_c)
-        e_acb2, e_q_loss_acb2, z_acb2 = self.model.plus(e_ac, z_b)
+        e_acb_1, e_q_loss_acb_1, z_acb_1 = self.model.plus(e_ac, z_b)
+        e_bac_2, e_q_loss_bac_2, z_bac_2 = self.model.plus(z_b, e_ac)
         # pure_assoc
         e_bc, e_q_loss_bc, z_bc = self.model.plus(z_b, z_c)
-        e_abc2, e_q_loss_abc2, z_abc2 = self.model.plus(z_a, e_bc)
+        e_abc_2, e_q_loss_abc_2, z_abc_2 = self.model.plus(z_a, e_bc)
         # choose loss
         assoc_plus_loss = torch.zeros(1)[0].to(DEVICE)
         if self.config['is_assoc_on_e']:
             if self.is_symm_assoc:
-                assoc_plus_loss += self.mean_mse(e_abc1, e_acb2) * self.associative_z_loss_scalar
+                assoc_plus_loss += self.mean_mse(e_abc_1, e_acb_1) * self.associative_z_loss_scalar
+                if self.is_full_symm:
+                    assoc_plus_loss += self.mean_mse(e_abc_2, e_bac_2) * self.associative_z_loss_scalar
             if self.is_pure_assoc:
-                assoc_plus_loss += self.mean_mse(e_abc1, e_abc2) * self.associative_z_loss_scalar
+                assoc_plus_loss += self.mean_mse(e_abc_1, e_abc_2) * self.associative_z_loss_scalar
         if self.config['is_assoc_on_z']:
             if self.is_symm_assoc:
-                assoc_plus_loss += self.mean_mse(z_abc1, z_acb2) * self.associative_z_loss_scalar
+                assoc_plus_loss += self.mean_mse(z_abc_1, z_acb_1) * self.associative_z_loss_scalar
+                if self.is_full_symm:
+                    assoc_plus_loss += self.mean_mse(z_abc_2, z_bac_2) * self.associative_z_loss_scalar
             if self.is_pure_assoc:
-                assoc_plus_loss += self.mean_mse(z_abc1, z_abc2) * self.associative_z_loss_scalar
-        e_q_loss = e_q_loss_ab + e_q_loss_abc1
+                assoc_plus_loss += self.mean_mse(z_abc_1, z_abc_2) * self.associative_z_loss_scalar
+        e_q_loss = e_q_loss_ab + e_q_loss_abc_1
         if self.is_symm_assoc:
-            e_q_loss += e_q_loss_acb2
+            e_q_loss += e_q_loss_acb_1
+            if self.is_full_symm:
+                e_q_loss += e_q_loss_bac_2
         if self.is_pure_assoc:
-            e_q_loss += e_q_loss_abc2
+            e_q_loss += e_q_loss_abc_2
         return assoc_plus_loss + self.VQPlus_eqLoss_scalar * e_q_loss
 
     def operation_loss_z(self, z_all_content):

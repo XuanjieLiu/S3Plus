@@ -12,7 +12,8 @@ from torch.utils.data import DataLoader
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
 from dataMaker_fixedPosition_plusPair import data_name_2_labels
-
+from common_func import parse_label
+from evaler_common import OperResult
 
 
 def name_appd(name: str, path:str):
@@ -38,7 +39,6 @@ class OtherTask:
         self.latent_code_1 = self.pretrained.latent_code_1
         self.num_class = other_task_config['num_class']
         self.simple_fc = None
-        self.load_pretrained()
         # self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
         task_name = other_task_config['task_name']
         self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
@@ -72,7 +72,7 @@ class OtherTask:
             print(f"Pretrained Model is loaded")
             return pretrained
         else:
-            print("No pretrained parameters")
+            print(f"No pretrained parameters found in {pretrained_path}")
             exit()
 
     def train(self):
@@ -104,11 +104,35 @@ class OtherTask:
         e_content = e_all[..., 0:self.latent_code_1]
         ec_a, ec_b, ec_c = split_into_three(e_content)
         classify_ab = self.simple_fc.classify_composition(ec_a, ec_b)
-        recon_ab = self.simple_fc.recon_composition(ec_a, ec_b)
+        recon_z_ab = self.simple_fc.recon_composition(ec_a, ec_b)
         loss_classify = self.CE_loss(classify_ab, tensor_y)
-        loss_recon = self.MSE_loss(recon_ab, ec_c.detach())
+        loss_recon = self.MSE_loss(recon_z_ab, ec_c.detach())
         accu = (classify_ab.argmax(1) == tensor_y).float().mean().item()
-        return classify_ab, tensor_y, loss_classify, loss_recon, accu
+        return classify_ab, tensor_y, loss_classify, loss_recon, accu, recon_z_ab
+
+    def eval_dec_view(self, data_path, result_path):
+        self.resume()
+        os.makedirs(result_path, exist_ok=True)
+        dataset = Dataset(data_path)
+        loader = DataLoader(dataset, batch_size=128, shuffle=False)
+        styles = [('-').join(f.split('-')[2:]) for f in dataset.f_list]
+        all_oper_result = []
+        for batch_ndx, sample in enumerate(loader):
+            data, labels = sample
+            label_a = [parse_label(x) for x in labels[0]]
+            label_b = [parse_label(x) for x in labels[1]]
+            label_c = [parse_label(x) for x in labels[2]]
+            plus_result = []
+            classify_ab, tensor_y, loss_classify, loss_recon, accu, recon_z_ab = self.fc_comp(sample)
+            e_ab, e_q_loss = self.pretrained.vq_layer(recon_z_ab)
+            recon_ab = self.pretrained.batch_decode_from_z(e_ab)
+            for i in range(0, recon_z_ab.size(0)):
+                plus_result.append(OperResult(label_a[i], label_b[i], label_c[i], e_ab[i], recon_ab[i]))
+            all_oper_result.extend(plus_result)
+
+        for i in range(len(all_oper_result)):
+            all_oper_result[i].style = styles[i]
+            all_oper_result[i].save_recon(result_path)
 
     def one_epoch(self, epoch_num, loss_counter: LossCounter, data_loader,
                   is_log, optimizer: torch.optim.Optimizer = None):
@@ -116,7 +140,7 @@ class OtherTask:
             print(f'Epoch: {epoch_num}')
             if optimizer is not None:
                 optimizer.zero_grad()
-            ec_ab, tensor_y, loss_classify, loss_recon, accu = self.fc_comp(sample)
+            ec_ab, tensor_y, loss_classify, loss_recon, accu, recon_z_ab = self.fc_comp(sample)
             loss_counter.add_values([
                 loss_classify.item(),
                 accu,

@@ -52,6 +52,7 @@ CONFIG = {
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
     'is_symm_assoc': True,
+    'is_full_symm': False,
     'is_pure_assoc': True,
     'network_config': {
         'enc_dec': {

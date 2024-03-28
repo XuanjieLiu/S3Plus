@@ -2,15 +2,15 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1",
-    'plus_eval_set_path_2': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2",
+    'train_data_path': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/train",
+    'single_img_eval_set_path': f"{data_root}/(1,20)-FixedPos-oneStyle",
+    'plus_eval_set_path': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/test_1",
+    'plus_eval_set_path_2': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/test_2",
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
     'latent_code_2': 0,
-    'embedding_dim': 4,
+    'embedding_dim': 1,
     'is_plot_zc_value': True,
     'embeddings_num': 10,
     'is_plot_vis_num': True,
@@ -29,10 +29,10 @@ CONFIG = {
     'eval_interval': 2000,
     'is_save_img': True,
     'batch_size': 128,
-    'is_commutative_train': True,
-    'is_commutative_all': True,
+    'is_commutative_train': False,
+    'is_commutative_all': False,
     'z_plus_loss_scalar': 0.02,
-    'commutative_z_loss_scalar': 0.02,
+    'commutative_z_loss_scalar': 0.0,
     'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
     'plus_recon_loss_scalar': 3,
@@ -52,7 +52,7 @@ CONFIG = {
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
     'is_symm_assoc': True,
-    'is_full_symm': False,
+    'is_full_symm': True,
     'is_pure_assoc': False,
     'network_config': {
         'enc_dec': {

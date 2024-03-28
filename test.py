@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import math
 
 import sys
 import numpy as np
@@ -38,5 +39,12 @@ import numpy as np
 # }
 #
 # print(d[str(1.4)])
+
+a = pow(math.pi, 2)
+b = pow(math.pi, 2.5)
+c = pow(math.e, 3)
+print(pow(a, 2) + pow(b, 2), pow(c, 2))
+print(pow(math.pi, 3))
+
 
 
