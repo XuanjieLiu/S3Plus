@@ -9,14 +9,15 @@ DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../da
 RESULT_DIR_NAME = 'two_dim_z_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocCommuAll",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocSymmCommuAll",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_commuAll",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_SymmCommuAll",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Assoc",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocSymm",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Symm",
-    "2024.03.06_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Nothing",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocFullsymm",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocFullsymmCommuAll",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_FullsymmCommuAll",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocFullsymm",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocFullsymmCommuAll",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_FullsymmCommuAll",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
 ]
 
 
