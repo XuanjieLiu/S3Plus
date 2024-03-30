@@ -46,9 +46,14 @@ def is_need_train(train_config):
 def iter_add(a, b):
     return [a[i] + b[i] for i in range(0, len(a))]
 
-def split_into_three(tensor):
-    sizes = [3, int(tensor.size(0) / 3), *tensor.size()[1:]]
-    new_tensor = tensor.reshape(*sizes)
+
+def split_into_three(tensor, not_divisible_ok=False):
+    group_size = int(tensor.size(0) / 3)
+    sizes = [3, group_size, *tensor.size()[1:]]
+    if not_divisible_ok:
+        new_tensor = tensor[0:group_size*3].reshape(*sizes)
+    else:
+        new_tensor = tensor.reshape(*sizes)
     return new_tensor[0], new_tensor[1], new_tensor[2]
 
 
@@ -135,6 +140,7 @@ class PlusTrainer:
         self.is_pure_assoc = config['is_pure_assoc']
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
+        self.is_twice_oper = config['is_twice_oper']
 
     def init_plus_eval_loader_2(self, config, key):
         if config[key] is None:
@@ -322,7 +328,7 @@ class PlusTrainer:
         return recon_loss, z_loss + e_q_loss * self.VQPlus_eqLoss_scalar
 
     def commutative_z_loss(self, z_1, z_2):
-        if self.is_commutative_all:
+        if self.is_commutative_all or self.is_twice_oper:
             z_all = torch.concat([z_1, z_2], dim=0)
             idx_1 = torch.randperm(z_all.size(0))
             z_perm = z_all[idx_1, ...]
@@ -351,7 +357,7 @@ class PlusTrainer:
         return z_a.to(DEVICE), z_b.to(DEVICE), z_c.to(DEVICE)
 
     def zc_based_associative_z(self, z_all_content):
-        if self.is_assoc_within_batch:
+        if self.is_assoc_within_batch and not self.is_twice_oper:
             za, zb, zc = split_into_three(z_all_content)
             z_all = torch.concat([za, zb, za, zb], dim=0)
         else:
@@ -398,16 +404,34 @@ class PlusTrainer:
         return assoc_plus_loss + self.VQPlus_eqLoss_scalar * e_q_loss
 
     def operation_loss_z(self, z_all_content):
-        za, zb, zc = split_into_three(z_all_content)
+        if self.is_twice_oper:
+            random_c = self.random_plus(z_all_content, z_all_content)
+            z_contents = torch.cat([z_all_content, random_c], dim=0)
+        else:
+            z_contents = z_all_content
+        za, zb, zc = split_into_three(z_contents)
         loss = torch.zeros(1)[0].to(DEVICE)
         if self.commutative_z_loss_scalar > self.min_loss_scalar and self.is_commutative_train:
             loss += self.commutative_z_loss(za, zb)
         if self.associative_z_loss_scalar > self.min_loss_scalar:
             if self.config['is_zc_based_assoc']:
-                loss += self.associative_loss(*self.zc_based_associative_z(z_all_content))
+                loss += self.associative_loss(*self.zc_based_associative_z(z_contents))
             if self.config['is_rand_z_assoc']:
-                loss += self.associative_loss(*self.rand_associative_z(z_all_content))
+                loss += self.associative_loss(*self.rand_associative_z(z_contents))
         return loss
+
+    def random_plus(self, za, zb):
+        assert za.size(0) == zb.size(0), f"za size {za.size(0)} != zb size {zb.size(0)}"
+        z_all = torch.cat([za, zb], dim=0)
+        idx_1 = torch.randperm(z_all.size(0))
+        z_perm = z_all[idx_1, ...]
+        z_a = z_perm[:za.size(0), ...]
+        z_b = z_perm[za.size(0):, ...]
+        e_c, e_q_loss_c, z_c = self.model.plus(z_a, z_b)
+        if self.plus_by_embedding:
+            return e_c
+        else:
+            return z_c
 
     def vae_loss(self, data, recon):
         recon_loss = nn.MSELoss(reduction='mean')(recon, data)

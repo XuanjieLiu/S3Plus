@@ -49,7 +49,7 @@ CONFIG = {
     'is_rand_z_assoc': False,
     'is_assoc_on_e': True,
     'is_assoc_on_z': False,
-    'is_assoc_within_batch': True,
+    'is_assoc_within_batch': False,
     'is_switch_digital': False,
     'is_symm_assoc': True,
     'is_full_symm': True,

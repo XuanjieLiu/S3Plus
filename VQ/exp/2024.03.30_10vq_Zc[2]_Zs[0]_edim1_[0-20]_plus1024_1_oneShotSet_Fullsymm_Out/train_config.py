@@ -2,10 +2,10 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1",
-    'plus_eval_set_path_2': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2",
+    'train_data_path': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/train",
+    'single_img_eval_set_path': f"{data_root}/(1,20)-FixedPos-oneStyle",
+    'plus_eval_set_path': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/test_1",
+    'plus_eval_set_path_2': f"{data_root}/single_style_plus_random_one_shot_triple_set(1,20)/test_2",
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -49,7 +49,7 @@ CONFIG = {
     'is_rand_z_assoc': False,
     'is_assoc_on_e': True,
     'is_assoc_on_z': False,
-    'is_assoc_within_batch': True,
+    'is_assoc_within_batch': False,
     'is_switch_digital': False,
     'is_symm_assoc': True,
     'is_full_symm': True,
