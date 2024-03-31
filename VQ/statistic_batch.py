@@ -8,15 +8,12 @@ from loss_counter import read_record
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocFullsymm",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocFullsymmCommuAll",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_FullsymmCommuAll",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocFullsymm",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_AssocFullsymmCommuAll",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_FullsymmCommuAll",
-    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm_Out",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm_OutTwice",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm_Out",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm_OutTwice",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_Out",
+    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OutTwice",
 ]
 EVAL_RECORD_NAME = 'plus_eval.txt'
 EVAL_KEYS = ['train_accu', 'eval_accu', 'eval_accu_2']
