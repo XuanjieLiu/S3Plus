@@ -54,13 +54,14 @@ class MumEval:
         e_plus, e_q_loss, z_plus = self.model.plus(z1_seq, z2_repeat)
         return e_plus.detach(), z_plus.detach()
 
-    def integer_plus(self, num_zc, num_labels):
+    def integer_plus(self, num_zc, num_labels, plus_times=5):
+        assert plus_times <= len(num_zc), f'plus_times: {plus_times} should be less than len(num_zc): {len(num_zc)}'
         e_seq = []
         z_seq = []
         label_seq = []
         labels = []
         assert len(num_zc) == len(num_labels), f'len num_zc: {len(num_zc)} != len num_labels: {len(num_labels)}'
-        for i in range(len(num_zc)):
+        for i in range(plus_times):
             e_plus, z_plus = self.plus_z1seq_by_repeat_z2(num_zc, num_zc[i])
             label_plus = [label + num_labels[i] for label in num_labels]
             e_seq.append(e_plus)
