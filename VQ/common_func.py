@@ -1,5 +1,7 @@
 import sys
 import os
+from typing import List
+
 import numpy as np
 from loss_counter import read_record, find_optimal_checkpoint
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
@@ -63,6 +65,39 @@ def record_num_list(record_path, accu_list, exp_num_list=None):
         for i in range(len(accu_list)):
             f.write(f'Exp {exp_num_list[i]}: {accu_list[i]}\n')
 
+
 def parse_label(label):
     return int(label.split('.')[0].split('-')[1])
+
+
+def sorted_idx(nums: List[float]):
+    return sorted(range(len(nums)), key=lambda k: nums[k])
+
+
+def sort_X_by_Y(X: List, Y: List[float]):
+    return [X[i] for i in sorted_idx(Y)]
+
+
+def add_element_at_index(arr: List, element, index):
+    return arr[:index] + [element] + arr[index:]
+
+def add_prefix_0_for_int_small_than_10(nums: List[int]):
+    return [f'0{num}' if num < 10 else str(num) for num in nums]
+
+
+def calc_tensor_seq_limits(tensor_seq, margin=0.1):
+    limits = []
+    for i in range(tensor_seq.size(-1)):
+        max_val = tensor_seq[..., i].max().item()
+        min_val = tensor_seq[..., i].min().item()
+        interval = (max_val - min_val) * margin
+        limits.append((min_val - interval, max_val + interval))
+    return limits
+
+
+if __name__ == "__main__":
+    a = [1,0,1.5,3,2.5,2]
+    print(sorted_idx(a))
+    print(sort_X_by_Y(a, a))
+    print(sorted(a))
 

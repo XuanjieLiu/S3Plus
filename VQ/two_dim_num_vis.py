@@ -41,7 +41,7 @@ def plot_z_against_label(num_z, num_labels, eval_path=None, eval_helper: EvalHel
         plt.close()
 
 
-def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
+def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None):
     assert len(num_z[0]) == 2, f"The representation dimension of a number should be two, but got {len(num_z[0])} instead."
     sorted_label = sorted(num_labels)
     sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
@@ -52,6 +52,12 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None):
         plt.scatter(X[i], Y[i], marker=f'${sorted_label[i]}$', s=60)
         draw_scatter_gird(plt.gca(), X[i], Y[i])
     plt.plot(X, Y, linestyle='dashed', linewidth=0.5)
+    plt.xlabel('z1')
+    plt.ylabel('z2')
+    if x_limit is not None:
+        plt.xlim(x_limit)
+    if y_limit is not None:
+        plt.ylim(y_limit)
     if result_path is None:
         plt.show()
     else:
