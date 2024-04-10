@@ -29,6 +29,23 @@ MARK_NAME_SPACE = {
 }
 
 
+def plot_arabic_numbers(num, save_dir, color: str):
+    fig = plt.figure(figsize=(0.64, 0.64))
+    a1 = fig.add_axes([0, 0, 1, 1])
+    a1.scatter(0, 0,
+               c=color,
+               marker=f'${num}$',
+               s=800,
+               )
+    a1.set_ylim(-0.5, 0.5)
+    a1.set_xlim(-0.5, 0.5)
+    plt.savefig(save_dir)
+    plt.cla()
+    plt.clf()
+    plt.close()
+    return
+
+
 def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=True):
     x = [n[0] for n in position_list]
     y = [n[1] for n in position_list]
@@ -123,3 +140,5 @@ POSITIONS = {
 
 }
 
+if "__main__" == __name__:
+    plot_arabic_numbers(1, save_dir='./3.png', color='blue')

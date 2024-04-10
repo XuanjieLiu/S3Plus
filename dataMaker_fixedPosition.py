@@ -46,6 +46,7 @@ NEW_SHAPE_COLOR_CONF = [
     NEW_COLORS,
 ]
 
+
 def make_dataset_1(data_path, numbers, markers, colors):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
@@ -56,5 +57,14 @@ def make_dataset_1(data_path, numbers, markers, colors):
                 plot_a_scatter(position, fig_path, marker=mar, color=color, is_fill=i != 0)
 
 
+def make_arabic_num_dataset(data_path, numbers, colors):
+    os.makedirs(data_path, exist_ok=True)
+    for i in numbers:
+        for color in colors:
+            fig_path = os.path.join(data_path, f'{i}-default-{color}')
+            plot_arabic_numbers(i, fig_path, color)
+
+
 if __name__ == "__main__":
-    make_dataset_1(*NEW_SHAPE_COLOR_CONF)
+    data_path = f'{DATA_ROOT}/(1,20)-FixedPos-oneStyle_arabic'
+    make_arabic_num_dataset(data_path, range(1, 21), ['blue'])

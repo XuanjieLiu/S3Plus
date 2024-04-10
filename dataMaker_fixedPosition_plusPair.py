@@ -47,6 +47,27 @@ def draw_data(i, j, mar, color, data_path, compositional_func):
     )
 
 
+def draw_arabic_data(i, j, color, data_path, compositional_func):
+    os.makedirs(data_path, exist_ok=True)
+    plot_arabic_numbers(
+        i,
+        save_dir=os.path.join(data_path, f'a-{i}'),
+        color=color
+    )
+    plot_arabic_numbers(
+        j,
+        save_dir=os.path.join(data_path, f'b-{j}'),
+        color=color
+    )
+    result = compositional_func(i, j)
+    print(f'i={i}, j={j}, k={result}')
+    plot_arabic_numbers(
+        result,
+        save_dir=os.path.join(data_path, f'c-{result}'),
+        color=color
+    )
+
+
 def data_name_2_labels(data: Iterable):
     return torch.LongTensor([data_name_2_num(x) for x in data])
 
@@ -266,6 +287,17 @@ def render_dataset(data_list: List[PairData], data_root: str, compositional_func
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
         draw_data(a, b, marker, color, data_path, compositional_func)
+
+
+def render_arabic_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
+    for data in tqdm(data_list, desc=data_root):
+        a = data.a
+        b = data.b
+        color = data.color
+        data_name = f'{a}-{b}-default-{color}'
+        data_path = os.path.join(data_root, data_name)
+        os.makedirs(data_path, exist_ok=True)
+        draw_arabic_data(a, b, color, data_path, compositional_func)
 
 
 def sum_pairs(min_number):
