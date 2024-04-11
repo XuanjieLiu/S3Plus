@@ -5,7 +5,6 @@ from importlib import reload
 from two_dim_num_vis import MumEval
 from common_func import load_config_from_exp_name, EXP_ROOT, find_optimal_checkpoint_num_by_train_config
 
-DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
 RESULT_DIR_NAME = 'two_dim_z_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
@@ -24,7 +23,8 @@ def batch_eval():
         result_dir = os.path.join(exp_path, RESULT_DIR_NAME)
         os.makedirs(result_dir, exist_ok=True)
         config = load_config_from_exp_name(exp_name)
-        evaler = MumEval(config, None, DATASET_PATH)
+        dataset_path = config['single_img_eval_set_path']
+        evaler = MumEval(config, None, dataset_path)
         for sub_exp in EXP_NUM_LIST:
             sub_exp_path = os.path.join(exp_path, sub_exp)
             optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
