@@ -151,7 +151,6 @@ class InterpolatePlusAccuEval:
 
 
 if __name__ == "__main__":
-    DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
     EXP_NAME = '2023.09.25_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1'
     SUB_EXP = 16
     CHECK_POINT = './checkpoint_60000.pt'
