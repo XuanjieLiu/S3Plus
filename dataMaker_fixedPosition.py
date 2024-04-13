@@ -66,5 +66,5 @@ def make_arabic_num_dataset(data_path, numbers, colors):
 
 
 if __name__ == "__main__":
-    data_path = f'{DATA_ROOT}/(1,20)-FixedPos-oneStyle_arabic'
-    make_arabic_num_dataset(data_path, range(1, 21), ['blue'])
+    data_path = f'{DATA_ROOT}/(0,99)-FixedPos-oneStyle_arabic'
+    make_arabic_num_dataset(data_path, range(0, 100), ['blue'])

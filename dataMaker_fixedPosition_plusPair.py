@@ -418,6 +418,28 @@ def make_dataset_multi_style_plus():
     render_dataset(test_set, test_root, comp_plus)
 
 
+def make_hundred_dataset_plus_arabic():
+    marks = ['default']
+    colors = ['blue']
+    start = 0
+    end = 99
+    data_root = f'dataset/single_style_pairs({start},{end})_arabic'
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN_no_leak(
+        start,
+        end,
+        3,
+        0.33,
+        marks,
+        colors,
+        sum_pairs(start),
+    )
+    render_arabic_num_dataset(train_set, train_root, comp_plus)
+    render_arabic_num_dataset(test_set, test_root, comp_plus)
+
+
 def make_dataset_single_style_plus_one_triple_set():
     marks = ['o']
     colors = ['blue']
@@ -505,4 +527,5 @@ if __name__ == "__main__":
     # make_dataset_single_style_plus_one_double_set()
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
-    make_dataset_single_style_plus_random_one_shot_triple()
+    # make_dataset_single_style_plus_random_one_shot_triple()
+    make_hundred_dataset_plus_arabic()
