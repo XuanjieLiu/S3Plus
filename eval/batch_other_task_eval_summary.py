@@ -10,14 +10,10 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 
 EXP_NAME_LIST = [
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocCommuAll",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocSymmCommuAll",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_CommuAll",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_SymmCommuAll",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Assoc",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_AssocSymm",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Symm",
-    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Nothing",
+    "2024.04.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_arabic_AssocFullsymm",
+    "2024.04.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_arabic_AssocFullsymmCommu",
+    "2024.04.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_arabic_Fullsymm",
+    "2024.04.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_arabic_Nothing",
 ]
 group_list = [
     ExpGroup(
