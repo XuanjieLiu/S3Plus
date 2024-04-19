@@ -4,12 +4,10 @@ import numpy as np
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 from eval_multi_style import AccuEval
-from common_func import EXP_ROOT, DATASET_ROOT, load_config_from_exp_name, record_num_list
-
-
+from common_func import EXP_ROOT, DATASET_ROOT, load_config_from_exp_name, record_num_list, \
+    find_optimal_checkpoint_num_by_train_config
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
-CHECK_POINT = 'checkpoint_10000.pt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
@@ -38,7 +36,9 @@ if __name__ == "__main__":
         list_shape_accu = []
         list_all_accu = []
         for sub_exp in EXP_NUM_LIST:
-            checkpoint_path = os.path.join(exp_path, sub_exp, CHECK_POINT)
+            sub_exp_path = os.path.join(exp_path, sub_exp)
+            optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+            checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
             list_color_accu.append(color_evaler.eval_check_point(checkpoint_path))
             list_shape_accu.append(shape_evaler.eval_check_point(checkpoint_path))
             list_all_accu.append(all_evaler.eval_check_point(checkpoint_path))
