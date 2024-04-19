@@ -12,6 +12,17 @@ EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 DEFAULT_CHECKPOINTS_NUM = [n*2000 for n in range(50)]
 DEFAULT_KEYS = ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED']
 DEFAULT_RECORD_NAME = 'Train_record.txt'
+SPECIFIC_CHECKPOINT_TXT_PATH = 'specific_checkpoint.txt'
+
+
+def read_specific_checkpoint(sub_exp_path):
+    path = os.path.join(sub_exp_path, SPECIFIC_CHECKPOINT_TXT_PATH)
+    if not os.path.exists(path):
+        return None
+    with open(path, 'r') as f:
+        lines = f.readlines()
+    first_line = lines[0].split('\n')[0]
+    return int(first_line)
 
 
 def find_optimal_checkpoint_num(
@@ -35,6 +46,9 @@ def find_optimal_checkpoint_num_by_train_config(
     train_config,
     keys=None,
 ):
+    specific_checkpoint = read_specific_checkpoint(sub_exp_path)
+    if specific_checkpoint is not None:
+        return specific_checkpoint
     record_name = train_config['train_record_path']
     checkpoint_interval = train_config['checkpoint_interval']
     max_iter_num = train_config['max_iter_num']
