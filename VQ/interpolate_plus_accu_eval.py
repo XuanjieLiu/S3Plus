@@ -62,6 +62,14 @@ class InterpolatePlusAccuEval:
         self.enc_num_dict = None
         self.itp_num_dict = None
 
+        embedding_dim = config['embedding_dim']
+        multi_num_embeddings = config['multi_num_embeddings']
+        if multi_num_embeddings is None:
+            latent_embedding_1 = config['latent_embedding_1']
+        else:
+            latent_embedding_1 = len(multi_num_embeddings)
+        self.latent_code_1 = latent_embedding_1 * embedding_dim
+
     def is_valid_itp_num(self, num):
         return self.min_interpolated_num <= num <= self.max_interpolated_num
 
@@ -108,7 +116,7 @@ class InterpolatePlusAccuEval:
         )
         self.enc_num_dict = {}
         for i in range(len(num_z)):
-            self.enc_num_dict[str(num_labels[i])] = num_z[i]
+            self.enc_num_dict[str(num_labels[i])] = num_z[i][..., 0:self.latent_code_1]
         min_label = min(num_labels)
         max_label = max(num_labels)
         self.min_interpolated_num = min_label + HALF
