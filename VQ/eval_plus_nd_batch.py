@@ -4,7 +4,8 @@ import numpy as np
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from eval_plus_nd import VQvaePlusEval, calc_ks_enc_plus_z, plot_plusZ_against_label
-from common_func import load_config_from_exp_name, record_num_list, DATASET_ROOT, EXP_ROOT
+from common_func import load_config_from_exp_name, record_num_list, DATASET_ROOT, EXP_ROOT, \
+    find_optimal_checkpoint_num_by_train_config
 from dataloader_plus import Dataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -46,11 +47,14 @@ EVAL_SETS = [
     }
 ]
 EXP_NAME_LIST = [
-    '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair',
-    '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair_noAssoc',
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
 ]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 CHECK_POINT = 'checkpoint_10000.pt'
+SAVED_IMG_NUM = 10
 
 
 def load_dataset():
@@ -59,12 +63,12 @@ def load_dataset():
     for item in tqdm(EVAL_SETS, desc="Loading datasets"):
         dataset_names.append(item['name'])
         dataset = Dataset(item['path'])
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
+        loader = DataLoader(dataset, batch_size=256, shuffle=True)
         dataset_loaders.append(loader)
     return dataset_names, dataset_loaders
 
 
-def save_imgs(model: VQVAE, dataloader: DataLoader, img_num=10, save_path: str = '', save_name: str = ''):
+def save_imgs(model: VQVAE, dataloader: DataLoader, img_num=SAVED_IMG_NUM, save_path: str = '', save_name: str = ''):
     for batch_ndx, sample in enumerate(dataloader):
         data, labels = sample
         assert img_num <= data[0].size(0), f"img_num should be smaller than batch size {data[0].size(0)}"
@@ -95,7 +99,10 @@ if __name__ == "__main__":
             os.makedirs(img_results_folder, exist_ok=True)
             img_results_folders.append(img_results_folder)
         for sub_exp in EXP_NUM_LIST:
-            checkpoint_path = os.path.join(exp_path, sub_exp, CHECK_POINT)
+            # checkpoint_path = os.path.join(exp_path, sub_exp, CHECK_POINT)
+            sub_exp_path = os.path.join(exp_path, sub_exp)
+            optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+            checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
             plus_evaler.reload_model(checkpoint_path)
             for i in range(0, len(evalset_names)):
                 # eval_plus_accu
