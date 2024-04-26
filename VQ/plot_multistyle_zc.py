@@ -37,7 +37,7 @@ def plot_plusZ_against_label(
     ax.set_title(f"{title}")
     ax.grid(is_gird)
     if is_scatter_lines:
-        draw_scatter_point_line(ax, [*num_labels], [*num_emb_idx, ])
+        draw_scatter_point_line(ax, [*num_labels], [*num_emb_idx])
     ax.label_outer()
     # plt.legend()
     plt.show()
