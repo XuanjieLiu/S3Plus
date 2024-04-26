@@ -40,7 +40,6 @@ def plot_plusZ_against_label(
         draw_scatter_point_line(ax, [*num_labels], [*num_emb_idx])
     ax.label_outer()
     # plt.legend()
-    plt.show()
     plt.savefig(f'{eval_path}.png')
     plt.cla()
     plt.clf()
