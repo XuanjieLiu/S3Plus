@@ -1,7 +1,8 @@
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import collections as matcoll
-
+from VQ.VQVAE import VQVAE
+from shared import *
 
 
 def calc_real_digit_num(latent_embedding_1, multi_num_embeddings):
@@ -63,3 +64,22 @@ def draw_scatter_point_line(ax: plt.Axes, x, y):
     linecoll = matcoll.LineCollection(lines, linewidths=0.2)
     ax.add_collection(linecoll)
     ax.grid(True, axis='x')
+
+
+class CommonEvaler:
+    def __init__(self, config, model_path):
+        self.config = config
+        self.embedding_dim = config['embedding_dim']
+        self.multi_num_embeddings = config['multi_num_embeddings']
+        if self.multi_num_embeddings is None:
+            self.latent_embedding_1 = config['latent_embedding_1']
+        else:
+            self.latent_embedding_1 = len(self.multi_num_embeddings)
+        self.latent_code_1 = self.latent_embedding_1 * self.embedding_dim
+        self.model = VQVAE(config).to(DEVICE)
+        if model_path is not None:
+            self.reload_model(model_path)
+        self.model.eval()
+
+    def reload_model(self, model_path):
+        self.model.load_state_dict(self.model.load_tensor(model_path))

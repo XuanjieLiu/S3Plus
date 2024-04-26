@@ -109,6 +109,10 @@ def calc_tensor_seq_limits(tensor_seq, margin=0.1):
     return limits
 
 
+def dict_switch_key_value(d):
+    return {v: k for k, v in d.items()}
+
+
 if __name__ == "__main__":
     a = [1,0,1.5,3,2.5,2]
     print(sorted_idx(a))

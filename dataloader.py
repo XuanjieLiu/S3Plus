@@ -23,6 +23,28 @@ def load_enc_eval_data(loader, encode_func):
     return num_z, num_labels
 
 
+def load_enc_eval_data_with_style(loader, encode_func):
+    num_labels = []
+    colors = []
+    shapes = []
+    num_z = None
+    for batch_ndx, sample in enumerate(loader):
+        data, labels = sample
+        data = data.to(DEVICE)
+        num = [int(label.split('-')[0]) for label in labels]
+        shape = [label.split('-')[1] for label in labels]
+        color = [label.split('-')[2].split('.')[0] for label in labels]
+        z = encode_func(data)
+        num_labels.extend(num)
+        colors.extend(color)
+        shapes.extend(shape)
+        if num_z is None:
+            num_z = z
+        else:
+            num_z = torch.cat((num_z, z), dim=0)
+    return num_z, num_labels, colors, shapes
+
+
 class SingleImgDataset(torch.utils.data.Dataset):
     def __init__(
             self, dataset_path,
