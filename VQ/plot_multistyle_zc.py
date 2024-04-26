@@ -58,7 +58,7 @@ class MultiStyleZcEvaler(CommonEvaler):
                 True, False
             )
         )
-        num_emb_idx = num_z.detach().cpu().numpy()
+        num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
         shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
         shape_marks = [shape_dict[shape] for shape in shapes]
         plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks, eval_path=save_path,

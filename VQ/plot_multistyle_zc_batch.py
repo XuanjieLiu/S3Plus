@@ -55,7 +55,6 @@ if __name__ == "__main__":
         for sub_exp in EXP_NUM_LIST:
             sub_exp_path = os.path.join(exp_path, sub_exp)
             optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
-            # optimal_checkpoint_num = 10000
             checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
             evaler.reload_model(checkpoint_path)
             for eval_set in EVAL_SETS:
