@@ -32,7 +32,7 @@ def plot_plusZ_against_label(
         y_shift = random.uniform(-1.5, 1.5)
         ax.scatter(num_labels[i]+x_shift, num_emb_idx[i]+y_shift, c='none', edgecolors=num_colors[i],
                    facecolors='none', s=60, marker=num_shapes[i])
-    ax.set(xlabel='Num of Points on the card', xticks=range(0, max(num_labels) + 1))
+    ax.set(xlabel='Num of Points on the Card', xticks=range(0, max(num_labels) + 1))
     ax.set(ylabel=y_label)
     ax.set_title(f"{title}")
     ax.grid(is_gird)
@@ -63,8 +63,8 @@ class MultiStyleZcEvaler(CommonEvaler):
         shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
         shape_marks = [shape_dict[shape] for shape in shapes]
         plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks, eval_path=save_path,
-                                 is_scatter_lines=True, is_gird=True, title=figure_title, y_label='Emb idx')
-        print('aaa')
+                                 is_scatter_lines=True, is_gird=True, title=figure_title, y_label='Content Emb Idx')
+
 
 if __name__ == "__main__":
     EVAL_SETS = [
