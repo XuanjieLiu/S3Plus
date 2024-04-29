@@ -64,9 +64,9 @@ class MultiStyleZcEvaler(CommonEvaler):
         shape_marks = [shape_dict[shape] for shape in shapes]
         emb_efficiency = self.calc_KM(num_emb_idx, num_labels)
         plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
-                                 eval_path=f'{save_path}_{emb_efficiency}',
+                                 eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
                                  is_scatter_lines=True, is_gird=True,
-                                 title=f'{figure_title} (match rate: {emb_efficiency})', y_label='Content Emb Idx')
+                                 title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})', y_label='Content Emb Idx')
         return emb_efficiency
 
     def calc_KM(self, num_emb_idx, num_labels):
@@ -80,7 +80,7 @@ class MultiStyleZcEvaler(CommonEvaler):
             label_emb_matrix[all_labels.index(label), emb_idx] += 1
         KM_value = KMMatcher(label_emb_matrix).solve(verbose=False)
         full_score = len(num_labels)
-        return round(KM_value / full_score, 2)
+        return KM_value / full_score
 
 
 if __name__ == "__main__":
