@@ -16,7 +16,6 @@ EXP_NAME_LIST = [
     "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
     "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
     "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
-
 ]
 
 EVAL_SETS = [
@@ -36,6 +35,7 @@ EVAL_SETS = [
 ]
 
 RESULT_PATH = 'multi_style_zc_eval'
+MATCH_RATE_PATH = 'match_rate.txt'
 
 
 if __name__ == "__main__":
@@ -48,8 +48,7 @@ if __name__ == "__main__":
         exp_path = os.path.join(EXP_ROOT, exp_name)
         config = load_config_from_exp_name(exp_name)
         evaler = MultiStyleZcEvaler(config)
-        accu_all_list = []
-        accu_train_list = []
+        match_rate_lists = [[] for _ in range(len(EVAL_SETS))]
         result_path = os.path.join(exp_path, RESULT_PATH)
         os.makedirs(result_path, exist_ok=True)
         for sub_exp in EXP_NUM_LIST:
@@ -57,9 +56,11 @@ if __name__ == "__main__":
             optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
             checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
             evaler.reload_model(checkpoint_path)
-            for eval_set in EVAL_SETS:
-                save_path = os.path.join(result_path, f'{sub_exp}_{optimal_checkpoint_num}_{eval_set["name"]}')
-                evaler.eval(eval_set['loader'], save_path, figure_title=f'Exp: {sub_exp} {eval_set["name"]}')
-
+            for i in range(len(EVAL_SETS)):
+                save_path = os.path.join(result_path, f'{sub_exp}_{optimal_checkpoint_num}_{EVAL_SETS[i]["name"]}')
+                match_rate = evaler.eval(EVAL_SETS[i]['loader'], save_path, figure_title=f'Exp: {sub_exp} {EVAL_SETS[i]["name"]}')
+                match_rate_lists[i].append(match_rate)
+        for i in range(len(EVAL_SETS)):
+            record_num_list(os.path.join(result_path, f'{EVAL_SETS[i]["name"]}_{MATCH_RATE_PATH}'), match_rate_lists[i], EXP_NUM_LIST)
 
 

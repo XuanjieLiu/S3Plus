@@ -1,8 +1,8 @@
 import random
-
+import numpy as np
 from eval_common import CommonEvaler, draw_scatter_point_line
 from dataMaker_commonFunc import MARK_NAME_SPACE
-from common_func import EXP_ROOT
+from common_func import EXP_ROOT, KMMatcher
 from shared import *
 from importlib import reload
 import sys
@@ -32,6 +32,7 @@ def plot_plusZ_against_label(
         y_shift = random.uniform(-1.5, 1.5)
         ax.scatter(num_labels[i]+x_shift, num_emb_idx[i]+y_shift, c='none', edgecolors=num_colors[i],
                    facecolors='none', s=60, marker=num_shapes[i])
+        ax.scatter(num_labels[i], num_emb_idx[i], c='navy', s=30, marker='o')
     ax.set(xlabel='Num of Points on the Card', xticks=range(0, max(num_labels) + 1))
     ax.set(ylabel=y_label)
     ax.set_title(f"{title}")
@@ -61,8 +62,25 @@ class MultiStyleZcEvaler(CommonEvaler):
         num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
         shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
         shape_marks = [shape_dict[shape] for shape in shapes]
-        plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks, eval_path=save_path,
-                                 is_scatter_lines=True, is_gird=True, title=figure_title, y_label='Content Emb Idx')
+        emb_efficiency = self.calc_KM(num_emb_idx, num_labels)
+        plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
+                                 eval_path=f'{save_path}_{emb_efficiency}',
+                                 is_scatter_lines=True, is_gird=True,
+                                 title=f'{figure_title} (match rate: {emb_efficiency})', y_label='Content Emb Idx')
+        return emb_efficiency
+
+    def calc_KM(self, num_emb_idx, num_labels):
+        book_size = self.config['embeddings_num']
+        total_emb = pow(book_size, self.latent_embedding_1)
+        all_labels = [int(n) for n in list(set(num_labels))]
+        label_emb_matrix = np.zeros((len(all_labels), total_emb))
+        for i in range(len(num_labels)):
+            label = num_labels[i]
+            emb_idx = int(num_emb_idx[i])
+            label_emb_matrix[all_labels.index(label), emb_idx] += 1
+        KM_value = KMMatcher(label_emb_matrix).solve(verbose=False)
+        full_score = len(num_labels)
+        return round(KM_value / full_score, 2)
 
 
 if __name__ == "__main__":
@@ -89,4 +107,5 @@ if __name__ == "__main__":
 
     evaler = MultiStyleZcEvaler(t_config.CONFIG, check_point_path)
     save_path = os.path.join(exp_path, str(SUB_EXP), 'eval_zc')
-    evaler.eval(single_img_eval_loader, save_path)
+    emb_efficiency = evaler.eval(single_img_eval_loader, save_path)
+    print(f'Emb efficiency: {emb_efficiency}')
