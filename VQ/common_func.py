@@ -130,8 +130,8 @@ class KMMatcher:
         self.label_y = np.zeros((self.m, ), dtype=np.float32)
 
         self.max_match = 0
-        self.xy = -np.ones((self.n,), dtype=np.int)
-        self.yx = -np.ones((self.m,), dtype=np.int)
+        self.xy = -np.ones((self.n,), dtype=np.int_)
+        self.yx = -np.ones((self.m,), dtype=np.int_)
 
     def do_augment(self, x, y):
         self.max_match += 1
@@ -146,9 +146,9 @@ class KMMatcher:
         self.T = np.zeros((self.m,), np.bool)
 
         self.slack = np.zeros((self.m,), dtype=np.float32)
-        self.slackyx = -np.ones((self.m,), dtype=np.int)  # l[slackyx[y]] + l[y] - w[slackx[y], y] == slack[y]
+        self.slackyx = -np.ones((self.m,), dtype=np.int_)  # l[slackyx[y]] + l[y] - w[slackx[y], y] == slack[y]
 
-        self.prev = -np.ones((self.n,), np.int)
+        self.prev = -np.ones((self.n,), np.int_)
 
         queue, st = [], 0
         root = -1
