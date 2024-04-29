@@ -142,8 +142,8 @@ class KMMatcher:
             x, y = self.prev[x], ty
 
     def find_augment_path(self):
-        self.S = np.zeros((self.n,), np.bool)
-        self.T = np.zeros((self.m,), np.bool)
+        self.S = np.zeros((self.n,), np.bool_)
+        self.T = np.zeros((self.m,), np.bool_)
 
         self.slack = np.zeros((self.m,), dtype=np.float32)
         self.slackyx = -np.ones((self.m,), dtype=np.int_)  # l[slackyx[y]] + l[y] - w[slackx[y], y] == slack[y]
