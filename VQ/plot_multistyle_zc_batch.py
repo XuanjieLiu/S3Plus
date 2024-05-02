@@ -35,7 +35,7 @@ EVAL_SETS = [
 ]
 
 RESULT_PATH = 'multi_style_zc_eval'
-MATCH_RATE_PATH = 'match_rate.txt'
+MATCH_RATE_PATH = 'EMB_match_rate.txt'
 
 
 if __name__ == "__main__":

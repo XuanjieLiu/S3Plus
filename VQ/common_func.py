@@ -223,9 +223,30 @@ class KMMatcher:
         self.slack[np.logical_not(self.T)] -= delta
 
 
+def keep_max_in_matrix_rows(matrix):
+    # 找到每行的最大值的索引
+    max_values_idx = np.argmax(matrix, axis=1)
+    # 创建一个全零矩阵
+    result = np.zeros_like(matrix)
+    # 将每行的最大值赋值给对应的索引
+    for i, idx in enumerate(max_values_idx):
+        result[i, idx] = matrix[i, idx]
+    return result
+
+
+def keep_max_in_matrix_colum(matrix):
+    # 找到每列的最大值的索引
+    max_values_idx = np.argmax(matrix, axis=0)
+    # 创建一个全零矩阵
+    result = np.zeros_like(matrix)
+    # 将每列的最大值赋值给对应的索引
+    for i, idx in enumerate(max_values_idx):
+        result[idx, i] = matrix[idx, i]
+    return result
+
+
 if __name__ == "__main__":
-    a = [1,0,1.5,3,2.5,2]
-    print(sorted_idx(a))
-    print(sort_X_by_Y(a, a))
-    print(sorted(a))
+    matrix = np.array([[1, 2, 3, 3], [4, 5, 5, 6], [7, 8, 9, 9]])
+    new_matrix_rows = keep_max_in_matrix_colum(matrix)
+    print("Matrix with only row maxes:", new_matrix_rows)
 

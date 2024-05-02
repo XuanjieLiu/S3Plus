@@ -7,7 +7,7 @@ from shared import *
 from importlib import reload
 import sys
 import os
-from common_func import load_config_from_exp_name, record_num_list, DATASET_ROOT, EXP_ROOT, dict_switch_key_value
+from common_func import keep_max_in_matrix_colum, record_num_list, DATASET_ROOT, EXP_ROOT, dict_switch_key_value
 from dataloader import SingleImgDataset, load_enc_eval_data_with_style
 from torch.utils.data import DataLoader
 import matplotlib.markers
@@ -62,14 +62,14 @@ class MultiStyleZcEvaler(CommonEvaler):
         num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
         shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
         shape_marks = [shape_dict[shape] for shape in shapes]
-        emb_efficiency = self.calc_KM(num_emb_idx, num_labels)
+        emb_efficiency = self.calc_emb_matching_score(num_emb_idx, num_labels)
         plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
                                  eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
                                  is_scatter_lines=True, is_gird=True,
                                  title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})', y_label='Content Emb Idx')
         return emb_efficiency
 
-    def calc_KM(self, num_emb_idx, num_labels):
+    def assemble_label_emb_matrix(self, num_emb_idx, num_labels):
         book_size = self.config['embeddings_num']
         total_emb = pow(book_size, self.latent_embedding_1)
         all_labels = [int(n) for n in list(set(num_labels))]
@@ -78,9 +78,20 @@ class MultiStyleZcEvaler(CommonEvaler):
             label = num_labels[i]
             emb_idx = int(num_emb_idx[i])
             label_emb_matrix[all_labels.index(label), emb_idx] += 1
+        return label_emb_matrix
+
+    def calc_KM(self, num_emb_idx, num_labels):
+        label_emb_matrix = self.assemble_label_emb_matrix(num_emb_idx, num_labels)
         KM_value = KMMatcher(label_emb_matrix).solve(verbose=False)
         full_score = len(num_labels)
         return KM_value / full_score
+
+    def calc_emb_matching_score(self, num_emb_idx, num_labels):
+        label_emb_matrix = self.assemble_label_emb_matrix(num_emb_idx, num_labels)
+        max_row_matrix = keep_max_in_matrix_colum(label_emb_matrix)
+        score = np.sum(max_row_matrix)
+        full_score = len(num_labels)
+        return score / full_score
 
 
 if __name__ == "__main__":
