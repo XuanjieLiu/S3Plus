@@ -25,20 +25,35 @@ def plot_plusZ_against_label(
         is_gird=False,
         title: str = '',
         y_label: str = '',
+        reordered_embs=None
 ):
     fig, ax = plt.subplots(figsize=(21, 14))
-    for i in range(len(num_emb_idx)):
+    if reordered_embs is not None:
+        X = []
+        Y = []
+        for i in range(len(num_emb_idx)):
+            if num_emb_idx[i] not in reordered_embs:
+                continue
+            X.append(num_labels[i])
+            Y.append(reordered_embs.index(num_emb_idx[i]) + 1)
+    else:
+        X = num_labels
+        Y = num_emb_idx
+    for i in range(len(Y)):
         x_shift = random.uniform(-0.25, 0.25)
-        y_shift = random.uniform(-1.5, 1.5)
-        ax.scatter(num_labels[i]+x_shift, num_emb_idx[i]+y_shift, c='none', edgecolors=num_colors[i],
+        if reordered_embs is not None:
+            y_shift = random.uniform(-0.4, 0.4)
+        else:
+            y_shift = random.uniform(-1.5, 1.5)
+        ax.scatter(X[i]+x_shift, Y[i]+y_shift, c='none', edgecolors=num_colors[i],
                    facecolors='none', s=60, marker=num_shapes[i])
-        ax.scatter(num_labels[i], num_emb_idx[i], c='navy', s=30, marker='o')
+        ax.scatter(X[i], Y[i], c='navy', s=30, marker='o')
     ax.set(xlabel='Num of Points on the Card', xticks=range(0, max(num_labels) + 1))
     ax.set(ylabel=y_label)
     ax.set_title(f"{title}")
     ax.grid(is_gird)
     if is_scatter_lines:
-        draw_scatter_point_line(ax, [*num_labels], [*num_emb_idx])
+        draw_scatter_point_line(ax, [*X], [*Y])
     ax.label_outer()
     # plt.legend()
     plt.savefig(f'{eval_path}.png')
@@ -63,10 +78,13 @@ class MultiStyleZcEvaler(CommonEvaler):
         shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
         shape_marks = [shape_dict[shape] for shape in shapes]
         emb_efficiency = self.calc_emb_matching_score(num_emb_idx, num_labels)
+        reordered_embs = self.reorder_emb(num_emb_idx, num_labels)
         plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
                                  eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
                                  is_scatter_lines=True, is_gird=True,
-                                 title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})', y_label='Content Emb Idx')
+                                 title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})',
+                                 y_label='Used Embedding',
+                                 reordered_embs=reordered_embs)
         return emb_efficiency
 
     def assemble_label_emb_matrix(self, num_emb_idx, num_labels):
@@ -92,6 +110,27 @@ class MultiStyleZcEvaler(CommonEvaler):
         score = np.sum(max_row_matrix)
         full_score = len(num_labels)
         return score / full_score
+
+    def reorder_emb(self, num_emb_idx, num_labels):
+        label_emb_matrix = self.assemble_label_emb_matrix(num_emb_idx, num_labels)
+        max_row_matrix = keep_max_in_matrix_colum(label_emb_matrix)
+        all_used_embs = []
+        for i in range(len(max_row_matrix)):
+            all_used_embs.extend(find_emb_idx_by_efficiency(max_row_matrix[i]))
+        return all_used_embs
+
+
+def find_emb_idx_by_efficiency(array_1d):
+    indices = np.argsort(array_1d)
+    # 翻转索引以实现从大到小的排序
+    reversed_indices = np.flip(indices)
+    embs = []
+    for i in reversed_indices:
+        if array_1d[i] > 0:
+            embs.append(i)
+        else:
+            break
+    return embs
 
 
 if __name__ == "__main__":

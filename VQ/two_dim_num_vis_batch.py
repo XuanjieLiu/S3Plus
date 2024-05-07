@@ -4,6 +4,8 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 from importlib import reload
 from two_dim_num_vis import MumEval
 from common_func import load_config_from_exp_name, EXP_ROOT, find_optimal_checkpoint_num_by_train_config
+from torch.utils.data import DataLoader
+from dataloader import SingleImgDataset
 
 RESULT_DIR_NAME = 'two_dim_z_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
@@ -24,7 +26,9 @@ def batch_eval():
         os.makedirs(result_dir, exist_ok=True)
         config = load_config_from_exp_name(exp_name)
         dataset_path = config['single_img_eval_set_path']
-        evaler = MumEval(config, None, dataset_path)
+        single_img_eval_set = SingleImgDataset(dataset_path)
+        single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=256)
+        evaler = MumEval(config, None)
         for sub_exp in EXP_NUM_LIST:
             sub_exp_path = os.path.join(exp_path, sub_exp)
             optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
@@ -32,7 +36,7 @@ def batch_eval():
             checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
             result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}.png')
-            evaler.num_eval_two_dim(result_path)
+            evaler.num_eval_two_dim(single_img_eval_loader, result_path)
 
 
 if __name__ == "__main__":
