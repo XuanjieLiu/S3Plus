@@ -42,6 +42,7 @@ def plot_z_against_label(num_z, num_labels, eval_path=None, eval_helper: EvalHel
 
 
 def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
+    plt.figure(figsize=(5, 5))
     assert len(num_z[0]) == 2, f"The representation dimension of a number should be two, but got {len(num_z[0])} instead."
     sorted_label = sorted(num_labels)
     sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
@@ -53,7 +54,7 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
         plt.scatter(X[i], Y[i],
                     marker=f'${sorted_label[i]}$',
                     s=200,
-                    alpha=1/max_repeating_num*1.3,
+                    alpha=min(1, 1/max_repeating_num*1.3),
                     c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
         if all_embs is None:
             draw_scatter_gird(plt.gca(), X[i], Y[i])
@@ -132,7 +133,32 @@ class MumEval:
         if is_show_all_emb and self.latent_embedding_1 == 2:
             code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
             all_embs = all_combinations(code_book, code_book)
+        is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
+        nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
+        print(f'Nearest neighbor analysis score: {nna_score}')
         plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_path, all_embs=all_embs)
+
+
+def nearest_neighbor_analysis(num_z_c, num_labels):
+    sorted_label = sorted(num_labels)
+    sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
+    sorted_num_z = [num_z_c[i] for i in sorted_indices]
+    valid_nearest_neighbor = 0
+    for i in range(len(sorted_label)-1):
+        z = sorted_num_z[i]
+        bigger_label_z = sorted_num_z[i+1:]
+        distances = np.linalg.norm(bigger_label_z - z, axis=1)
+        if is_the_unique_min_num(distances[0], distances):
+            valid_nearest_neighbor += 1
+        else:
+            print(f'Nearest neighbor analysis failed at number {sorted_label[i]}')
+    total_num = len(num_labels) - 1
+    return valid_nearest_neighbor / total_num
+
+
+def is_the_unique_min_num(num, num_list):
+    return num == min(num_list) and list(num_list).count(num) == 1
+
 
 
 def all_combinations(arr_1, arr_2):
@@ -143,7 +169,7 @@ if __name__ == "__main__":
     matplotlib.use('tkagg')
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
     DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/multi_style_eval_(0,20)_FixedPos_newShape')
-    EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu'
+    EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
     SUB_EXP = 1
     CHECK_POINT = 'checkpoint_10000.pt'
     # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
