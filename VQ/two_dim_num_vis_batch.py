@@ -11,11 +11,8 @@ RESULT_DIR_NAME = 'two_dim_z_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm_Out",
-    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Fullsymm_OutTwice",
     "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm_Out",
-    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneShotSet_Fullsymm_OutTwice",
     "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_Out",
-    "2024.03.30_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OutTwice",
 ]
 
 
@@ -35,7 +32,7 @@ def batch_eval():
             check_point_name = f'checkpoint_{optimal_checkpoint_num}.pt'
             checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
-            result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}.png')
+            result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}')
             evaler.num_eval_two_dim(single_img_eval_loader, result_path)
 
 

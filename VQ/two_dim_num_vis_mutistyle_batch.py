@@ -53,7 +53,7 @@ def batch_eval():
             checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
             for i in range(len(EVAL_SETS)):
-                result_path = os.path.join(result_dir, f'{sub_exp}_{optimal_checkpoint_num}_{EVAL_SETS[i]["name"]}.png')
+                result_path = os.path.join(result_dir, f'{sub_exp}_{optimal_checkpoint_num}_{EVAL_SETS[i]["name"]}')
                 evaler.num_eval_two_dim(EVAL_SETS[i]['loader'], result_path)
 
 

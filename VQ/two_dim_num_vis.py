@@ -72,7 +72,7 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
     if result_path is None:
         plt.show()
     else:
-        plt.savefig(result_path)
+        plt.savefig(f'{result_path}.png')
         plt.cla()
         plt.clf()
         plt.close()
@@ -135,25 +135,36 @@ class MumEval:
             all_embs = all_combinations(code_book, code_book)
         is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
         nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-        print(f'Nearest neighbor analysis score: {nna_score}')
-        plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_path, all_embs=all_embs)
+        result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else f'{result_path}'
+        plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+        return nna_score
 
 
-def nearest_neighbor_analysis(num_z_c, num_labels):
-    sorted_label = sorted(num_labels)
-    sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
-    sorted_num_z = [num_z_c[i] for i in sorted_indices]
-    valid_nearest_neighbor = 0
-    for i in range(len(sorted_label)-1):
-        z = sorted_num_z[i]
-        bigger_label_z = sorted_num_z[i+1:]
-        distances = np.linalg.norm(bigger_label_z - z, axis=1)
-        if is_the_unique_min_num(distances[0], distances):
-            valid_nearest_neighbor += 1
-        else:
-            print(f'Nearest neighbor analysis failed at number {sorted_label[i]}')
-    total_num = len(num_labels) - 1
-    return valid_nearest_neighbor / total_num
+def nearest_neighbor_analysis(num_z_c, num_labels, verbose=False):
+    ascend_sorted_label = sorted(num_labels)
+    ascend_sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
+    ascend_sorted_num_z = [num_z_c[i] for i in ascend_sorted_indices]
+
+    def is_the_next_num_the_closest(sorted_num_z, sorted_label):
+        valid_nearest_neighbor = 0
+        for i in range(len(sorted_label)-1):
+            z = sorted_num_z[i]
+            next_label_z = sorted_num_z[i+1:]
+            distances = np.linalg.norm(next_label_z - z, axis=1)
+            if is_the_unique_min_num(distances[0], distances):
+                valid_nearest_neighbor += 1
+            else:
+                if verbose:
+                    print(f'Nearest neighbor analysis failed at number {sorted_label[i]} and {sorted_label[i+1]}.')
+        return valid_nearest_neighbor
+
+    ascend_valid_nearest_neighbor = is_the_next_num_the_closest(ascend_sorted_num_z, ascend_sorted_label)
+    descend_sorted_label = ascend_sorted_label[::-1]
+    descend_sorted_num_z = ascend_sorted_num_z[::-1]
+    descend_valid_nearest_neighbor = is_the_next_num_the_closest(descend_sorted_num_z, descend_sorted_label)
+    all_valid_nearest_neighbor = ascend_valid_nearest_neighbor + descend_valid_nearest_neighbor
+    total_num = (len(num_labels) - 1) * 2
+    return all_valid_nearest_neighbor / total_num
 
 
 def is_the_unique_min_num(num, num_list):
@@ -168,11 +179,11 @@ def all_combinations(arr_1, arr_2):
 if __name__ == "__main__":
     matplotlib.use('tkagg')
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
-    DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/multi_style_eval_(0,20)_FixedPos_newShape')
+    # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/multi_style_eval_(0,20)_FixedPos_newShape')
     EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
     SUB_EXP = 1
     CHECK_POINT = 'checkpoint_10000.pt'
-    # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
+    DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
     # EXP_NAME = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
     # SUB_EXP = 1
     # CHECK_POINT = 'curr_model.pt'
