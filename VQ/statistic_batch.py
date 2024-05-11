@@ -23,6 +23,9 @@ EVAL_KEYS = ['train_accu', 'eval_accu', 'eval_accu_2']
 
 
 def batch_statistic():
+    is_summary_two_eval = 'eval_accu_2' in EVAL_KEYS and 'eval_accu' in EVAL_KEYS
+    if is_summary_two_eval:
+        EVAL_KEYS.append('eval_accu_all')
     for exp_name in EXP_NAME_LIST:
         record_lists = [[] for _ in range(len(EVAL_KEYS))]
         exp_path = os.path.join(EXP_ROOT, exp_name)
@@ -37,24 +40,19 @@ def batch_statistic():
                 if key in eval_record.keys():
                     value = eval_record[key].filter_Y_by_X_nums([optimal_checkpoint_num])[1][0]
                     record_lists[i].append(value)
-        is_summary_two_eval = 'eval_accu_2' in EVAL_KEYS and 'eval_accu' in EVAL_KEYS
         if is_summary_two_eval:
             eval_size_1 = len(Dataset(config['plus_eval_set_path']))
             eval_size_2 = len(Dataset(config['plus_eval_set_path_2']))
-            accu_all_list = []
             idx_1 = EVAL_KEYS.index('eval_accu')
             idx_2 = EVAL_KEYS.index('eval_accu_2')
+            idx_accu_all = EVAL_KEYS.index('eval_accu_all')
             for i in range(len(record_lists[idx_1])):
                 accu_all = ((record_lists[idx_1][i] * eval_size_1 + record_lists[idx_2][i] * eval_size_2) /
                             (eval_size_1 + eval_size_2))
-                accu_all_list.append(accu_all)
-                print(f'accu_all: {accu_all}')
-            record_lists.append(accu_all_list)
-            EVAL_KEYS.append('eval_accu_all')
+                record_lists[idx_accu_all].append(accu_all)
+            
         for i in range(len(EVAL_KEYS)):
             key = EVAL_KEYS[i]
-            print(f'key: {key}')
-            print(f'record_lists: {record_lists[i]}')
             results_path = os.path.join(exp_path, f'statistic_{key}.txt')
             record_num_list(results_path, record_lists[i], EXP_NUM_LIST)
 
