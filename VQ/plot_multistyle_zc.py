@@ -25,7 +25,8 @@ def plot_plusZ_against_label(
         is_gird=False,
         title: str = '',
         y_label: str = '',
-        reordered_embs=None
+        reordered_embs=None,
+        is_shift=True
 ):
     fig, ax = plt.subplots(figsize=(21, 14))
     if reordered_embs is not None:
@@ -40,11 +41,15 @@ def plot_plusZ_against_label(
         X = num_labels
         Y = num_emb_idx
     for i in range(len(Y)):
-        x_shift = random.uniform(-0.25, 0.25)
-        if reordered_embs is not None:
-            y_shift = random.uniform(-0.4, 0.4)
+        if is_shift:
+            x_shift = random.uniform(-0.25, 0.25)
+            if reordered_embs is not None:
+                y_shift = random.uniform(-0.4, 0.4)
+            else:
+                y_shift = random.uniform(-1.5, 1.5)
         else:
-            y_shift = random.uniform(-1.5, 1.5)
+            x_shift = 0
+            y_shift = 0
         ax.scatter(X[i]+x_shift, Y[i]+y_shift, c='none', edgecolors=num_colors[i],
                    facecolors='none', s=60, marker=num_shapes[i])
         ax.scatter(X[i], Y[i], c='navy', s=30, marker='o')
@@ -66,7 +71,7 @@ class MultiStyleZcEvaler(CommonEvaler):
     def __init__(self, config, model_path=None):
         super(MultiStyleZcEvaler, self).__init__(config, model_path)
 
-    def eval(self, data_loader, save_path, figure_title=''):
+    def eval(self, data_loader, save_path, figure_title='', is_shift=True):
         num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
             data_loader,
             lambda x: self.model.find_indices(
@@ -84,7 +89,9 @@ class MultiStyleZcEvaler(CommonEvaler):
                                  is_scatter_lines=True, is_gird=True,
                                  title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})',
                                  y_label='Used Embedding',
-                                 reordered_embs=reordered_embs)
+                                 reordered_embs=reordered_embs,
+                                 is_shift=is_shift
+                                 )
         return emb_efficiency
 
     def assemble_label_emb_matrix(self, num_emb_idx, num_labels):

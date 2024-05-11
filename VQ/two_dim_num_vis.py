@@ -132,10 +132,14 @@ class MumEval:
         all_embs = None
         if is_show_all_emb and self.latent_embedding_1 == 2:
             code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
+            code_book = np.around(code_book, decimals=3)
             all_embs = all_combinations(code_book, code_book)
+        if is_show_all_emb and self.latent_embedding_1 == 1:
+            code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
+            all_embs = np.around(code_book, decimals=3)
         is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
         nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-        result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else f'{result_path}'
+        result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else None
         plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
         return nna_score
 
@@ -179,14 +183,22 @@ def all_combinations(arr_1, arr_2):
 if __name__ == "__main__":
     matplotlib.use('tkagg')
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
+
     # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/multi_style_eval_(0,20)_FixedPos_newShape')
-    EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
-    SUB_EXP = 1
-    CHECK_POINT = 'checkpoint_10000.pt'
-    DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
+    # EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
+    # SUB_EXP = 1
+    # CHECK_POINT = 'checkpoint_10000.pt'
+
+    # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
     # EXP_NAME = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
     # SUB_EXP = 1
     # CHECK_POINT = 'curr_model.pt'
+
+    DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
+    EXP_NAME = '2024.05.10_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu'
+    SUB_EXP = 1
+    CHECK_POINT = 'checkpoint_50000.pt'
+
     exp_path = os.path.join(EXP_ROOT_PATH, EXP_NAME)
     sys.path.append(exp_path)
     os.chdir(exp_path)
