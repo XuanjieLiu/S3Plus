@@ -52,6 +52,8 @@ def batch_statistic():
             EVAL_KEYS.append('eval_accu_all')
         for i in range(len(EVAL_KEYS)):
             key = EVAL_KEYS[i]
+            print(f'key: {key}')
+            print(f'record_lists: {record_lists[i]}')
             results_path = os.path.join(exp_path, f'statistic_{key}.txt')
             record_num_list(results_path, record_lists[i], EXP_NUM_LIST)
 
