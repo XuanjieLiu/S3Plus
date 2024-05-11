@@ -48,6 +48,7 @@ def batch_statistic():
                 accu_all = ((record_lists[idx_1][i] * eval_size_1 + record_lists[idx_2][i] * eval_size_2) /
                             (eval_size_1 + eval_size_2))
                 accu_all_list.append(accu_all)
+                print(f'accu_all: {accu_all}')
             record_lists.append(accu_all_list)
             EVAL_KEYS.append('eval_accu_all')
         for i in range(len(EVAL_KEYS)):
