@@ -111,17 +111,7 @@ class MumEval:
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
 
-    # def num_eval_multi_dim(self):
-    #     num_z, num_labels = load_enc_eval_data(
-    #                                 self.loader,
-    #                                 lambda x: self.model.find_indices(
-    #                                       self.model.batch_encode_to_z(x)[0], True
-    #                                 )
-    #     )
-    #     eval_helper = EvalHelper(self.config)
-    #     plot_z_against_label(num_z, num_labels, eval_helper=eval_helper)
-
-    def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True):
+    def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True, is_draw_graph=True):
         num_z, num_labels = load_enc_eval_data(
             data_loader,
             lambda x:
@@ -129,18 +119,18 @@ class MumEval:
         )
         num_z = num_z.cpu().detach().numpy()
         num_z_c = num_z[:, :self.latent_code_1]
-        all_embs = None
-        if is_show_all_emb and self.latent_embedding_1 == 2:
-            code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
-            code_book = np.around(code_book, decimals=3)
-            all_embs = all_combinations(code_book, code_book)
-        if is_show_all_emb and self.latent_embedding_1 == 1:
-            code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
-            all_embs = np.around(code_book, decimals=3)
         is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
         nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-        result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else None
-        plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+        if is_draw_graph and self.latent_code_1 == 2:
+            all_embs = None
+            code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
+            code_book = np.around(code_book, decimals=3)
+            if is_show_all_emb and self.latent_embedding_1 == 2:
+                all_embs = all_combinations(code_book, code_book)
+            if is_show_all_emb and self.latent_embedding_1 == 1:
+                all_embs = code_book
+            result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else None
+            plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
         return nna_score
 
 

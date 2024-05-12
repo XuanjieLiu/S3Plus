@@ -50,7 +50,7 @@ def batch_statistic():
                 accu_all = ((record_lists[idx_1][i] * eval_size_1 + record_lists[idx_2][i] * eval_size_2) /
                             (eval_size_1 + eval_size_2))
                 record_lists[idx_accu_all].append(accu_all)
-            
+
         for i in range(len(EVAL_KEYS)):
             key = EVAL_KEYS[i]
             results_path = os.path.join(exp_path, f'statistic_{key}.txt')
