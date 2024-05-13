@@ -10,9 +10,7 @@ from dataloader import SingleImgDataset
 RESULT_DIR_NAME = 'two_dim_z_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.05.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
-    "2024.05.13_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
-    "2024.05.13_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Nothing_trainAll"
+    "2024.03.17_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_PureVQ",
 ]
 
 RESULT_NAME = 'near_neighbour_score.txt'
