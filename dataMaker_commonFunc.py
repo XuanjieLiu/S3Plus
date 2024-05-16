@@ -26,7 +26,6 @@ MARK_NAME_SPACE = {
     '_': 'hline',
     'P': 'plus_filled',
     'X': 'x_filled',
-    '9': 'default',
 }
 
 

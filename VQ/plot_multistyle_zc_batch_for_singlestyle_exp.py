@@ -36,7 +36,7 @@ if __name__ == "__main__":
             single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
             single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=256)
             save_path = os.path.join(result_path, f'{sub_exp}_{optimal_checkpoint_num}')
-            match_rate = evaler.eval(single_img_eval_loader, save_path, figure_title=f'Exp: {sub_exp}', is_shift=False)
+            match_rate = evaler.eval(single_img_eval_loader, save_path, figure_title=f'Exp: {sub_exp}', is_shift=False, is_plot_graph=False)
             match_rate_lists.append(match_rate)
             record_num_list(os.path.join(exp_path, f'{MATCH_RATE_PATH}'), match_rate_lists, EXP_NUM_LIST)
 

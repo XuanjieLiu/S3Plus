@@ -71,7 +71,7 @@ class MultiStyleZcEvaler(CommonEvaler):
     def __init__(self, config, model_path=None):
         super(MultiStyleZcEvaler, self).__init__(config, model_path)
 
-    def eval(self, data_loader, save_path, figure_title='', is_shift=True):
+    def eval(self, data_loader, save_path, figure_title='', is_shift=True, is_plot_graph=True):
         num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
             data_loader,
             lambda x: self.model.find_indices(
@@ -80,18 +80,19 @@ class MultiStyleZcEvaler(CommonEvaler):
             )
         )
         num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
-        shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
-        shape_marks = [shape_dict[shape] for shape in shapes]
         emb_efficiency = self.calc_emb_matching_score(num_emb_idx, num_labels)
         reordered_embs = self.reorder_emb(num_emb_idx, num_labels)
-        plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
-                                 eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
-                                 is_scatter_lines=True, is_gird=True,
-                                 title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})',
-                                 y_label='Used Embedding',
-                                 reordered_embs=reordered_embs,
-                                 is_shift=is_shift
-                                 )
+        if is_plot_graph:
+            shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
+            shape_marks = [shape_dict[shape] for shape in shapes]
+            plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
+                                     eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
+                                     is_scatter_lines=True, is_gird=True,
+                                     title=f'{figure_title} (match rate: {round(emb_efficiency, 2)})',
+                                     y_label='Used Embedding',
+                                     reordered_embs=reordered_embs,
+                                     is_shift=is_shift
+                                     )
         return emb_efficiency
 
     def assemble_label_emb_matrix(self, num_emb_idx, num_labels):
