@@ -6,7 +6,7 @@ from typing import List, Iterable
 from dataMaker_commonFunc import *
 from tqdm import tqdm
 import torch
-
+from dataMaker_commonFunc import ZHENG_POSITIONS
 matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
@@ -29,19 +29,19 @@ SINGLE_COLOR = ['blue']
 def draw_data(i, j, mar, color, data_path, compositional_func):
     os.makedirs(data_path, exist_ok=True)
     plot_a_scatter(
-        POSITIONS[i],
+        DOT_POSITIONS[i],
         save_dir=os.path.join(data_path, f'a-{i}'),
         marker=mar, color=color, is_fill=i != 0
     )
     plot_a_scatter(
-        POSITIONS[j],
+        DOT_POSITIONS[j],
         save_dir=os.path.join(data_path, f'b-{j}'),
         marker=mar, color=color, is_fill=j != 0
     )
     result = compositional_func(i, j)
     print(f'i={i}, j={j}, k={result}')
     plot_a_scatter(
-        POSITIONS[result],
+        DOT_POSITIONS[result],
         save_dir=os.path.join(data_path, f'c-{result}'),
         marker=mar, color=color, is_fill=result != 0
     )
@@ -63,6 +63,26 @@ def draw_arabic_data(i, j, color, data_path, compositional_func):
     print(f'i={i}, j={j}, k={result}')
     plot_arabic_numbers(
         result,
+        save_dir=os.path.join(data_path, f'c-{result}'),
+        color=color
+    )
+
+def draw_ZHENG_data(i, j, color, data_path, compositional_func):
+    os.makedirs(data_path, exist_ok=True)
+    plot_lines(
+        ZHENG_POSITIONS[i],
+        save_dir=os.path.join(data_path, f'a-{i}'),
+        color=color
+    )
+    plot_lines(
+        ZHENG_POSITIONS[j],
+        save_dir=os.path.join(data_path, f'b-{j}'),
+        color=color
+    )
+    result = compositional_func(i, j)
+    print(f'i={i}, j={j}, k={result}')
+    plot_lines(
+        ZHENG_POSITIONS[result],
         save_dir=os.path.join(data_path, f'c-{result}'),
         color=color
     )
@@ -298,6 +318,16 @@ def render_arabic_num_dataset(data_list: List[PairData], data_root: str, composi
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
         draw_arabic_data(a, b, color, data_path, compositional_func)
+
+def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
+    for data in tqdm(data_list, desc=data_root):
+        a = data.a
+        b = data.b
+        color = data.color
+        data_name = f'{a}-{b}-default-{color}'
+        data_path = os.path.join(data_root, data_name)
+        os.makedirs(data_path, exist_ok=True)
+        draw_ZHENG_data(a, b, color, data_path, compositional_func)
 
 
 def sum_pairs(min_number):

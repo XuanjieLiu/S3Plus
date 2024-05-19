@@ -1,7 +1,7 @@
 import tkinter
 from importlib import reload
 import sys
-from dataMaker_commonFunc import plot_a_scatter, POSITIONS
+from dataMaker_commonFunc import plot_a_scatter, DOT_POSITIONS
 from VQVAE import VQVAE
 from tkinter import *
 from PIL import Image, ImageTk
@@ -199,7 +199,7 @@ class EvalEncoder:
         num = int(self.num_var.get())
         color = self.color_var.get()
         shape = self.shape_var.get()
-        plot_a_scatter(POSITIONS[num], self.img_path, shape, color, num != 0)
+        plot_a_scatter(DOT_POSITIONS[num], self.img_path, shape, color, num != 0)
         load_img(self.card, self.img_path)
         img_tensor = read_a_data_from_disk(self.img_path).to(DEVICE)
         z = self.vae.batch_encode_to_z(img_tensor)[0][0]

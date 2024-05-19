@@ -165,6 +165,10 @@ class PlusTrainer:
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
                 optimizer.zero_grad()
+            else:
+                print("Optimizer is None")
+                print(batch_ndx)
+                print(len(sample[0][0]))
             data, labels = sample
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
@@ -204,11 +208,12 @@ class PlusTrainer:
             if self.is_save_img:
                 vis_imgs.save_img(f'{epoch_num}.png')
 
-    def train(self):
+    def train(self, is_resume=True, optimizer: torch.optim.Optimizer = None):
         os.makedirs(self.train_result_path, exist_ok=True)
         os.makedirs(self.eval_result_path, exist_ok=True)
         self.model.train()
-        self.resume()
+        if is_resume:
+            self.resume()
         loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
         train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
         eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
@@ -217,13 +222,13 @@ class PlusTrainer:
             special_loss_counter_keys.extend(['eval_ks_2', 'eval_accu_2'])
         special_loss_counter = LossCounter(special_loss_counter_keys, self.plus_accu_record_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
-        optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
+        if optimizer is None:
+            optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(start_epoch))
         for epoch_num in range(start_epoch, self.max_iter_num):
-            is_log = (epoch_num % self.log_interval == 0 and epoch_num != 0)
+            is_log = (epoch_num % self.log_interval == 0)
             train_vis_img = VisImgs(self.train_result_path)
             eval_vis_img = VisImgs(self.eval_result_path)
-            self.one_epoch(epoch_num, train_loss_counter, self.loader, is_log, train_vis_img, optimizer)
             # scheduler.step()
             if is_log:
                 self.model.eval()
@@ -243,6 +248,7 @@ class PlusTrainer:
                         self.plot_plus_z(epoch_num, self.plus_eval_loader, self.eval_result_path, 'plus_z')
                         if self.plus_eval_loader_2 is not None:
                             self.plot_plus_z(epoch_num, self.plus_eval_loader_2, self.eval_result_path, 'plus_z_2')
+            self.one_epoch(epoch_num, train_loss_counter, self.loader, is_log, train_vis_img, optimizer)
 
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')

@@ -52,7 +52,7 @@ def make_dataset_1(data_path, numbers, markers, colors):
     for i in numbers:
         for mar in markers:
             for color in colors:
-                position = POSITIONS[i]
+                position = DOT_POSITIONS[i]
                 fig_path = os.path.join(data_path, f'{i}-{MARK_NAME_SPACE[mar]}-{color}')
                 plot_a_scatter(position, fig_path, marker=mar, color=color, is_fill=i != 0)
 
@@ -65,6 +65,13 @@ def make_arabic_num_dataset(data_path, numbers, colors):
             plot_arabic_numbers(i, fig_path, color)
 
 
+def make_ZHENG_num_dataset(data_path, numbers, colors):
+    os.makedirs(data_path, exist_ok=True)
+    for i in numbers:
+        for color in colors:
+            fig_path = os.path.join(data_path, f'{i}-default-{color}')
+            plot_lines(ZHENG_POSITIONS[i], fig_path, color)
+
 if __name__ == "__main__":
-    data_path = f'{DATA_ROOT}/(0,99)-FixedPos-oneStyle_arabic'
-    make_arabic_num_dataset(data_path, range(0, 100), ['blue'])
+    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-oneStyle_ZHENG'
+    make_ZHENG_num_dataset(data_path, range(0, 21), ['blue'])
