@@ -82,24 +82,73 @@ MANUAL_DATAPAIRS_TUPLE = [
     (2, 12), (11, 4), (12, 8), (15, 3), (2, 14), (17, 2)
 ]
 
+
+def render_new_data_from_old_pairs(
+        source_data_set_path: str,
+        target_data_set_path: str,
+        markers: List[str],
+        colors: List[str],
+        compositional_func=comp_plus,
+        data_render_func: callable = render_dataset,
+):
+    data_tuple = load_data_pairs_from_dataset(source_data_set_path)
+    make_dataset_datapair_from_tuple_list(
+        data_tuple,
+        target_data_set_path,
+        markers,
+        colors,
+        compositional_func,
+        data_render_func
+    )
+
+
+def render_new_dataset_from_old_dataset(
+        seb_set_list: List[str],
+        source_data_set_path: str,
+        target_data_set_path: str,
+        markers: List[str],
+        colors: List[str],
+        compositional_func=comp_plus,
+        data_render_func: callable = render_dataset,
+):
+    for name in seb_set_list:
+        render_new_data_from_old_pairs(
+            os.path.join(source_data_set_path, name),
+            os.path.join(target_data_set_path, name),
+            markers,
+            colors,
+            compositional_func,
+            data_render_func
+        )
+
 if __name__ == "__main__":
-    source_dataset = os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet')
-    train_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'train'))
-    test_1_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'test_1'))
-    test_2_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'test_2'))
-    target_data_set_path = "single_style_pairs(0,20)_tripleSet_ZHENG"
-    test_1_path = os.path.join(DATA_ROOT, target_data_set_path, 'test_1')
-    test_2_path = os.path.join(DATA_ROOT, target_data_set_path, 'test_2')
-    train_path = os.path.join(DATA_ROOT, target_data_set_path, 'train')
-    make_dataset_datapair_from_tuple_list(
-        train_plus_tuple, train_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
+    render_new_dataset_from_old_dataset(
+        ['train', 'test'],
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)_ZHENG'),
+        ['default'],
+        ['b'],
+        comp_minus,
+        render_ZHENG_num_dataset
     )
-    make_dataset_datapair_from_tuple_list(
-        test_1_plus_tuple, test_1_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
-    )
-    make_dataset_datapair_from_tuple_list(
-        test_2_plus_tuple, test_2_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
-    )
+
+    # source_dataset = os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet')
+    # train_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'train'))
+    # test_1_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'test_1'))
+    # test_2_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'test_2'))
+    # target_data_set_path = "single_style_pairs(0,20)_tripleSet_ZHENG"
+    # test_1_path = os.path.join(DATA_ROOT, target_data_set_path, 'test_1')
+    # test_2_path = os.path.join(DATA_ROOT, target_data_set_path, 'test_2')
+    # train_path = os.path.join(DATA_ROOT, target_data_set_path, 'train')
+    # make_dataset_datapair_from_tuple_list(
+    #     train_plus_tuple, train_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
+    # )
+    # make_dataset_datapair_from_tuple_list(
+    #     test_1_plus_tuple, test_1_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
+    # )
+    # make_dataset_datapair_from_tuple_list(
+    #     test_2_plus_tuple, test_2_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
+    # )
 
     print('aaa')
 

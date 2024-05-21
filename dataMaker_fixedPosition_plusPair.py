@@ -319,6 +319,7 @@ def render_arabic_num_dataset(data_list: List[PairData], data_root: str, composi
         os.makedirs(data_path, exist_ok=True)
         draw_arabic_data(a, b, color, data_path, compositional_func)
 
+
 def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
     for data in tqdm(data_list, desc=data_root):
         a = data.a
