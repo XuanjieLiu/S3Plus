@@ -70,7 +70,7 @@ def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=Tru
     return
 
 
-def plot_lines(line_list, save_dir = './a.png', color: str='b'):
+def plot_lines(line_list, save_dir = './a.png', color: str='b', linewidth: float=2.):
     # 创建一个新的图形和轴
     fig, ax = plt.subplots()
     #设置figuresize
@@ -79,7 +79,7 @@ def plot_lines(line_list, save_dir = './a.png', color: str='b'):
     for l in line_list:
         x = [n[0] for n in l]
         y = [n[1] for n in l]
-        line = Line2D(x, y, linewidth=2, color=color)
+        line = Line2D(x, y, linewidth=linewidth, color=color)
         ax.add_line(line)
     # 设置轴的范围
     ax.set_ylim(-0.5, 0.5)
@@ -133,6 +133,7 @@ def Five(center: tuple, interval: float = 0.125):
         center
     ]
 
+
 def zheng_0(center: tuple = (0, 0), scalar: float = 1.):
     return np.array([[[-0.02, 0.], [0.02, 0.0]]]) * scalar + np.array(center)
 
@@ -167,6 +168,42 @@ def zheng_5(center: tuple = (0, 0), scalar: float = 1.):
         zheng_4(center, scalar),
         np.array([[[-0.16, -0.16], [0.16, -0.16]]]) * scalar + np.array(center)
     ))
+
+
+def tally_mark_EU_0(center: tuple = (0, 0), scalar: float = 1.):
+    return np.array([[[-0.02, 0.], [0.02, 0.0]]]) * scalar + np.array(center)
+
+
+def tally_mark_EU_1(center: tuple = (0, 0), scalar: float = 1.):
+    return np.array([[[-0.15, 0.16], [-0.15, -0.16]]]) * scalar + np.array(center)
+
+
+def tally_mark_EU_2(center: tuple = (0, 0), scalar: float = 1.):
+    return np.vstack((
+        tally_mark_EU_1(center, scalar),
+        np.array([[[-0.05, 0.16], [-0.05, -0.16]]]) * scalar + np.array(center)
+    ))
+
+def tally_mark_EU_3(center: tuple = (0, 0), scalar: float = 1.):
+    return np.vstack((
+        tally_mark_EU_2(center, scalar),
+        np.array([[[0.05, 0.16], [0.05, -0.16]]]) * scalar + np.array(center)
+    ))
+
+def tally_mark_EU_4(center: tuple = (0, 0), scalar: float = 1.):
+    return np.vstack((
+        tally_mark_EU_3(center, scalar),
+        np.array([[[0.15, 0.16], [0.15, -0.16]]]) * scalar + np.array(center)
+    ))
+
+def tally_mark_EU_5(center: tuple = (0, 0), scalar: float = 1.):
+    return np.vstack((
+        tally_mark_EU_4(center, scalar),
+        np.array([[[-0.2, -0.05], [0.2, 0.05]]]) * scalar + np.array(center)
+    ))
+
+
+
 
 
 ANCHORS = {
@@ -227,4 +264,4 @@ ZHENG_POSITIONS = {
 if "__main__" == __name__:
 
     print(zheng_4())
-    plot_lines(ZHENG_POSITIONS[12])
+    plot_lines(tally_mark_EU_1(), linewidth=1.5)

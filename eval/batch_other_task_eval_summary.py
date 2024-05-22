@@ -10,10 +10,11 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 
 EXP_NAME_LIST = [
-    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
-    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu",
-    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
-    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_PureVQ",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Fullsymm",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_AssocFullsymm",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_AssocFullsymmCommu",
 ]
 group_list = [
     ExpGroup(
