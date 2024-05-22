@@ -70,7 +70,7 @@ def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=Tru
     return
 
 
-def plot_lines(line_list, save_dir = './a.png', color: str='b', linewidth: float=2.):
+def plot_lines(line_list, save_dir = './a.png', color: str='b', line_width: float=2.):
     # 创建一个新的图形和轴
     fig, ax = plt.subplots()
     #设置figuresize
@@ -79,7 +79,7 @@ def plot_lines(line_list, save_dir = './a.png', color: str='b', linewidth: float
     for l in line_list:
         x = [n[0] for n in l]
         y = [n[1] for n in l]
-        line = Line2D(x, y, linewidth=linewidth, color=color)
+        line = Line2D(x, y, linewidth=line_width, color=color)
         ax.add_line(line)
     # 设置轴的范围
     ax.set_ylim(-0.5, 0.5)
@@ -170,35 +170,35 @@ def zheng_5(center: tuple = (0, 0), scalar: float = 1.):
     ))
 
 
-def tally_mark_EU_0(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_0(center: tuple = (0, 0), scalar: float = 1.):
     return np.array([[[-0.02, 0.], [0.02, 0.0]]]) * scalar + np.array(center)
 
 
-def tally_mark_EU_1(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_1(center: tuple = (0, 0), scalar: float = 1.):
     return np.array([[[-0.15, 0.16], [-0.15, -0.16]]]) * scalar + np.array(center)
 
 
-def tally_mark_EU_2(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_2(center: tuple = (0, 0), scalar: float = 1.):
     return np.vstack((
-        tally_mark_EU_1(center, scalar),
+        EU_tally_mark_1(center, scalar),
         np.array([[[-0.05, 0.16], [-0.05, -0.16]]]) * scalar + np.array(center)
     ))
 
-def tally_mark_EU_3(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_3(center: tuple = (0, 0), scalar: float = 1.):
     return np.vstack((
-        tally_mark_EU_2(center, scalar),
+        EU_tally_mark_2(center, scalar),
         np.array([[[0.05, 0.16], [0.05, -0.16]]]) * scalar + np.array(center)
     ))
 
-def tally_mark_EU_4(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_4(center: tuple = (0, 0), scalar: float = 1.):
     return np.vstack((
-        tally_mark_EU_3(center, scalar),
+        EU_tally_mark_3(center, scalar),
         np.array([[[0.15, 0.16], [0.15, -0.16]]]) * scalar + np.array(center)
     ))
 
-def tally_mark_EU_5(center: tuple = (0, 0), scalar: float = 1.):
+def EU_tally_mark_5(center: tuple = (0, 0), scalar: float = 1.):
     return np.vstack((
-        tally_mark_EU_4(center, scalar),
+        EU_tally_mark_4(center, scalar),
         np.array([[[-0.2, -0.05], [0.2, 0.05]]]) * scalar + np.array(center)
     ))
 
@@ -261,7 +261,31 @@ ZHENG_POSITIONS = {
     20: [*zheng_5(ANCHORS[4][0]), *zheng_5(ANCHORS[4][1]), *zheng_5(ANCHORS[4][2]), *zheng_5(ANCHORS[4][3])],
 }
 
+EU_tally_mark_POSITIONS = {
+    0: EU_tally_mark_0(scalar=1.3),
+    1: EU_tally_mark_1(),
+    2: EU_tally_mark_2(),
+    3: EU_tally_mark_3(),
+    4: EU_tally_mark_4(),
+    5: EU_tally_mark_5(),
+    6: [*EU_tally_mark_5(ANCHORS[2][0]), *EU_tally_mark_1(ANCHORS[2][1])],
+    7: [*EU_tally_mark_5(ANCHORS[2][0]), *EU_tally_mark_2(ANCHORS[2][1])],
+    8: [*EU_tally_mark_5(ANCHORS[2][0]), *EU_tally_mark_3(ANCHORS[2][1])],
+    9: [*EU_tally_mark_5(ANCHORS[2][0]), *EU_tally_mark_4(ANCHORS[2][1])],
+    10: [*EU_tally_mark_5(ANCHORS[2][0]), *EU_tally_mark_5(ANCHORS[2][1])],
+    11: [*EU_tally_mark_5(ANCHORS[3][0]), *EU_tally_mark_5(ANCHORS[3][1]), *EU_tally_mark_1(ANCHORS[3][2])],
+    12: [*EU_tally_mark_5(ANCHORS[3][0]), *EU_tally_mark_5(ANCHORS[3][1]), *EU_tally_mark_2(ANCHORS[3][2])],
+    13: [*EU_tally_mark_5(ANCHORS[3][0]), *EU_tally_mark_5(ANCHORS[3][1]), *EU_tally_mark_3(ANCHORS[3][2])],
+    14: [*EU_tally_mark_5(ANCHORS[3][0]), *EU_tally_mark_5(ANCHORS[3][1]), *EU_tally_mark_4(ANCHORS[3][2])],
+    15: [*EU_tally_mark_5(ANCHORS[3][0]), *EU_tally_mark_5(ANCHORS[3][1]), *EU_tally_mark_5(ANCHORS[3][2])],
+    16: [*EU_tally_mark_5(ANCHORS[4][0]), *EU_tally_mark_5(ANCHORS[4][1]), *EU_tally_mark_5(ANCHORS[4][2]), *EU_tally_mark_1(ANCHORS[4][3])],
+    17: [*EU_tally_mark_5(ANCHORS[4][0]), *EU_tally_mark_5(ANCHORS[4][1]), *EU_tally_mark_5(ANCHORS[4][2]), *EU_tally_mark_2(ANCHORS[4][3])],
+    18: [*EU_tally_mark_5(ANCHORS[4][0]), *EU_tally_mark_5(ANCHORS[4][1]), *EU_tally_mark_5(ANCHORS[4][2]), *EU_tally_mark_3(ANCHORS[4][3])],
+    19: [*EU_tally_mark_5(ANCHORS[4][0]), *EU_tally_mark_5(ANCHORS[4][1]), *EU_tally_mark_5(ANCHORS[4][2]), *EU_tally_mark_4(ANCHORS[4][3])],
+    20: [*EU_tally_mark_5(ANCHORS[4][0]), *EU_tally_mark_5(ANCHORS[4][1]), *EU_tally_mark_5(ANCHORS[4][2]), *EU_tally_mark_5(ANCHORS[4][3])],
+}
+
 if "__main__" == __name__:
 
     print(zheng_4())
-    plot_lines(tally_mark_EU_1(), linewidth=1.5)
+    plot_lines(EU_tally_mark_1(), linewidth=1.5)

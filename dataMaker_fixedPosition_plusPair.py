@@ -6,7 +6,7 @@ from typing import List, Iterable
 from dataMaker_commonFunc import *
 from tqdm import tqdm
 import torch
-from dataMaker_commonFunc import ZHENG_POSITIONS
+
 matplotlib.use('AGG')
 from scipy.spatial import distance
 import os
@@ -67,24 +67,27 @@ def draw_arabic_data(i, j, color, data_path, compositional_func):
         color=color
     )
 
-def draw_ZHENG_data(i, j, color, data_path, compositional_func):
+def draw_lines_data(i, j, color, data_path, compositional_func, line_positions, line_width=2.):
     os.makedirs(data_path, exist_ok=True)
     plot_lines(
-        ZHENG_POSITIONS[i],
+        line_positions[i],
         save_dir=os.path.join(data_path, f'a-{i}'),
-        color=color
+        color=color,
+        line_width=line_width
     )
     plot_lines(
-        ZHENG_POSITIONS[j],
+        line_positions[j],
         save_dir=os.path.join(data_path, f'b-{j}'),
-        color=color
+        color=color,
+        line_width = line_width
     )
     result = compositional_func(i, j)
     print(f'i={i}, j={j}, k={result}')
     plot_lines(
-        ZHENG_POSITIONS[result],
+        line_positions[result],
         save_dir=os.path.join(data_path, f'c-{result}'),
-        color=color
+        color=color,
+        line_width=line_width
     )
 
 
@@ -136,17 +139,6 @@ def pair_list2set(pair_list, markers, colors):
                 pair_set.append(PairData(pair[0], pair[1], mar, color))
     return pair_set
 
-# def make_train_dataset_n2(numbers, markers, colors, dataset_path):
-#     data_root = os.path.join(dataset_path, 'train')
-#     os.makedirs(data_root, exist_ok=True)
-#     for i in numbers:
-#         for j in range(i, numbers[-1]+1):
-#             for mar in markers:
-#                 for color in colors:
-#                     data_name = f'{i}-{j}-{MARK_NAME_SPACE[mar]}-{color}'
-#                     data_path = os.path.join(data_root, data_name)
-#                     os.makedirs(data_path, exist_ok=True)
-#                     draw_data(i, j, mar, color, data_path)
 
 
 class PairData:
@@ -320,7 +312,7 @@ def render_arabic_num_dataset(data_list: List[PairData], data_root: str, composi
         draw_arabic_data(a, b, color, data_path, compositional_func)
 
 
-def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
+def render_lines_num_dataset(data_list: List[PairData], data_root: str, compositional_func, line_positions, line_width=2.):
     for data in tqdm(data_list, desc=data_root):
         a = data.a
         b = data.b
@@ -328,7 +320,14 @@ def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, composit
         data_name = f'{a}-{b}-default-{color}'
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
-        draw_ZHENG_data(a, b, color, data_path, compositional_func)
+        draw_lines_data(a, b, color, data_path, compositional_func, line_positions, line_width)
+
+def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
+    return render_lines_num_dataset(data_list, data_root, compositional_func, ZHENG_POSITIONS)
+
+
+def render_EU_tally_mark_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
+    return render_lines_num_dataset(data_list, data_root, compositional_func, EU_tally_mark_POSITIONS, 1.5)
 
 
 def sum_pairs(min_number):
