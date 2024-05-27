@@ -12,11 +12,10 @@ RESULT_DIR_NAME = 'two_dim_z_vis_multi_style'
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymmCommu",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
+    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
 ]
 
 EVAL_SETS = [
