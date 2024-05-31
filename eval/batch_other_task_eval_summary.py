@@ -10,11 +10,11 @@ from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 
 
 EXP_NAME_LIST = [
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymmCommu",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
+    "2024.05.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
+    "2024.05.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
+    "2024.03.28_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
+    "2024.04.07_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu",
+    "2024.04.07_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymm",
 ]
 group_list = [
     ExpGroup(
