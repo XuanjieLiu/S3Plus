@@ -77,6 +77,46 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
         plt.clf()
         plt.close()
 
+
+def plot_num_position_in_three_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
+    fig = plt.figure(figsize=(5, 5))
+    ax = fig.add_subplot(111, projection='3d')
+    assert len(num_z[0]) == 3, f"The representation dimension of a number should be three, but got {len(num_z[0])} instead."
+    sorted_label = sorted(num_labels)
+    sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
+    sorted_num_z = [num_z[i] for i in sorted_indices]
+    X = [item[0] for item in sorted_num_z]
+    Y = [item[1] for item in sorted_num_z]
+    Z = [item[2] for item in sorted_num_z]
+    max_repeating_num = find_most_frequent_elements_repeating_num(num_labels)
+    for i in range(0, len(num_z)):
+        ax.scatter(X[i], Y[i], Z[i],
+                    marker=f'${sorted_label[i]}$',
+                    s=200,
+                    alpha=min(1, 1/max_repeating_num*1.3),
+                    c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
+    plt.plot(X, Y, Z, linestyle='dashed', linewidth=0.5)
+    if all_embs is not None:
+        embs_x = [item[0] for item in all_embs]
+        embs_y = [item[1] for item in all_embs]
+        embs_z = [item[2] for item in all_embs]
+        ax.scatter(embs_x, embs_y, embs_z, marker='o', s=1, c='navy')
+    ax.set_xlabel('z1')
+    ax.set_ylabel('z2')
+    ax.set_zlabel('z3')
+    if x_limit is not None:
+        ax.set_xlim(x_limit)
+    if y_limit is not None:
+        ax.set_ylim(y_limit)
+    if result_path is None:
+        plt.show()
+    else:
+        plt.savefig(f'{result_path}.png')
+        plt.cla()
+        plt.clf()
+        plt.close()
+
+
 def find_most_frequent_elements_repeating_num(arr):
     nd_array = np.array(arr)
     unique_elements, counts = np.unique(nd_array, return_counts=True)
@@ -90,7 +130,6 @@ def draw_scatter_gird(ax: plt.Axes, x, y):
     lines = [horizontal_line, vertical_line]
     linecoll = matcoll.LineCollection(lines, linewidths=0.2)
     ax.add_collection(linecoll)
-
 
 
 class MumEval:
@@ -121,16 +160,22 @@ class MumEval:
         num_z_c = num_z[:, :self.latent_code_1]
         is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
         nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-        if is_draw_graph and self.latent_code_1 == 2:
+        if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
             all_embs = None
             code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
             code_book = np.around(code_book, decimals=3)
             if is_show_all_emb and self.latent_embedding_1 == 2:
-                all_embs = all_combinations(code_book, code_book)
+                all_embs = combine_two_codebooks(code_book, code_book)
+            if self.latent_embedding_1 == 3:
+                all_embs = combine_three_codebooks(code_book, code_book, code_book)
             if is_show_all_emb and self.latent_embedding_1 == 1:
                 all_embs = code_book
-            result_name = f'{result_path}_{round(nna_score, 2)}' if nna_score is not None else None
-            plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+            result_name = f'{result_path}_{round(nna_score, 2)}' if result_path is not None else None
+            print(f'Nearest neighbor analysis score: {nna_score}')
+            if self.latent_code_1 == 2:
+                plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+            elif self.latent_code_1 == 3:
+                plot_num_position_in_three_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
         return nna_score
 
 
@@ -165,27 +210,26 @@ def is_the_unique_min_num(num, num_list):
     return num == min(num_list) and list(num_list).count(num) == 1
 
 
-
-def all_combinations(arr_1, arr_2):
+def combine_two_codebooks(arr_1, arr_2):
     return [[x, y] for x in arr_1 for y in arr_2]
 
 
-if __name__ == "__main__":
+def combine_three_codebooks(arr_1, arr_2, arr_3):
+    combined = []
+    for i in range(0, len(arr_1)):
+        for j in range(0, len(arr_2)):
+            for k in range(0, len(arr_3)):
+                combined.append([arr_1[i], arr_2[j], arr_3[k]])
+    return combined
+
+
+def test_two_dim_vis():
     matplotlib.use('tkagg')
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 
-    # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/multi_style_eval_(0,20)_FixedPos_newShape')
-    # EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
-    # SUB_EXP = 1
-    # CHECK_POINT = 'checkpoint_10000.pt'
-
-    # DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
-    # EXP_NAME = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
-    # SUB_EXP = 1
-    # CHECK_POINT = 'curr_model.pt'
-
     DATASET_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/(0,20)-FixedPos-oneStyle')
-    EXP_NAME = '2024.05.10_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu'
+    EXP_NAME = '2024.05.31_5vq_Zc[3]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu'
+    # EXP_NAME = '2024.05.10_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu'
     SUB_EXP = 1
     CHECK_POINT = 'checkpoint_50000.pt'
 
@@ -201,3 +245,7 @@ if __name__ == "__main__":
     single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=256)
     evaler = MumEval(t_config.CONFIG, model_path)
     evaler.num_eval_two_dim(single_img_eval_loader)
+
+
+if __name__ == "__main__":
+    test_two_dim_vis()
