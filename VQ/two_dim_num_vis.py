@@ -66,9 +66,11 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
     plt.xlabel('z1')
     plt.ylabel('z2')
     if x_limit is not None:
-        plt.xlim(x_limit)
+        plt.xlim(x_limit[0], x_limit[1])
     if y_limit is not None:
-        plt.ylim(y_limit)
+        plt.ylim(y_limit[0], y_limit[1])
+    if x_limit is None and y_limit is None:
+        plt.axis('equal')
     if result_path is None:
         plt.show()
     else:

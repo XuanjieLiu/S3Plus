@@ -38,12 +38,12 @@ POINT_RANGE = (0, 20)
 SAMPLE_RANGE = (0.1, 0.90)
 MIN_DIST = 0.15
 
-NUMBERS = range(1, 17)
-NUM_NUMS = 8
+NUMBERS = range(1, 11)
+NUM_NUMS = 20
 # MARKERS = ['o', 'v', '*', 'd']
-MARKERS = ['o', 'v', '*', 'd']
+MARKERS = ['v']
 DATA_ROOT = 'dataset'
-DATA_PATH = f'{DATA_ROOT}/({NUMBERS[0]},{NUMBERS[-1]})-{NUM_NUMS}-{str([MARK_NAME_SPACE[name] for name in MARKERS])}'
+DATA_PATH = f'{DATA_ROOT}/RandPos_({NUMBERS[0]},{NUMBERS[-1]})-{NUM_NUMS}-{str([MARK_NAME_SPACE[name] for name in MARKERS])}'
 aaa = matplotlib.markers.CARETDOWNBASE
 
 
@@ -54,7 +54,7 @@ def make_dataset_1():
             for j in range(0, NUM_NUMS):
                 position = gen_positions(i, SAMPLE_RANGE, MIN_DIST)
                 fig_path = os.path.join(DATA_PATH, f'{i}-{MARK_NAME_SPACE[mar]}-{j}')
-                plot_a_scatter(position, fig_path, marker=mar, color='blue')
+                plot_a_scatter(position, fig_path, marker=mar, color='black')
 
 
 def plot_a_scatter(position_list, save_dir, marker: str, color: str):

@@ -13,3 +13,7 @@ slurm_*.err
 *.gz
 *.pickle
 /venv
+/Pascal_VOC
+/data/MNIST
+/tb_logs
+**/wandb/

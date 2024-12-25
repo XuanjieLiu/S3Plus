@@ -208,7 +208,7 @@ class PlusTrainer:
             if self.is_save_img:
                 vis_imgs.save_img(f'{epoch_num}.png')
 
-    def train(self, is_resume=True, optimizer: torch.optim.Optimizer = None):
+    def train(self, is_resume=True, optimizer: torch.optim.Optimizer = None, eval_func: callable = None):
         os.makedirs(self.train_result_path, exist_ok=True)
         os.makedirs(self.eval_result_path, exist_ok=True)
         self.model.train()
@@ -226,6 +226,8 @@ class PlusTrainer:
             optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         # scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(start_epoch))
         for epoch_num in range(start_epoch, self.max_iter_num):
+            if eval_func is not None:
+                eval_func(epoch_num, self.model)
             is_log = (epoch_num % self.log_interval == 0)
             train_vis_img = VisImgs(self.train_result_path)
             eval_vis_img = VisImgs(self.eval_result_path)
@@ -278,6 +280,12 @@ class PlusTrainer:
                 enc_labels=num_labels,
                 dict_sizes=self.multi_num_embeddings
             )
+
+    def calc_plus_accu(self, data_loader):
+        plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, True)
+        ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
+        return ks, accu
 
     def plot_plus_idx(self, epoch_num, data_loader, result_path, result_name="plus_idx"):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)

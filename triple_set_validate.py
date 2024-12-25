@@ -50,6 +50,23 @@ def validate_train_set(start, end):
             print(f'No pair sum: {i}')
     print('Done')
 
+def count_pair_num(start, end):
+    print(f'Validate train set from {start} to {end}')
+    data_pairs = load_data_list(TRAIN_DATA_PATH)
+    ab_dict = [0 for i in range(start, end+1)]
+    abc_dict = [0 for i in range(start, end+1)]
+    for data_pair in data_pairs:
+        ab_dict[data_pair[0]] += 1
+        ab_dict[data_pair[1]] += 1
+        abc_dict[data_pair[0]] += 1
+        abc_dict[data_pair[1]] += 1
+        abc_dict[data_pair[0] + data_pair[1]] += 1
+    print(f'ab_dict:')
+    for i in range(start, end+1):
+        print(f'{i}: {ab_dict[i]}')
+    print(f'abc_dict:')
+    for i in range(start, end+1):
+        print(f'{i}: {abc_dict[i]}')
 
 def detect_repeat_pair_from_subset(data_path):
     print(f'Detect repeat pair from {data_path}')
@@ -67,7 +84,8 @@ def detect_none_repeat_pair_from_subset(data_path):
 
 if __name__ == "__main__":
     print("Hello World")
-    detect_repeat_pair_from_subset(TRAIN_DATA_PATH)
-    detect_repeat_pair_from_subset(TEST_2_DATA_PATH)
-    detect_none_repeat_pair_from_subset(TEST_1_DATA_PATH)
-    validate_train_set(2, 20)
+    # detect_repeat_pair_from_subset(TRAIN_DATA_PATH)
+    # detect_repeat_pair_from_subset(TEST_2_DATA_PATH)
+    # detect_none_repeat_pair_from_subset(TEST_1_DATA_PATH)
+    # validate_train_set(2, 20)
+    count_pair_num(0, 20)

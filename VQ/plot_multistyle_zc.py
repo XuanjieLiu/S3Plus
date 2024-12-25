@@ -153,8 +153,8 @@ if __name__ == "__main__":
     EVAL_SETS[0]['loader'] = single_img_eval_loader
 
     EXP_NAME = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing'
-    SUB_EXP = 1
-    CHECK_POINT = 'checkpoint_10000.pt'
+    SUB_EXP = 6
+    CHECK_POINT = 'checkpoint_9500.pt'
     exp_path = os.path.join(EXP_ROOT, EXP_NAME)
     check_point_path = os.path.join(exp_path, str(SUB_EXP), CHECK_POINT)
     sys.path.append(exp_path)

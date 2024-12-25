@@ -20,30 +20,12 @@ def load_idx_and_label(loader: DataLoader, loaded_model: VQVAE):
     return [int(n[0]) for n in idx.tolist()], num_labels
 
 
-
-
-def eval_accu(base_idxs: List[int], base_labels: List[int], eval_idxs: List[int], eval_labels: List[int]):
-    label_set = list(set(base_labels))
-    base_dict = {}
-    for label in label_set:
-        base_dict[str(label)] = []
-    for i in range(len(base_idxs)):
-        base_dict[str(base_labels[i])].append(base_idxs[i])
-    mode_dict = {}
-    for key, value in base_dict.items():
-        mode = find_mode(value)
-        assert mode is not None
-        mode_dict[key] = mode
-    correct = 0
-    for i in range(len(eval_idxs)):
-        if mode_dict[str(eval_labels[i])] == eval_idxs[i]:
-            correct += 1
-    return correct / len(eval_idxs)
-
-
-
-
 def find_mode(int_list: List[int]):
+    """
+    Find the mode of a list of integers.
+    :param int_list: /List[int]/ The list of integers.
+    :return: /int/ The mode of the list.
+    """
     int_set = list(set(int_list))
     int_dict = {}
     for i in int_set:
@@ -57,6 +39,34 @@ def find_mode(int_list: List[int]):
             max_count = int_dict[i]
             mode = int(i)
     return mode
+
+
+def find_mode_label_zc(base_idxs: List[int], base_labels: List[int]):
+    label_set = list(set(base_labels))
+    base_dict = {}
+    for label in label_set:
+        base_dict[str(label)] = []
+    for i in range(len(base_idxs)):
+        base_dict[str(base_labels[i])].append(base_idxs[i])
+    mode_dict = {}
+    for key, value in base_dict.items():
+        mode = find_mode(value)
+        assert mode is not None
+        mode_dict[key] = mode
+    return mode_dict
+
+
+def determine_accu_by_mode(mode_dict, eval_idxs: List[int], eval_labels: List[int]):
+    correct = 0
+    for i in range(len(eval_idxs)):
+        if mode_dict[str(eval_labels[i])] == eval_idxs[i]:
+            correct += 1
+    return correct / len(eval_idxs)
+
+
+def eval_accu(base_idxs: List[int], base_labels: List[int], eval_idxs: List[int], eval_labels: List[int]):
+    mode_dict = find_mode_label_zc(base_idxs, base_labels)
+    return determine_accu_by_mode(mode_dict, eval_idxs, eval_labels)
 
 
 class AccuEval:
