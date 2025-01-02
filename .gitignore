@@ -17,3 +17,4 @@ slurm_*.err
 /data/MNIST
 /tb_logs
 **/wandb/
+/fruit_recognition_dataset

@@ -11,7 +11,7 @@ import torch
 from torchvision import transforms
 from shared import DEVICE
 
-EXP_path = '2023.12.17_multiStyle_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_2_realPair'
+EXP_path = '2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu'
 SUB_EXP = '1'
 MODEL_PATH = 'checkpoint_10000.pt'
 
