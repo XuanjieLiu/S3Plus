@@ -28,7 +28,9 @@ transform = transforms.Compose([
 
 # Define the custom dataset
 class FruitRecognitionDataset(Dataset):
-    def __init__(self, data_root, subset_list, transform=None):
+    def __init__(self, data_root=DATA_ROOT, subset_list=None, transform=transform):
+        if subset_list is None:
+            subset_list = SUBSET_LIST
         self.data_root = data_root
         self.subset_list = subset_list
         self.transform = transform
@@ -82,6 +84,7 @@ def random_mask_batch(batch_images):
 if __name__ == "__main__":
     # Create the dataset
     dataset = FruitRecognitionDataset(DATA_ROOT, SUBSET_LIST, transform=transform)
+    print("Number of samples in the dataset:", len(dataset))
 
     # Create a DataLoader
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
@@ -91,6 +94,7 @@ if __name__ == "__main__":
         print(images.shape, labels)
         masked_1, masked_2 = random_mask_batch(images)
         # Visualize one image
+        visulize_one_img(images[0])
         visulize_one_img(masked_1[0])
         visulize_one_img(masked_2[0])
         break

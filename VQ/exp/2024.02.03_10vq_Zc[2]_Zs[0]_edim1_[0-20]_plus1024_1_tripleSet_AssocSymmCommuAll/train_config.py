@@ -52,7 +52,9 @@ CONFIG = {
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
     'is_symm_assoc': True,
+    'is_full_symm': True,
     'is_pure_assoc': True,
+    'is_twice_oper': False,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,

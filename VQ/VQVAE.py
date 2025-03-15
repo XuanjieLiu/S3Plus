@@ -87,7 +87,7 @@ class MultiVectorQuantizer(nn.Module):
           equation 4 in the paper - this variable is Beta).
     """
 
-    def __init__(self, embedding_dim, num_embeddings, commitment_cost, embedding_cost, multi_num_embeddings=None):
+    def __init__(self, embedding_dim, num_embeddings, commitment_cost, embedding_cost, multi_num_embeddings=None, init_embs: torch.Tensor=None):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.num_embeddings = num_embeddings
@@ -97,6 +97,9 @@ class MultiVectorQuantizer(nn.Module):
         self.num_embedding_list = multi_num_embeddings
         # initialize embeddings
         self.embeddings = nn.Embedding(self.num_embeddings, self.embedding_dim).to(DEVICE)
+        if init_embs is not None:
+            assert init_embs.shape == self.embeddings.weight.shape, "init_embs shape not match"
+            self.embeddings.weight.data = torch.tensor(init_embs, dtype=torch.float)
         if self.is_multiVQ:
             self.codebooks = [nn.Embedding(n, self.embedding_dim).to(DEVICE) for n in self.num_embedding_list]
         self.mse_loss = nn.MSELoss()
@@ -344,7 +347,7 @@ class VQVAE(nn.Module):
 
     def load_tensor(self, path):
         """从文件读取 tensor 对象"""
-        return torch.load(path, map_location=torch.device(DEVICE))
+        return torch.load(path, map_location=torch.device(DEVICE), weights_only=False)
 
     def index2z(self, idx):
         if self.multi_num_embeddings is not None:

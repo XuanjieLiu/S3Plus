@@ -5,12 +5,12 @@ from shared import DEVICE
 import os
 
 # Path to your DINO checkpoint
-checkpoint_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/checkpoints/')
-checkpoint_name = "dino_deitsmall8_pretrain.pth"
-checkpoint_path = os.path.join(checkpoint_root, checkpoint_name)
+dino_checkpoint_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/checkpoints/')
+dino_checkpoint_name = "dino_deitsmall8_pretrain.pth"
+dino_checkpoint_path = os.path.join(dino_checkpoint_root, dino_checkpoint_name)
 
 # Define a function to load the DINO model
-def load_dino_vit_s8(checkpoint_path):
+def load_dino_vit_s8(checkpoint_path=dino_checkpoint_path):
     # Load the ViT-S/8 model structure
     model = VisionTransformer(
         img_size=224,  # DINO typically trains on 224x224 images
@@ -34,10 +34,6 @@ def load_dino_vit_s8(checkpoint_path):
 
     return model
 
-# Load your DINO model
-model = load_dino_vit_s8(checkpoint_path)
-print("DINO model loaded successfully!")
-
 # Define a transform pipeline for your images
 transform = transforms.Compose([
     transforms.Resize(224),  # Resize to 224x224
@@ -47,7 +43,7 @@ transform = transforms.Compose([
 ])
 
 
-# Assume you have a dataloader named `dataloader`
+# Assume you have a dataloader named `dataloader`, convert images to their features
 def evaluate_images(model, dataloader):
     features = []
     with torch.no_grad():  # Disable gradient computation for inference
@@ -59,3 +55,16 @@ def evaluate_images(model, dataloader):
     # Concatenate all features into a single tensor
     features = torch.cat(features, dim=0)
     return features
+
+
+if __name__ == "__main__":
+    # Load the DINO model
+    # Load your DINO model
+    model = load_dino_vit_s8(dino_checkpoint_path)
+    print("DINO model loaded successfully!")
+
+    # Load your dataset
+    # dataloader = ...
+
+    # Extract features from the dataset
+    # features = evaluate_images(dino_model, dataloader)
