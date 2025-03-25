@@ -37,7 +37,7 @@ VISION_MODEL_LIGHTViT = 'lightViT'
 VISION_MODEL_CNN = 'cnn'
 
 CONFIG = {
-    'name': '25.03.14.align_Synth_online_dino_16',
+    'name': '25.03.24.align_Synth_online_dino_adjustCollapse_noZero_3',
     'dataset_anchor': os.path.join(PROJECT_DIR, 'fruit_recognition_dataset_oneFruit'),
     'subset_list': ['Apple/Apple A', 'Apple/Apple D'],
     'VQSPS': {
@@ -66,13 +66,14 @@ CONFIG = {
         'LR': 0.0001,
         'BATCH_SIZE': 32,
         'EPOCHS': 100,
-        'commitment_scalar': 2.,
+        'commitment_scalar': 1,
         'embedding_scalar': 0.0,
-        'collapse_scalar': 100.0,
-        'collapse_multiplier': 2, # before was 2.0
+        'collapse_scalar': 1,
+        'collapse_multiplier': 1, # before was 2.0
         'is_use_anchor': False,
         'plus_scalar': 1, # before was 100
-        'CODES': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        # 'CODES': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        'CODES': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
         # 'CODES': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20],
     },
     'data_type': DATA_TYPE_SYNTH_ONLINE,
@@ -86,8 +87,8 @@ CONFIG = {
         'dataset_anchor': os.path.join(PROJECT_DIR, 'LM_align/synthData/pre_generated_data_anchor_1'),
     },
     'data_synth_online': {
-        'train_num_samples': 2048,
-        'train_reuse_times': 8, # 8 for dino
+        'train_num_samples': 1024,
+        'train_reuse_times': 4, # 4 for dino
     },
     
 }
@@ -95,7 +96,7 @@ CONFIG = {
 def calc_accuracy(pred_label, true_label):
     return np.sum(pred_label == true_label) / len(true_label)
 
-def collapse_loss_func(margin, collapse_scalar=1, collapse_multiplier=1):
+def collapse_loss_func(margin, collapse_multiplier=1):
     def collapse_loss(a, b, c):
         # 对每个样本计算pairwise欧氏距离
         d_ab = torch.norm(a - b, p=2, dim=1)
@@ -109,7 +110,7 @@ def collapse_loss_func(margin, collapse_scalar=1, collapse_multiplier=1):
         loss = F.relu(margin - d_max)
         
         # 返回整个batch的平均loss
-        return loss.mean() * collapse_scalar
+        return loss.mean()
     return collapse_loss
 
 def load_VQSPS_loader(config=CONFIG):
@@ -200,24 +201,26 @@ class AlignTrain:
         self.batch_size = config['ALIGN']['BATCH_SIZE']
         self.anchor_1_z = self.sps_loader.num_z_c[self.sps_loader.num_labels.index(1)]
         self.anchor_1_z_batch = torch.tensor(self.anchor_1_z).unsqueeze(0).repeat(self.batch_size, 1).to(DEVICE)
-        self.vq_layer = MultiVectorQuantizer(
-            num_embeddings=self.sps_loader.num_z_c.shape[0],
-            embedding_dim=self.sps_loader.num_z_c.shape[1],
-            commitment_cost=config['ALIGN']['commitment_scalar'],
-            embedding_cost=config['ALIGN']['embedding_scalar'],
-            init_embs=self.sps_loader.num_z_c
-        ).to(DEVICE)
+        # self.vq_layer = MultiVectorQuantizer(
+        #     num_embeddings=self.sps_loader.num_z_c.shape[0],
+        #     embedding_dim=self.sps_loader.num_z_c.shape[1],
+        #     commitment_cost=config['ALIGN']['commitment_scalar'],
+        #     embedding_cost=config['ALIGN']['embedding_scalar'],
+        #     init_embs=self.sps_loader.num_z_c
+        # ).to(DEVICE)
         # self.min_margin = torch.min(torch.pdist(torch.tensor(self.sps_loader.num_z_c), p=2))
+        self.codes = self.config['ALIGN']['CODES']
         self.vq_layer, self.min_margin = self.init_codebook()
         self.criterion = nn.MSELoss()
         self.train_step = 0
-        self.collapse_loss = collapse_loss_func(self.min_margin, config['ALIGN']['collapse_scalar'], config['ALIGN']['collapse_multiplier'])
+        self.collapse_loss = collapse_loss_func(self.min_margin, config['ALIGN']['collapse_multiplier'])
+        self.collapse_scalar = config['ALIGN']['collapse_scalar']
+        
 
     def init_codebook(self):
-        codees = self.config['ALIGN']['CODES']
-        codes_index = [self.sps_loader.num_labels.index(code) for code in codees]
+        codes_index = [self.sps_loader.num_labels.index(code) for code in self.codes]
         codebook_emb = self.sps_loader.num_z_c[codes_index]
-        num_embeddings = len(codees)
+        num_embeddings = len(self.codes)
         min_margin = torch.min(torch.pdist(torch.tensor(codebook_emb), p=2))
         vq_layer = MultiVectorQuantizer(
             num_embeddings=num_embeddings,
@@ -230,7 +233,7 @@ class AlignTrain:
 
     def embs2label(self, embs):
         embs_idx = self.vq_layer.get_code_indices(embs).cpu().squeeze(1).numpy()
-        embs_label = np.array(self.sps_loader.num_labels)[embs_idx]
+        embs_label = np.array(self.codes)[embs_idx]
         return embs_label
 
 
@@ -292,17 +295,28 @@ class AlignTrain:
             # plus_loss = criterion(e_ab.detach(), e_c) + criterion(e_ab, e_c.detach())
             # plus_loss = criterion(e_ab.detach(), z_c) + criterion(e_ab, e_c.detach())
             plus_loss = self.criterion(e_ab.detach(), e_c) + self.criterion(e_ab, e_c.detach())
-            plus_loss *= self.config['ALIGN']['plus_scalar']
+            # plus_loss += self.criterion(e_ab.detach(), z_c) + self.criterion(e_ab, e_c.detach())
+            plus_loss = plus_loss * self.config['ALIGN']['plus_scalar']
 
             collapse_loss_c = self.collapse_loss(e_a, e_b, e_c)
             collapse_loss_ab = self.collapse_loss(e_a, e_b, e_ab)
-            collapse_loss = (collapse_loss_c + collapse_loss_ab)
+            collapse_loss_all = collapse_loss_c + collapse_loss_ab
+            collapse_loss = collapse_loss_all * self.collapse_scalar
 
             # Calculate accuracy
             e_all = torch.cat((e_a, e_b, e_c), dim=0)
             label_all = np.concatenate((label_a, label_b, label_c))
             pred_label = self.embs2label(e_all)
             accuracy = calc_accuracy(pred_label, label_all)
+
+            # # Adjust e_q_loss by collapse_loss
+            # e_q_mean = (e_q_loss_a + e_q_loss_b + e_q_loss_c) / 3
+            # if collapse_loss_all > 0.5:
+            #     e_q_loss_a = e_q_loss_a * 0.01
+            #     e_q_loss_b = e_q_loss_b * 0.01
+            #     e_q_loss_c = e_q_loss_c * 0.01
+            #     e_q_loss_ab = e_q_loss_ab * 0.01
+            #     plus_loss = plus_loss * 0.1
 
             # Anchor loss
             anchor_loss = torch.zeros(1).to(DEVICE)
@@ -326,6 +340,7 @@ class AlignTrain:
                 f'{stage}_plus_loss': plus_loss,
                 f'{stage}_anchor_loss': anchor_loss,
                 f'{stage}_collapse_loss': collapse_loss,
+                f'{stage}_collapse_loss_mean': collapse_loss_all,
                 f'{stage}_all_loss': all_loss,
                 f'{stage}_train_step': self.train_step,
                 f'{stage}_accuracy': accuracy,
@@ -354,7 +369,7 @@ class AlignTrain:
         os.makedirs(self.results_dir, exist_ok=True)
         if self.config['vision_model'] == VISION_MODEL_DINO:
             optimizer = optim.Adam(self.model_proj.parameters(), lr=self.config['ALIGN']['LR'])
-        if self.config['vision_model'] == VISION_MODEL_LIGHTViT or self.config['vision_model'] == VISION_MODEL_CNN:
+        elif self.config['vision_model'] == VISION_MODEL_LIGHTViT or self.config['vision_model'] == VISION_MODEL_CNN:
             optimizer = optim.Adam(list(self.model_proj.parameters()) + list(self.model_vision.parameters()), lr=self.config['ALIGN']['LR'])
         for epoch in range(self.config['ALIGN']['EPOCHS']):
             self.one_epoch(epoch, self.data_loader_train, optimizer, stage=STAGE_TRAIN)
