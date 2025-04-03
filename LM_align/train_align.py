@@ -201,14 +201,6 @@ class AlignTrain:
         self.batch_size = config['ALIGN']['BATCH_SIZE']
         self.anchor_1_z = self.sps_loader.num_z_c[self.sps_loader.num_labels.index(1)]
         self.anchor_1_z_batch = torch.tensor(self.anchor_1_z).unsqueeze(0).repeat(self.batch_size, 1).to(DEVICE)
-        # self.vq_layer = MultiVectorQuantizer(
-        #     num_embeddings=self.sps_loader.num_z_c.shape[0],
-        #     embedding_dim=self.sps_loader.num_z_c.shape[1],
-        #     commitment_cost=config['ALIGN']['commitment_scalar'],
-        #     embedding_cost=config['ALIGN']['embedding_scalar'],
-        #     init_embs=self.sps_loader.num_z_c
-        # ).to(DEVICE)
-        # self.min_margin = torch.min(torch.pdist(torch.tensor(self.sps_loader.num_z_c), p=2))
         self.codes = self.config['ALIGN']['CODES']
         self.vq_layer, self.min_margin = self.init_codebook()
         self.criterion = nn.MSELoss()
@@ -290,12 +282,8 @@ class AlignTrain:
             e_a, e_q_loss_a, z_a = self.img2emb(img_a)
             e_b, e_q_loss_b, z_b = self.img2emb(img_b)
             e_c, e_q_loss_c, z_c = self.img2emb(img_c)
-            # e_ab, e_q_loss_ab, z_ab = self.model_sps.plus(e_a, e_b)
             e_ab, e_q_loss_ab, z_ab = self.plus(e_a, e_b)
-            # plus_loss = criterion(e_ab.detach(), e_c) + criterion(e_ab, e_c.detach())
-            # plus_loss = criterion(e_ab.detach(), z_c) + criterion(e_ab, e_c.detach())
             plus_loss = self.criterion(e_ab.detach(), e_c) + self.criterion(e_ab, e_c.detach())
-            # plus_loss += self.criterion(e_ab.detach(), z_c) + self.criterion(e_ab, e_c.detach())
             plus_loss = plus_loss * self.config['ALIGN']['plus_scalar']
 
             collapse_loss_c = self.collapse_loss(e_a, e_b, e_c)
@@ -308,15 +296,6 @@ class AlignTrain:
             label_all = np.concatenate((label_a, label_b, label_c))
             pred_label = self.embs2label(e_all)
             accuracy = calc_accuracy(pred_label, label_all)
-
-            # # Adjust e_q_loss by collapse_loss
-            # e_q_mean = (e_q_loss_a + e_q_loss_b + e_q_loss_c) / 3
-            # if collapse_loss_all > 0.5:
-            #     e_q_loss_a = e_q_loss_a * 0.01
-            #     e_q_loss_b = e_q_loss_b * 0.01
-            #     e_q_loss_c = e_q_loss_c * 0.01
-            #     e_q_loss_ab = e_q_loss_ab * 0.01
-            #     plus_loss = plus_loss * 0.1
 
             # Anchor loss
             anchor_loss = torch.zeros(1).to(DEVICE)
