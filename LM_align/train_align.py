@@ -1,7 +1,7 @@
 import os
 import torch.optim as optim
 import torch.nn as nn
-from vis_funcs import visualize_alignment
+from vis_funcs import visualize_alignment, vis_all_confusion_and_accuracy
 from loader_VQSPS import VQSPSLoader
 from VQ.VQVAE import MultiVectorQuantizer
 from loader_dino import load_dino_vit_s8
@@ -37,7 +37,7 @@ VISION_MODEL_LIGHTViT = 'lightViT'
 VISION_MODEL_CNN = 'cnn'
 
 CONFIG = {
-    'name': '25.03.24.align_Synth_online_dino_adjustCollapse_noZero_3',
+    'name': '25.04.04.align_Synth_online_cnn_noZero_1',
     'dataset_anchor': os.path.join(PROJECT_DIR, 'fruit_recognition_dataset_oneFruit'),
     'subset_list': ['Apple/Apple A', 'Apple/Apple D'],
     'VQSPS': {
@@ -51,14 +51,6 @@ CONFIG = {
         'IS_LAYER_NORM': False,
         'NG_SLOPE': 0.01,
     },
-
-    # LightVisionModel Projector
-    # 'PROJECTOR': {
-    #     'HIDDEN_PARAM': [256, 256],
-    #     'IS_BATCH_NORM': False,
-    #     'IS_LAYER_NORM': False,
-    #     'NG_SLOPE': 0.01,
-    # },
     'project_name': 'LM_align_2.20',
     'vision_model': VISION_MODEL_DINO,
     'vision_out_dim': 256,
@@ -87,8 +79,9 @@ CONFIG = {
         'dataset_anchor': os.path.join(PROJECT_DIR, 'LM_align/synthData/pre_generated_data_anchor_1'),
     },
     'data_synth_online': {
-        'train_num_samples': 1024,
+        'train_num_samples': 1024, # 1024 for dino
         'train_reuse_times': 4, # 4 for dino
+        # 'train_reuse_times': 16, # 16 for vit and cnn
     },
     
 }
@@ -242,7 +235,8 @@ class AlignTrain:
             label_a = data_batch['label']['a'].numpy()
             label_b = data_batch['label']['b'].numpy()
             label_c = data_batch['label']['c'].numpy()
-            return img_a, img_b, img_c, label_a, label_b, label_c
+            objs = data_batch['label']['obj']
+            return img_a, img_b, img_c, label_a, label_b, label_c, objs
         
     def databatch2imgs_anchor(self, data_batch):
         if self.data_type == DATA_TYPE_FRUIT:
@@ -278,7 +272,7 @@ class AlignTrain:
             print(f'Stage: {stage}, Epoch: {epoch}, Batch: {i}, Train step: {self.train_step}')
             if optimizer is not None:
                 optimizer.zero_grad()
-            img_a, img_b, img_c, label_a, label_b, label_c = self.databatch2imgs(data_batch)
+            img_a, img_b, img_c, label_a, label_b, label_c, objs = self.databatch2imgs(data_batch)
             e_a, e_q_loss_a, z_a = self.img2emb(img_a)
             e_b, e_q_loss_b, z_b = self.img2emb(img_b)
             e_c, e_q_loss_c, z_c = self.img2emb(img_c)
@@ -329,7 +323,11 @@ class AlignTrain:
                 self.train_step += 1
 
             wandb.log(loss_dict)
-            if self.train_step % 50 == 0 or stage == STAGE_VAL or stage == STAGE_VAL_OOD: # This command for dino
+            if CONFIG['vision_model'] == VISION_MODEL_DINO:
+                train_log_interval = 50
+            else:
+                train_log_interval = 200
+            if self.train_step % train_log_interval == 0 or stage == STAGE_VAL or stage == STAGE_VAL_OOD: # This command for dino
             # if stage == STAGE_VAL or stage == STAGE_VAL_OOD:
                 visualize_alignment(
                     self.sps_loader.num_z_c, self.sps_loader.num_labels,
@@ -339,6 +337,11 @@ class AlignTrain:
                     e_ab[0].cpu().detach().numpy(),
                     z_ab[0].cpu().detach().numpy(),
                     save_path=os.path.join(self.results_dir ,f'{stage}_step_{self.train_step}.png')
+                )
+                # Visualize accuracy
+                vis_all_confusion_and_accuracy(
+                    np.array(pred_label), np.array(label_all), np.array(np.concatenate((objs, objs, objs))),
+                    save_path=os.path.join(self.results_dir, f'{stage}_step_{self.train_step}_confusion.png')
                 )
             if stage == STAGE_VAL or stage == STAGE_VAL_OOD:
                 break

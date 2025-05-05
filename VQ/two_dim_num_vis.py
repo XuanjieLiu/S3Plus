@@ -172,7 +172,12 @@ class MumEval:
                 all_embs = combine_three_codebooks(code_book, code_book, code_book)
             if is_show_all_emb and self.latent_embedding_1 == 1:
                 all_embs = code_book
-            result_name = f'{result_path}_{round(nna_score, 2)}' if result_path is not None else None
+            if result_path is not None and nna_score is not None:
+                result_name = f'{result_path}_nna_{round(nna_score, 2)}'
+            elif result_path is not None:
+                result_name = f'{result_path}_no_nna'
+            else:
+                result_name = None
             print(f'Nearest neighbor analysis score: {nna_score}')
             if self.latent_code_1 == 2:
                 plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
