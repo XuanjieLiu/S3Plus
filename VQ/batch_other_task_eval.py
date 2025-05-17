@@ -14,6 +14,7 @@ EXP_NAME_LIST = sys.argv[1:]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 
+# Batch eval minus
 
 for exp_num in EXP_NUM_LIST:
     for exp_name in EXP_NAME_LIST:
