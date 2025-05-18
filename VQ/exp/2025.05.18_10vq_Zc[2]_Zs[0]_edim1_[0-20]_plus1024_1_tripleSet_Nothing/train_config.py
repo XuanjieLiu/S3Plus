@@ -54,6 +54,7 @@ CONFIG = {
     'is_full_symm': False,
     'is_symm_assoc': False,
     'is_pure_assoc': False,
+    'is_twice_oper': False,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
