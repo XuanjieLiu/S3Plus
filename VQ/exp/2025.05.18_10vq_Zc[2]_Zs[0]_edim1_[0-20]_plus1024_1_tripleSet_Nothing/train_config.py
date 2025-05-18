@@ -51,6 +51,7 @@ CONFIG = {
     'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
+    'is_full_symm': False,
     'is_symm_assoc': False,
     'is_pure_assoc': False,
     'network_config': {
