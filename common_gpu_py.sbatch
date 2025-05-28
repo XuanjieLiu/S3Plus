@@ -11,8 +11,8 @@
 #SBATCH --qos=cscc-gpu-qos
 
 
-exp_list=$1
-echo "The Exp list is: $exp_list"
+py_run_file=$1
+args=$2
 
 
 nvidia-smi -a
