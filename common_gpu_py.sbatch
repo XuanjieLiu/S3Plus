@@ -23,5 +23,5 @@ hostname
 source activate xxxxj
 
 
-cd /l/users/xuanjie.liu/S3Plus/VQ
+cd /l/users/xuanjie.liu/S3Plus
 python $py_run_file $args
