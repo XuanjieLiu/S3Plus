@@ -26,64 +26,6 @@ group_list = [
     ) for name in EXP_NAME_LIST
 ]
 
-# group_list = [
-#     ExpGroup(
-#         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymmCommuAll",
-#         exp_alias='w/ assoc & symm & commu',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocSymm",
-#         exp_alias='w/ assoc & symm',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_AssocCommuAll",
-#         exp_alias='w/ assoc & commu',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_SymmCommuAll",
-#         exp_alias='w/ symm & commu',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Symm",
-#         exp_alias='w/ symm',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_Assoc",
-#         exp_alias='w/ assoc',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_commuAll",
-#         exp_alias='w/ commu',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-#     ExpGroup(
-#         exp_name="2024.02.08_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_oneColSet_nothing",
-#         exp_alias='w/ nothing',
-#         sub_exp=[i for i in range(1, 21)],
-#         record_name="minus_16_1.1_eval_record.txt",
-#         is_load_record=False
-#     ),
-# ]
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp')
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
