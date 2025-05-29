@@ -7,6 +7,7 @@
 #SBATCH --output=slurm_common_cpu.out
 #SBATCH --error=slurm_common_cpu.err
 #SBATCH -p cscc-cpu-p
+#SBATCH --qos=cscc-cpu-qos
 
 py_run_file=$1
 args=$2
