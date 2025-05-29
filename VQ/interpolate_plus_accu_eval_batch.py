@@ -9,12 +9,12 @@ from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT, fi
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_AssocFullsymmCommu",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
-
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
+    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
+    "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
+    "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing",
+    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
 ]
 ITP_PLUS_RECORD_PATH_ALL = 'interpolate_plus_accu_all.txt'
 ITP_PLUS_RECORD_PATH_TRAIN = 'interpolate_plus_accu_train.txt'
