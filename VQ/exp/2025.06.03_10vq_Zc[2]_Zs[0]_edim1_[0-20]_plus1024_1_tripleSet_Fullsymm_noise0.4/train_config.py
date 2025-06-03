@@ -2,7 +2,7 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet_trainAll/train",
+    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/train",
     'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
     'plus_eval_set_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1",
     'plus_eval_set_path_2': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2",
@@ -33,7 +33,7 @@ CONFIG = {
     'is_commutative_all': False,
     'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.0,
+    'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
     'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
@@ -51,11 +51,11 @@ CONFIG = {
     'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_symm_assoc': False,
-    'is_full_symm': False,
+    'is_symm_assoc': True,
+    'is_full_symm': True,
     'is_pure_assoc': False,
     'is_twice_oper': False,
-    'img_noise': 0.0,
+    'img_noise': 0.4,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,

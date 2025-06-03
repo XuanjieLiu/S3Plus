@@ -21,6 +21,28 @@ from eval_common import EvalHelper
 from eval.dec_vis_eval_2digit import plot_dec_img
 
 
+def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
+    """
+    为一批图片 (batch_size, 3, 64, 64) 添加高斯噪声。
+
+    参数:
+        images: torch.Tensor, 形状为 (batch_size, 3, 64, 64), 像素范围通常是 [0, 1] 或 [0, 255]
+        mean: 高斯噪声的均值 (默认 0)
+        std: 高斯噪声的标准差 (默认 15/255, 适合像素归一化到 [0, 1] 的情况)
+
+    返回:
+        noisy_images: 添加噪声后的图片
+    """
+    if images.max() > 1.0:
+        # 如果像素范围在 [0, 255]，先归一化
+        images = images / 255.0
+    noise = torch.randn_like(images).to(DEVICE) * std + mean
+    noisy_images = images + noise
+    # 保证像素范围在 [0, 1]
+    noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
+    return noisy_images
+
+
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
     scale = t_range[1] - t_range[0]
     if is_std_normal:
@@ -141,6 +163,7 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
+        self.img_noise = config['img_noise']
 
     def init_plus_eval_loader_2(self, config, key):
         if config[key] is None:
@@ -170,6 +193,8 @@ class PlusTrainer:
                 print(batch_ndx)
                 print(len(sample[0][0]))
             data, labels = sample
+            if self.img_noise > 0.0:
+                data = [add_gaussian_noise(d, std=self.img_noise) for d in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
@@ -231,7 +256,8 @@ class PlusTrainer:
             is_log = (epoch_num % self.log_interval == 0)
             train_vis_img = VisImgs(self.train_result_path)
             eval_vis_img = VisImgs(self.eval_result_path)
-            # scheduler.step()
+
+            # Evaluation phase
             if is_log:
                 self.model.eval()
                 self.one_epoch(epoch_num, eval_loss_counter, self.plus_eval_loader, True, eval_vis_img, None)
@@ -250,6 +276,8 @@ class PlusTrainer:
                         self.plot_plus_z(epoch_num, self.plus_eval_loader, self.eval_result_path, 'plus_z')
                         if self.plus_eval_loader_2 is not None:
                             self.plot_plus_z(epoch_num, self.plus_eval_loader_2, self.eval_result_path, 'plus_z_2')
+
+            # Training phase
             self.one_epoch(epoch_num, train_loss_counter, self.loader, is_log, train_vis_img, optimizer)
 
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
