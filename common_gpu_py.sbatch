@@ -5,8 +5,8 @@
 #SBATCH --mem=6GB
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=s3plus
-#SBATCH --output=common_gpu.out
-#SBATCH --error=common_gpu.err
+#SBATCH --output=slurm_common_gpu.out
+#SBATCH --error=slurm_common_gpu.err
 #SBATCH --partition=cscc-gpu-p
 #SBATCH --qos=cscc-gpu-qos
 
