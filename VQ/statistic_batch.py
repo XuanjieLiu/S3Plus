@@ -9,8 +9,9 @@ from dataloader_plus import Dataset
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.06.04_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_noise0.4",
-    "2025.06.04_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
+    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu_noise0.4",
+    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
+    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_noise0.4",
 
 ]
 EVAL_RECORD_NAME = 'plus_eval.txt'
