@@ -10,13 +10,10 @@ from dataloader import SingleImgDataset
 
 RESULT_DIR_NAME = 'two_dim_z_vis_multi_style'
 
-# EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-EXP_NUM_LIST = ['6']
+EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+# EXP_NUM_LIST = ['6']
 EXP_NAME_LIST = [
-    # "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymmCommu",
-    # "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_AssocFullsymm",
-    # "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
-    "2024.04.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
+    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
 ]
 
 EVAL_SETS = [
@@ -48,8 +45,8 @@ def batch_eval():
         evaler = MumEval(config, None)
         for sub_exp in EXP_NUM_LIST:
             sub_exp_path = os.path.join(exp_path, sub_exp)
-            # optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
-            optimal_checkpoint_num=9500
+            optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+            # optimal_checkpoint_num=9500
             check_point_name = f'checkpoint_{optimal_checkpoint_num}.pt'
             checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
