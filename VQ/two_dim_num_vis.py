@@ -10,6 +10,7 @@ import matplotlib.markers
 import matplotlib.pyplot as plt
 from VQ.eval_common import EvalHelper
 from matplotlib import collections as matcoll
+from common_func import add_gaussian_noise
 
 matplotlib.use('AGG')
 COLOR_LIST = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'hotpink', 'gray', 'steelblue', 'olive']
@@ -134,6 +135,16 @@ def draw_scatter_gird(ax: plt.Axes, x, y):
     ax.add_collection(linecoll)
 
 
+def make_result_name(result_path, nna_score=None):
+    if result_path is not None and nna_score is not None:
+        result_name = f'{result_path}_nna_{round(nna_score, 2)}'
+    elif result_path is not None:
+        result_name = f'{result_path}_no_nna'
+    else:
+        result_name = None
+    return result_name
+
+
 class MumEval:
     def __init__(self, config, model_path):
         self.config = config
@@ -148,11 +159,22 @@ class MumEval:
         if model_path is not None:
             self.reload_model(model_path)
         self.model.eval()
+        self.img_noise = self.config['img_noise']
 
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
 
     def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True, is_draw_graph=True):
+        num_z_c, num_labels = self.get_num_z_and_labels(data_loader)
+        is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
+        nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
+        print(f'Nearest neighbor analysis score: {nna_score}')
+        if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
+            result_name = make_result_name(result_path, nna_score)
+            self.plot_num_position_graph(num_z_c, num_labels, is_show_all_emb, result_name)
+        return nna_score
+
+    def get_num_z_and_labels(self, data_loader):
         num_z, num_labels = load_enc_eval_data(
             data_loader,
             lambda x:
@@ -160,9 +182,10 @@ class MumEval:
         )
         num_z = num_z.cpu().detach().numpy()
         num_z_c = num_z[:, :self.latent_code_1]
-        is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
-        nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-        if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
+        return num_z_c, num_labels
+
+    def plot_num_position_graph(self, num_z_c, num_labels, is_show_all_emb=True, result_name=None):
+        if self.latent_code_1 == 2 or self.latent_code_1 == 3:
             all_embs = None
             code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
             code_book = np.around(code_book, decimals=3)
@@ -172,18 +195,39 @@ class MumEval:
                 all_embs = combine_three_codebooks(code_book, code_book, code_book)
             if is_show_all_emb and self.latent_embedding_1 == 1:
                 all_embs = code_book
-            if result_path is not None and nna_score is not None:
-                result_name = f'{result_path}_nna_{round(nna_score, 2)}'
-            elif result_path is not None:
-                result_name = f'{result_path}_no_nna'
-            else:
-                result_name = None
-            print(f'Nearest neighbor analysis score: {nna_score}')
             if self.latent_code_1 == 2:
                 plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
             elif self.latent_code_1 == 3:
                 plot_num_position_in_three_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
-        return nna_score
+
+    def num_eval_two_dim_with_gaussian_noise(self, data_loader, result_path=None, is_show_all_emb=True,
+                                             is_draw_graph=True, noise_batch: int = 10):
+        nna_score_list = []
+        num_z_c_all = None
+        num_labels_all = []
+        for i in range(0, noise_batch):
+            num_z_c, num_labels = load_enc_eval_data(
+                data_loader,
+                lambda x: self.model.batch_encode_to_z(add_gaussian_noise(x, mean=0, std=self.img_noise))[0]
+            )
+            is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
+            nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
+            if nna_score is not None:
+                nna_score_list.append(nna_score)
+            if num_z_c_all is None:
+                num_z_c_all = num_z_c
+            else:
+                num_z_c_all = torch.cat((num_z_c_all, num_z_c), dim=0)
+            num_labels_all.extend(num_labels)
+        if len(nna_score_list) == 0:
+            nna_score_mean = None
+        else:
+            nna_score_mean = round(np.mean(nna_score_list), 2)
+        print(f'Nearest neighbor analysis score: {nna_score_mean}')
+        if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
+            result_name = make_result_name(result_path, nna_score_mean)
+            self.plot_num_position_graph(num_z_c_all, num_labels_all, is_show_all_emb, result_name)
+        return nna_score_mean
 
 
 def nearest_neighbor_analysis(num_z_c, num_labels, verbose=False):

@@ -1,8 +1,9 @@
 import sys
 import os
 from typing import List
-
+import torch
 import numpy as np
+from shared import DEVICE
 from loss_counter import read_record, find_optimal_checkpoint
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
@@ -14,6 +15,27 @@ DEFAULT_KEYS = ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED']
 DEFAULT_RECORD_NAME = 'Train_record.txt'
 SPECIFIC_CHECKPOINT_TXT_PATH = 'specific_checkpoint.txt'
 
+
+def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
+    """
+    为一批图片 (batch_size, 3, 64, 64) 添加高斯噪声。
+
+    参数:
+        images: torch.Tensor, 形状为 (batch_size, 3, 64, 64), 像素范围通常是 [0, 1] 或 [0, 255]
+        mean: 高斯噪声的均值 (默认 0)
+        std: 高斯噪声的标准差 (默认 15/255, 适合像素归一化到 [0, 1] 的情况)
+
+    返回:
+        noisy_images: 添加噪声后的图片
+    """
+    if images.max() > 1.0:
+        # 如果像素范围在 [0, 255]，先归一化
+        images = images / 255.0
+    noise = torch.randn_like(images).to(DEVICE) * std + mean
+    noisy_images = images + noise
+    # 保证像素范围在 [0, 1]
+    noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
+    return noisy_images
 
 def read_specific_checkpoint(sub_exp_path):
     path = os.path.join(sub_exp_path, SPECIFIC_CHECKPOINT_TXT_PATH)

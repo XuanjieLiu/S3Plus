@@ -4,6 +4,8 @@ import os
 from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision import transforms
+
+from VQ.common_func import add_gaussian_noise
 from shared import DEVICE
 
 

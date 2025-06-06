@@ -5,7 +5,7 @@ from importlib import reload
 from two_dim_num_plus_vis import MumEval, gen_k_list
 from common_func import load_config_from_exp_name, EXP_ROOT, find_optimal_checkpoint_num_by_train_config
 
-RESULT_DIR_NAME = 'two_dim_z_vis'
+RESULT_DIR_NAME = 'two_dim_z_plus_vis'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_noise0.4",

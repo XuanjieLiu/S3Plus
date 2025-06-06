@@ -6,17 +6,26 @@ from two_dim_num_vis import MumEval
 from common_func import load_config_from_exp_name, EXP_ROOT, find_optimal_checkpoint_num_by_train_config, record_num_list
 from torch.utils.data import DataLoader
 from dataloader import SingleImgDataset
+from common_func import add_gaussian_noise
 
 RESULT_DIR_NAME = 'two_dim_z_vis'
+RESULT_NAME = 'near_neighbour_score.txt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
     "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu_noise0.4",
-    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
+    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_noise0.4",
     "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_noise0.4",
-
+    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_noise0.4",
+    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_noise0.4",
 ]
+IS_ADD_NOISE = True  # 是否添加噪声
 
-RESULT_NAME = 'near_neighbour_score.txt'
+if IS_ADD_NOISE:
+    RESULT_DIR_NAME = 'two_dim_z_vis_with_noise'
+    RESULT_NAME = 'near_neighbour_score_with_noise.txt'
+
+
+
 
 def batch_eval():
     for exp_name in EXP_NAME_LIST:
@@ -36,7 +45,12 @@ def batch_eval():
             checkpoint_path = os.path.join(exp_path, sub_exp, check_point_name)
             evaler.reload_model(checkpoint_path)
             result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}')
-            nna_score = evaler.num_eval_two_dim(single_img_eval_loader, result_path)
+            if IS_ADD_NOISE:
+                nna_score = evaler.num_eval_two_dim_with_gaussian_noise(
+                    single_img_eval_loader, result_path, noise_batch=10,
+                )
+            else:
+                nna_score = evaler.num_eval_two_dim(single_img_eval_loader, result_path)
             nna_score_lists.append(nna_score)
             record_num_list(os.path.join(exp_path, f'{RESULT_NAME}'), nna_score_lists, EXP_NUM_LIST)
 

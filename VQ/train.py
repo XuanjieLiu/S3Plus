@@ -2,7 +2,6 @@ import os
 import random
 import sys
 from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z
-
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.nn as nn
 import numpy as np
@@ -18,30 +17,8 @@ from shared import *
 from two_dim_num_vis import plot_z_against_label
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
+from common_func import add_gaussian_noise
 from eval.dec_vis_eval_2digit import plot_dec_img
-
-
-def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
-    """
-    为一批图片 (batch_size, 3, 64, 64) 添加高斯噪声。
-
-    参数:
-        images: torch.Tensor, 形状为 (batch_size, 3, 64, 64), 像素范围通常是 [0, 1] 或 [0, 255]
-        mean: 高斯噪声的均值 (默认 0)
-        std: 高斯噪声的标准差 (默认 15/255, 适合像素归一化到 [0, 1] 的情况)
-
-    返回:
-        noisy_images: 添加噪声后的图片
-    """
-    if images.max() > 1.0:
-        # 如果像素范围在 [0, 255]，先归一化
-        images = images / 255.0
-    noise = torch.randn_like(images).to(DEVICE) * std + mean
-    noisy_images = images + noise
-    # 保证像素范围在 [0, 1]
-    noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
-    return noisy_images
-
 
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
     scale = t_range[1] - t_range[0]
@@ -115,8 +92,8 @@ class PlusTrainer:
         self.min_loss_scalar = config['min_loss_scalar']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=self.batch_size)
-        self.plus_eval_loader = DataLoader(plus_eval_set, batch_size=self.batch_size)
-        self.plus_eval_loader_2 = self.init_plus_eval_loader_2(config, 'plus_eval_set_path_2')
+        self.plus_eval_loader = DataLoader(plus_eval_set, batch_size=self.batch_size, shuffle=True)
+        self.plus_eval_loader_2 = self.init_plus_eval_loader_2(config, 'plus_eval_set_path_2', shuffle=True)
         self.model = VQVAE(config).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -165,12 +142,12 @@ class PlusTrainer:
         self.is_twice_oper = config['is_twice_oper']
         self.img_noise = config['img_noise']
 
-    def init_plus_eval_loader_2(self, config, key):
+    def init_plus_eval_loader_2(self, config, key, shuffle=True):
         if config[key] is None:
             print(f"Key {key} is None")
             return None
         else:
-            return DataLoader(Dataset(config[key]), batch_size=self.batch_size)
+            return DataLoader(Dataset(config[key]), batch_size=self.batch_size, shuffle=shuffle)
 
     def resume(self):
         if os.path.exists(self.model_path):
