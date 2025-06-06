@@ -203,21 +203,20 @@ class MumEval:
     def num_eval_two_dim_with_gaussian_noise(self, data_loader, result_path=None, is_show_all_emb=True,
                                              is_draw_graph=True, noise_batch: int = 10):
         nna_score_list = []
-        num_z_c_all = None
+        num_z_c_all = np.array([])
         num_labels_all = []
         for i in range(0, noise_batch):
-            num_z_c, num_labels = load_enc_eval_data(
+            num_z, num_labels = load_enc_eval_data(
                 data_loader,
                 lambda x: self.model.batch_encode_to_z(add_gaussian_noise(x, mean=0, std=self.img_noise))[0]
             )
+            num_z = num_z.cpu().detach().numpy()
+            num_z_c = num_z[:, :self.latent_code_1]
             is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
             nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
             if nna_score is not None:
                 nna_score_list.append(nna_score)
-            if num_z_c_all is None:
-                num_z_c_all = num_z_c
-            else:
-                num_z_c_all = torch.cat((num_z_c_all, num_z_c), dim=0)
+            num_z_c_all = np.concatenate((num_z_c_all, num_z_c), axis=0) if num_z_c_all.size else num_z_c
             num_labels_all.extend(num_labels)
         if len(nna_score_list) == 0:
             nna_score_mean = None
