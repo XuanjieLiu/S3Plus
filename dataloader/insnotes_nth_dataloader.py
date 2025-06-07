@@ -147,6 +147,7 @@ class InsNotesTestDataset(Dataset):
         root = int(data_name.split("_")[1][4:])
 
         p_list = [0, 2, 4, 5, 7, 9, 11]
+        # filler pitches for the content now
         pitches = [
             (p_list[i % len(p_list)] + root) % 12 for i in range(self.n_segments)
         ]

@@ -5,6 +5,8 @@ import numpy as np
 import librosa as lr
 from soundfile import write
 
+from dataset.music_melody.collect_melody_midi import collect_from_dataset
+
 
 class PseudoMelGen:
     def __init__(self, ins_index, sr=16000):
@@ -93,7 +95,7 @@ class PseudoMelGen:
         # convert to float32
         melody = melody.astype(np.float32)
 
-        pitches = np.array(pitches)
+        pitches = np.array(input_seq)
 
         return melody, pitches
 
@@ -206,6 +208,56 @@ def gen_directory(save_dir):
     )
 
 
+def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melody"):
+    """
+    generate a directory maybe for testing
+    """
+    S_LIST = [
+        "Soprano Sax",
+        "Pipe Organ",
+        "Accordion",
+        "Viola",
+        "Trumpet",
+        "Muted Trumpet",
+        "Oboe",
+        "Clarinet",
+        "Piccolo",
+        "Pan Flute",
+        "Harmonica",
+        "Choir Aahs",
+    ]
+
+    generators = []
+    for i in range(len(S_LIST)):
+        generators.append(PseudoMelGen(ins_index=i))
+
+    input_seqs = collect_from_dataset(data_dir=data_dir)
+
+    for k in tqdm(range(len(input_seqs))):
+        for round in range(1):
+            for i in range(len(S_LIST)):
+                for j in range(1):  # # only one root for now for speed
+                    audio, contents = generators[i].gen_melody_with_input(
+                        mel_len=90, input_seq=input_seqs[k], root=j
+                    )
+                    # save to npy for now
+                    np.save(
+                        os.path.join(save_dir, f"ins{i}_root{j}_{str(k).zfill(5)}.npy"),
+                        audio,
+                    )
+    # write one sample to wav
+    audio = audio.reshape(-1)
+    write(
+        os.path.join("./", f"ins{i}_root{j}_{str(k).zfill(5)}.wav"),
+        audio,
+        16000,
+    )
+
+
 if __name__ == "__main__":
     os.makedirs("../data/insnotes_val", exist_ok=True)
-    gen_directory("../data/insnotes_val")
+    os.makedirs("../data/insnotes_nth_val", exist_ok=True)
+    # gen_directory("../data/insnotes_val")
+    gen_directory_with_dataset_input(
+        "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
+    )

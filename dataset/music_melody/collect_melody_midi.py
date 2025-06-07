@@ -22,6 +22,7 @@ def collect_from_dataset(
     When only_one_octave==True, all notes will be moved into one octave C3-C4.
     When transpose==True, all notes will be transposed to all 12 keys.
     """
+    lib = []
 
     # collect melody from dataset (this works for Wikifonia and other datasets with no subdirectories)
     file_paths = glob(os.path.join(data_dir, "*.mid"))
@@ -39,11 +40,19 @@ def collect_from_dataset(
             midi_data.instruments = [midi_data.instruments[0]]
         notes = midi_data.instruments[0].notes
         pitches = [note.pitch for note in notes]
+
+        key = (
+            midi_data.key_signature_changes[0].key_number % 12
+            if midi_data.key_signature_changes
+            else 0
+        )
+        pitches = [pitch - key for pitch in pitches]
         if only_one_octave:
             # move all pitches into one octave C3-C4
             pitches = [pitch % 12 + 48 for pitch in pitches]
 
-        return pitches
+        lib.append(pitches)
+    return lib
 
 
 if __name__ == "__main__":
