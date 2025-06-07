@@ -14,9 +14,9 @@ class Encoder(nn.Module):
 
         self.cnn_1 = self._make_cnn(1, n_channels_1, 5, 3, (9, 3), (2, 2))
         W_1, H_1 = self._get_cnn_output_size(W, H, n_channels, 5, (2, 2))[1:3]
-        self.cnn_2 = self._make_cnn(n_channels_1, n_channels, 1, 3, (5, 3), (2, 1))
+        self.cnn_2 = self._make_cnn(n_channels_1, n_channels, 2, 3, (5, 3), (2, 1))
         W_2, H_2, output_size = self._get_cnn_output_size(
-            W_1, H_1, n_channels, 1, (2, 1)
+            W_1, H_1, n_channels, 2, (2, 1)
         )[1:]
 
         self.linear_1 = nn.Linear(output_size, d_emb)
@@ -141,7 +141,7 @@ class Decoder(nn.Module):
             1:3
         ]
         self.W_2, self.H_2, cnn_output_size = Encoder._get_cnn_output_size(
-            self.W_1, self.H_1, n_channels, 1, (2, 1)
+            self.W_1, self.H_1, n_channels, 2, (2, 1)
         )[1:]
 
         self.linear_0 = nn.Linear(d_emb, self.W_2 * self.H_2 * n_channels)
@@ -149,7 +149,7 @@ class Decoder(nn.Module):
         n_channels_1 = n_channels // (2**1)
 
         self.cnn_transpose_2 = self._make_cnn_transpose(
-            n_channels, n_channels_1, 1, 2, (5, 3), (2, 1)
+            n_channels, n_channels_1, 2, 2, (5, 3), (2, 1)
         )
         self.cnn_transpose_1 = self._make_cnn_transpose(
             n_channels_1, 1, 5, 2, (9, 3), (2, 2)

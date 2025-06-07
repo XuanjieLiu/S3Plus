@@ -49,17 +49,17 @@ def gen_1sec_midi(
                 # p_list = np.random.permutation(12)
                 note = pretty_midi.Note(
                     velocity=np.random.randint(80, 121),
-                    pitch=k + 60,
+                    pitch=k + 48,
                     start=0,
-                    end=0.96,
+                    end=0.48,
                 )
                 instrument.notes.append(note)
-                # in between each note, there is a short pause, which makes each note having 1.056 seconds long, which is 33 hop_lengths (sr=16000, hop_length=512)
+                # in between each note, there is a short pause, which makes each note having 1.056 seconds long, which is 33 hop_lengths (sr=16000, hop_length=256)
                 blank = pretty_midi.Note(
                     velocity=0,
                     pitch=0,
-                    start=0.96,
-                    end=1.056,
+                    start=0.48,
+                    end=0.528,
                 )
                 instrument.notes.append(blank)
                 midi_data.instruments.append(instrument)
