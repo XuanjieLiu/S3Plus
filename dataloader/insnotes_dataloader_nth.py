@@ -17,6 +17,7 @@ from torch.utils.data import Dataset, DataLoader, IterableDataset, get_worker_in
 from torchaudio.transforms import Spectrogram, MelScale
 
 from dataset.music_melody.gen_melody_from_samples import PseudoMelGen
+from dataset.music_melody.collect_melody_midi import collect_from_dataset
 from utils.training_utils import setup_seed
 
 S_LIST = [
@@ -72,6 +73,8 @@ class InsNotesDataset(IterableDataset):
             Spectrogram(n_fft=1024, win_length=1024, hop_length=256),
             MelScale(n_mels=128, sample_rate=16000, f_min=0, f_max=8000, n_stft=513),
         )
+        self.pitch_seqs = collect_from_dataset(data_dir="../data/Nottingham/melody")
+        self.n_pitch_seqs = len(self.pitch_seqs)
 
     def __iter__(self):
         """
@@ -85,14 +88,17 @@ class InsNotesDataset(IterableDataset):
         while True:
             i = random.randint(0, len(S_LIST) - 1)  # instrument
             j = random.randint(0, len(C_LIST) - 1)  # root
-            audio, contents = generators[i].gen_melody(mel_len=self.n_segments, root=j)
+            k = random.randint(0, self.n_pitch_seqs - 1)  # song
+            audio, contents = generators[i].gen_melody_with_input(
+                mel_len=self.n_segments, input_seq=self.pitch_seqs[k], root=j
+            )
             audio = torch.tensor(audio)
             audio = self.transform(audio)  # spectrogram
             # audio = audio[
             #     :, :-1, :64
             # ]  # remove the last column because it's always zero. Only for vanilla STFT, also, cut the length to 64 for now
             audio = audio[
-                :, :, :64
+                :, :, :32
             ]  # remove the last column because it's always zero. Only for MelSpec, also, cut the length to 64 for now
             audio = torch.log(audio + 1e-6)  # log spectrogram
             audio = audio.unsqueeze(1)  # add channel dimension
@@ -133,7 +139,7 @@ class InsNotesTestDataset(Dataset):
         #     :, :-1, :64
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
         audio = audio[
-            : self.n_segments, :, :64
+            : self.n_segments, :, :32
         ]  # remove the last column because it's always zero. Only for Melspec. also, cut the length to 64 for now
         audio = torch.log(audio + 1e-6)  # log spectrogram
         audio = audio.unsqueeze(1)  # add channel dimension

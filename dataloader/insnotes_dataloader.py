@@ -91,7 +91,7 @@ class InsNotesDataset(IterableDataset):
             #     :, :-1, :64
             # ]  # remove the last column because it's always zero. Only for vanilla STFT, also, cut the length to 64 for now
             audio = audio[
-                :, :, :64
+                :, :, :32
             ]  # remove the last column because it's always zero. Only for MelSpec, also, cut the length to 64 for now
             audio = torch.log(audio + 1e-6)  # log spectrogram
             audio = audio.unsqueeze(1)  # add channel dimension
@@ -132,7 +132,7 @@ class InsNotesTestDataset(Dataset):
         #     :, :-1, :64
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
         audio = audio[
-            : self.n_segments, :, :64
+            : self.n_segments, :, :32
         ]  # remove the last column because it's always zero. Only for Melspec. also, cut the length to 64 for now
         audio = torch.log(audio + 1e-6)  # log spectrogram
         audio = audio.unsqueeze(1)  # add channel dimension

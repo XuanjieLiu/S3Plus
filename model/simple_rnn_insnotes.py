@@ -143,8 +143,9 @@ class SymmCSAEwithPrior(nn.Module):
         self.n_atoms = config["n_atoms"]
         # self.base_len = config["base_len"]
 
-        self.encoder = Encoder(n_channels=128, W=128, H=64, d_emb=self.d_zc + self.d_zs)
-        self.decoder = Decoder(n_channels=128, W=128, H=64, d_emb=self.d_zc + self.d_zs)
+        # hard-coded parameters
+        self.encoder = Encoder(n_channels=128, W=128, H=32, d_emb=self.d_zc + self.d_zs)
+        self.decoder = Decoder(n_channels=128, W=128, H=32, d_emb=self.d_zc + self.d_zs)
 
         self.vq = VectorQuantize(
             dim=self.d_zc,

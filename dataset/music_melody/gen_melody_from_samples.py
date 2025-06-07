@@ -66,6 +66,37 @@ class PseudoMelGen:
 
         return melody, pitches
 
+    def gen_melody_with_input(self, mel_len=12, input_seq=None, root=0):
+        """
+        generate a melody of length mel_len
+        input_seq: input pitch sequences
+        root: the root note of the melody (0-11)
+        """
+
+        if input_seq is not None:
+            # first transpose input_seq by adding root, then compress range
+            input_seq = [(p + root) % 12 for p in input_seq]
+            # if longer or shorter, trim or cycle the input sequence
+            if len(input_seq) > mel_len:
+                input_seq = input_seq[:mel_len]
+            elif len(input_seq) < mel_len:
+                input_seq = np.tile(input_seq, (mel_len // len(input_seq) + 1))[
+                    :mel_len
+                ]
+            # map the input sequence to the samples
+            melody = np.array([self.samples[p] for p in input_seq])
+
+        envelope = self.gen_randomize_envelope(n_notes=mel_len)
+        melody = melody * envelope
+        # normalize the melody
+        melody = melody / np.max(np.abs(melody))
+        # convert to float32
+        melody = melody.astype(np.float32)
+
+        pitches = np.array(pitches)
+
+        return melody, pitches
+
     def gen_randomize_envelope(self, n_notes=12, dont_cat=True):
         """
         Apply a randomized envelope to every note (1s) in the audio.
