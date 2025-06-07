@@ -139,7 +139,7 @@ class PseudoMelGen:
 
 def gen_directory(save_dir):
     """
-    generate a directory usually for testing
+    generate a directory maybe for testing
     """
     S_LIST = [
         "Soprano Sax",

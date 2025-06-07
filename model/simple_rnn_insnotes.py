@@ -231,7 +231,7 @@ class SymmCSAEwithPrior(nn.Module):
     def rnn_forward(self, z, ntf_ratio=1.0):
         """
         z: input tensor of shape (B, T, d_zc), full sequence
-        tf_ratio: non teacher forcing ratio
+        ntf_ratio: non teacher forcing ratio
         """
         B, T, D = z.size()
         h = torch.zeros(self.n_layers_rnn, B, self.d_zc, device=z.device)

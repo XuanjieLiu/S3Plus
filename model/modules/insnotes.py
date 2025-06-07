@@ -12,9 +12,9 @@ class Encoder(nn.Module):
 
         n_channels_1 = n_channels // (2**4)
 
-        self.cnn_1 = self._make_cnn(1, n_channels_1, 3, 2, (9, 3), (2, 2))
+        self.cnn_1 = self._make_cnn(1, n_channels_1, 5, 3, (9, 3), (2, 2))
         W_1, H_1 = self._get_cnn_output_size(W, H, n_channels, 3, (2, 2))[1:3]
-        self.cnn_2 = self._make_cnn(n_channels_1, n_channels, 1, 2, (5, 3), (2, 1))
+        self.cnn_2 = self._make_cnn(n_channels_1, n_channels, 1, 3, (5, 3), (2, 1))
         W_2, H_2, output_size = self._get_cnn_output_size(
             W_1, H_1, n_channels, 1, (2, 1)
         )[1:]
@@ -152,7 +152,7 @@ class Decoder(nn.Module):
             n_channels, n_channels_1, 1, 2, (5, 3), (2, 1)
         )
         self.cnn_transpose_1 = self._make_cnn_transpose(
-            n_channels_1, 1, 3, 2, (9, 3), (2, 2)
+            n_channels_1, 1, 5, 2, (9, 3), (2, 2)
         )
 
     def _make_cnn_transpose(
