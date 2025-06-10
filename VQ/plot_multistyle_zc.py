@@ -96,6 +96,12 @@ class MultiStyleZcEvaler(CommonEvaler):
         return emb_efficiency
 
     def assemble_label_emb_matrix(self, num_emb_idx, num_labels):
+        """
+        Assemble a label embedding matrix based on the provided embedding indices and labels.
+        :param num_emb_idx:
+        :param num_labels:
+        :return: label_emb_matrix: A matrix where each row corresponds to a unique label and each column corresponds to an embedding index.
+        """
         book_size = self.config['embeddings_num']
         total_emb = pow(book_size, self.latent_embedding_1)
         all_labels = [int(n) for n in list(set(num_labels))]
