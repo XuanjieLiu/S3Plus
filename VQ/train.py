@@ -20,6 +20,7 @@ from eval_common import EvalHelper
 from common_func import add_gaussian_noise
 from eval.dec_vis_eval_2digit import plot_dec_img
 
+
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
     scale = t_range[1] - t_range[0]
     if is_std_normal:
@@ -82,18 +83,44 @@ def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
     return a_switch, b_switch
 
 
+def init_plus_eval_loader_2(config, key, batch_size, shuffle=True):
+    if config[key] is None:
+        print(f"Key {key} is None")
+        return None
+    else:
+        return DataLoader(Dataset(config[key]), batch_size=batch_size, shuffle=shuffle)
+
+
+def init_plus_dataloaders(config):
+    batch_size = config['batch_size']
+    if config['is_random_split_data']:
+        print("Using random split data")
+        train_ratio = config['train_data_ratio']
+        dataset_all = Dataset(config['train_data_path'])
+        train_size = int(len(dataset_all) * train_ratio)
+        eval_size = len(dataset_all) - train_size
+        train_dataset, eval_dataset = torch.utils.data.random_split(dataset_all, [train_size, eval_size])
+        loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True)
+        plus_eval_loader_2 = None
+    else:
+        print("Using predefined datasets")
+        dataset = Dataset(config['train_data_path'])
+        plus_eval_set = Dataset(config['plus_eval_set_path'])
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True)
+        plus_eval_loader_2 = init_plus_eval_loader_2(config, 'plus_eval_set_path_2', shuffle=True)
+    return loader, plus_eval_loader, plus_eval_loader_2
+
+
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
-        dataset = Dataset(config['train_data_path'])
-        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
-        plus_eval_set = Dataset(config['plus_eval_set_path'])
         self.batch_size = config['batch_size']
-        self.min_loss_scalar = config['min_loss_scalar']
-        self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        self.loader, self.plus_eval_loader, self.plus_eval_loader_2 = init_plus_dataloaders(config)
+        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
         self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=self.batch_size)
-        self.plus_eval_loader = DataLoader(plus_eval_set, batch_size=self.batch_size, shuffle=True)
-        self.plus_eval_loader_2 = self.init_plus_eval_loader_2(config, 'plus_eval_set_path_2', shuffle=True)
+        self.min_loss_scalar = config['min_loss_scalar']
         self.model = VQVAE(config).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -140,13 +167,6 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
-
-    def init_plus_eval_loader_2(self, config, key, shuffle=True):
-        if config[key] is None:
-            print(f"Key {key} is None")
-            return None
-        else:
-            return DataLoader(Dataset(config[key]), batch_size=self.batch_size, shuffle=shuffle)
 
     def resume(self):
         if os.path.exists(self.model_path):
