@@ -288,4 +288,4 @@ EU_tally_mark_POSITIONS = {
 if "__main__" == __name__:
 
     print(zheng_4())
-    plot_lines(EU_tally_mark_1(), linewidth=1.5)
+    plot_a_scatter(DOT_POSITIONS[17], './17.png', marker='o', color='b', is_fill=True)

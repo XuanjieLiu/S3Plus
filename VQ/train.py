@@ -140,7 +140,6 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
-        self.img_noise = config['img_noise']
 
     def init_plus_eval_loader_2(self, config, key, shuffle=True):
         if config[key] is None:
@@ -170,8 +169,6 @@ class PlusTrainer:
                 print(batch_ndx)
                 print(len(sample[0][0]))
             data, labels = sample
-            if self.img_noise > 0.0:
-                data = [add_gaussian_noise(d, std=self.img_noise) for d in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
