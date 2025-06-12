@@ -206,13 +206,13 @@ def gen_directory(save_dir):
                 audio, contents = generators[i].gen_melody(mel_len=90, root=j)
                 # save to npy for now
                 np.save(os.path.join(save_dir, f"ins{i}_root{j}_{round}.npy"), audio)
-    # write one sample to wav
-    audio = audio.reshape(-1)
-    write(
-        os.path.join("./", f"ins{i}_root{j}_{round}.wav"),
-        audio,
-        16000,
-    )
+    # # write one sample to wav
+    # audio = audio.reshape(-1)
+    # write(
+    #     os.path.join("./", f"ins{i}_root{j}_{round}.wav"),
+    #     audio,
+    #     16000,
+    # )
 
 
 def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melody"):
@@ -252,13 +252,13 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
                         os.path.join(save_dir, f"ins{i}_root{j}_{str(k).zfill(5)}.npy"),
                         audio,
                     )
-    # write one sample to wav
-    audio = audio.reshape(-1)
-    write(
-        os.path.join("./", f"ins{i}_root{j}_{str(k).zfill(5)}.wav"),
-        audio,
-        16000,
-    )
+    # # write one sample to wav
+    # audio = audio.reshape(-1)
+    # write(
+    #     os.path.join("./", f"ins{i}_root{j}_{str(k).zfill(5)}.wav"),
+    #     audio,
+    #     16000,
+    # )
 
 
 if __name__ == "__main__":
