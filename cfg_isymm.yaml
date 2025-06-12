@@ -11,7 +11,7 @@ method: "ISymm"
 device: "cuda"
 num_workers: 4
 batch_size: 8
-steps: 100000 # incremental if load_checkpoint is active
+steps: 10000 # incremental if load_checkpoint is active
 val_every_n_steps: 1000 # steps
 val_steps: 100 # steps, an integer or "whole" to use the whole dataset
 log_every_n_steps: 1 # steps
