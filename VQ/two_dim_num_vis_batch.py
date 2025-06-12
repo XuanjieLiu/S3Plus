@@ -47,7 +47,7 @@ def batch_eval():
             result_path = os.path.join(result_dir, f'{sub_exp}_{check_point_name}')
             if IS_ADD_NOISE:
                 nna_score = evaler.num_eval_two_dim_with_gaussian_noise(
-                    single_img_eval_loader, result_path, noise_batch=10,
+                    single_img_eval_loader, result_path, noise_batch=1,
                 )
             else:
                 nna_score = evaler.num_eval_two_dim(single_img_eval_loader, result_path)

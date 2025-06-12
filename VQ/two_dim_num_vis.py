@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+from collections import defaultdict
 from importlib import reload
 from torch.utils.data import DataLoader
 from dataloader import SingleImgDataset, load_enc_eval_data
@@ -145,6 +146,37 @@ def make_result_name(result_path, nna_score=None):
     return result_name
 
 
+def sample_unique_with_indices(nums):
+    """
+    从 nums 中采样唯一值，并返回这些值及其对应的索引。
+    :param nums: 包含数字的列表或数组。
+    :return:
+        sampled_values: 采样的唯一值列表。
+        sampled_indices: 这些唯一值在原 nums 中的索引列表。
+    """
+    index_map = defaultdict(list)
+    # 建立每个数字对应的所有索引列表
+    for idx, val in enumerate(nums):
+        index_map[val].append(idx)
+    sampled_values = []
+    sampled_indices = []
+    for val, indices in index_map.items():
+        sampled_idx = np.random.choice(indices)
+        sampled_values.append(nums[sampled_idx])
+        sampled_indices.append(sampled_idx)
+    return sampled_values, sampled_indices
+
+
+def multiple_nearest_neighbor_analysis(num_z_c, num_labels, n_times=10):
+    score_list = []
+    for i in range(n_times):
+        sampled_labels, sampled_indices = sample_unique_with_indices(num_labels)
+        sampled_num_z_c = num_z_c[sampled_indices]
+        score = nearest_neighbor_analysis(sampled_num_z_c, sampled_labels, verbose=False)
+        score_list.append(score)
+    mean_score = np.mean(score_list)
+    return mean_score
+
 class MumEval:
     def __init__(self, config, model_path):
         self.config = config
@@ -166,8 +198,11 @@ class MumEval:
 
     def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True, is_draw_graph=True):
         num_z_c, num_labels = self.get_num_z_and_labels(data_loader)
-        is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
-        nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
+        has_duplicate_labels = len(set(num_labels)) < len(num_labels)
+        if not has_duplicate_labels:
+            nna_score = nearest_neighbor_analysis(num_z_c, num_labels)
+        else:
+            nna_score = multiple_nearest_neighbor_analysis(num_z_c, num_labels)
         print(f'Nearest neighbor analysis score: {nna_score}')
         if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
             result_name = make_result_name(result_path, nna_score)
@@ -212,16 +247,18 @@ class MumEval:
             )
             num_z = num_z.cpu().detach().numpy()
             num_z_c = num_z[:, :self.latent_code_1]
-            is_nearest_neighbor_analysis = find_most_frequent_elements_repeating_num(num_labels) < 2
-            nna_score = nearest_neighbor_analysis(num_z_c, num_labels) if is_nearest_neighbor_analysis else None
-            if nna_score is not None:
-                nna_score_list.append(nna_score)
+            has_duplicate_labels = len(set(num_labels)) < len(num_labels)
+            if not has_duplicate_labels:
+                nna_score = nearest_neighbor_analysis(num_z_c, num_labels)
+            else:
+                nna_score = multiple_nearest_neighbor_analysis(num_z_c, num_labels)
+            nna_score_list.append(nna_score)
             num_z_c_all = np.concatenate((num_z_c_all, num_z_c), axis=0) if num_z_c_all.size else num_z_c
             num_labels_all.extend(num_labels)
         if len(nna_score_list) == 0:
             nna_score_mean = None
         else:
-            nna_score_mean = round(np.mean(nna_score_list), 2)
+            nna_score_mean = round(np.mean(nna_score_list), 3)
         print(f'Nearest neighbor analysis score: {nna_score_mean}')
         if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
             result_name = make_result_name(result_path, nna_score_mean)
