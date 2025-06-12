@@ -109,7 +109,7 @@ def init_plus_dataloaders(config):
         plus_eval_set = Dataset(config['plus_eval_set_path'])
         loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
         plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True)
-        plus_eval_loader_2 = init_plus_eval_loader_2(config, 'plus_eval_set_path_2', shuffle=True)
+        plus_eval_loader_2 = init_plus_eval_loader_2(config, 'plus_eval_set_path_2', batch_size=batch_size, shuffle=True)
     return loader, plus_eval_loader, plus_eval_loader_2
 
 
