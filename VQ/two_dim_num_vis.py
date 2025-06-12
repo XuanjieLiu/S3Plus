@@ -191,7 +191,6 @@ class MumEval:
         if model_path is not None:
             self.reload_model(model_path)
         self.model.eval()
-        self.img_noise = self.config['img_noise']
 
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
@@ -236,14 +235,14 @@ class MumEval:
                 plot_num_position_in_three_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
 
     def num_eval_two_dim_with_gaussian_noise(self, data_loader, result_path=None, is_show_all_emb=True,
-                                             is_draw_graph=True, noise_batch: int = 10):
+                                             is_draw_graph=True, noise_batch: int = 10, noise_std=0.2):
         nna_score_list = []
         num_z_c_all = np.array([])
         num_labels_all = []
         for i in range(0, noise_batch):
             num_z, num_labels = load_enc_eval_data(
                 data_loader,
-                lambda x: self.model.batch_encode_to_z(add_gaussian_noise(x, mean=0, std=self.img_noise))[0]
+                lambda x: self.model.batch_encode_to_z(add_gaussian_noise(x, mean=0, std=noise_std))[0]
             )
             num_z = num_z.cpu().detach().numpy()
             num_z_c = num_z[:, :self.latent_code_1]

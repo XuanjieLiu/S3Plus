@@ -8,21 +8,21 @@ from torch.utils.data import DataLoader
 from dataloader import SingleImgDataset
 from common_func import add_gaussian_noise
 
-RESULT_DIR_NAME = 'two_dim_z_vis'
-RESULT_NAME = 'near_neighbour_score.txt'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_noise0.4",
-    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_noise0.4",
+    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_blur",
+    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_blur",
+    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_blur",
+    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_blur",
 ]
-IS_ADD_NOISE = True  # 是否添加噪声
+IS_ADD_NOISE = False  # 是否添加噪声
 
 if IS_ADD_NOISE:
     RESULT_DIR_NAME = 'two_dim_z_vis_with_noise'
     RESULT_NAME = 'near_neighbour_score_with_noise.txt'
+else:
+    RESULT_DIR_NAME = 'two_dim_z_vis'
+    RESULT_NAME = 'near_neighbour_score.txt'
 
 
 
