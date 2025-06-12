@@ -23,10 +23,14 @@ class SymmLoss:
         z is a tensor of shape (B, N, D). We sample lengths on N.
         """
         N = z.shape[1]
-        p1 = torch.randint(4, 6, size=())
-        g1 = torch.randint(6, 8, size=())
-        p2 = torch.randint(6, 8, size=())
-        g2 = torch.randint(4, 6, size=())
+        # p1 = torch.randint(4, 6, size=())
+        # g1 = torch.randint(6, 8, size=())
+        # p2 = torch.randint(6, 8, size=())
+        # g2 = torch.randint(4, 6, size=())
+        p1 = torch.randint(6, 8, size=())
+        g1 = torch.randint(8, 10, size=())
+        p2 = torch.randint(8, 10, size=())
+        g2 = torch.randint(6, 8, size=())
 
         return p1, g1, p2, g2
 

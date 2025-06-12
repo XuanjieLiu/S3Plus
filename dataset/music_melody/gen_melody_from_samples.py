@@ -22,34 +22,41 @@ class PseudoMelGen:
             self.samples.append(sample)
         self.n_sample_points_per_sample = len(self.samples[0])
 
-    def gen_melody(self, mel_len=12, mode="major", root=0):
+    def gen_melody(self, mel_len=12, mode="random", root=0):
         """
         generate a melody of length mel_len
         return the melody (float32), the note boundaries and the pitches
         mode: major or minor or random or chromatic
         root: the root note of the melody (0-11)
         """
-        # make random permutation of 12 and repeat until mel_len
+        # choose a random scale in "major" (0.3), "minor" (0.3), "dorian" (0.1), "phrygian" (0.1), "lydian" (0.1), "mixolydian" (0.1)
         if mode == "random":
-            p_list = np.random.permutation(12)
-            melody = []
-            pitches = []
-            for i in range(mel_len):
-                note = self.samples[p_list[i % 12]]
-                melody.append(note)
-                pitches.append(p_list[i % 12])
-            melody = np.array(melody)
-        # upwards and downwards major scale
-        elif mode == "major":
+            mode = np.random.choice(
+                ["major", "minor", "dorian", "phrygian", "lydian", "mixolydian"],
+                p=[0.3, 0.3, 0.1, 0.1, 0.1, 0.1],
+            )
+
+        if mode == "major":
             p_list = [0, 2, 4, 5, 7, 9, 11]
-            melody = []
-            pitches = []
-            for i in range(mel_len):
-                pitch = (p_list[i % len(p_list)] + root) % 12
-                note = self.samples[pitch]
-                melody.append(note)
-                pitches.append(pitch)
-            melody = np.array(melody)
+        elif mode == "minor":
+            p_list = [0, 2, 3, 5, 7, 8, 10]
+        elif mode == "dorian":
+            p_list = [0, 2, 3, 5, 7, 9, 10]
+        elif mode == "phrygian":
+            p_list = [0, 1, 3, 5, 7, 8, 10]
+        elif mode == "lydian":
+            p_list = [0, 2, 4, 6, 7, 9, 11]
+        elif mode == "mixolydian":
+            p_list = [0, 2, 4, 5, 7, 9, 10]
+
+        melody = []
+        pitches = []
+        for i in range(mel_len):
+            pitch = (p_list[i % len(p_list)] + root) % 12
+            note = self.samples[pitch]
+            melody.append(note)
+            pitches.append(pitch)
+        melody = np.array(melody)
 
         envelope = self.gen_randomize_envelope(n_notes=mel_len)
         melody = melody * envelope
@@ -193,7 +200,7 @@ def gen_directory(save_dir):
     for i in range(len(S_LIST)):
         generators.append(PseudoMelGen(ins_index=i))
 
-    for round in tqdm(range(10)):
+    for round in tqdm(range(100)):
         for i in range(len(S_LIST)):
             for j in range(12):
                 audio, contents = generators[i].gen_melody(mel_len=90, root=j)
@@ -257,7 +264,7 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
 if __name__ == "__main__":
     os.makedirs("../data/insnotes_val", exist_ok=True)
     os.makedirs("../data/insnotes_nth_val", exist_ok=True)
-    # gen_directory("../data/insnotes_val")
-    gen_directory_with_dataset_input(
-        "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
-    )
+    gen_directory("../data/insnotes_val")
+    # gen_directory_with_dataset_input(
+    #     "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
+    # )
