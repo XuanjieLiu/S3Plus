@@ -6,6 +6,7 @@ CONFIG = {
     'single_img_eval_set_path': f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
     'plus_eval_set_path': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
     'plus_eval_set_path_2': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2",
+    'is_random_split_data': False,
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
