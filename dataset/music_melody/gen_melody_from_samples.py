@@ -264,7 +264,7 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
 if __name__ == "__main__":
     os.makedirs("../data/insnotes_val", exist_ok=True)
     os.makedirs("../data/insnotes_nth_val", exist_ok=True)
-    gen_directory("../data/insnotes_val_major")
+    # gen_directory("../data/insnotes_val_major")
     # gen_directory_with_dataset_input(
     #     "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
     # )
