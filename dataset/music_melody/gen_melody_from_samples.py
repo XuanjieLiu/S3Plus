@@ -22,7 +22,7 @@ class PseudoMelGen:
             self.samples.append(sample)
         self.n_sample_points_per_sample = len(self.samples[0])
 
-    def gen_melody(self, mel_len=12, mode="random", root=0):
+    def gen_melody(self, mel_len=12, mode="major", root=0):
         """
         generate a melody of length mel_len
         return the melody (float32), the note boundaries and the pitches
