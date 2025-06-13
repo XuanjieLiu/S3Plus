@@ -200,7 +200,7 @@ def gen_directory(save_dir):
     for i in range(len(S_LIST)):
         generators.append(PseudoMelGen(ins_index=i))
 
-    for round in tqdm(range(100)):
+    for round in tqdm(range(10)):
         for i in range(len(S_LIST)):
             for j in range(12):
                 audio, contents = generators[i].gen_melody(mel_len=90, root=j)
