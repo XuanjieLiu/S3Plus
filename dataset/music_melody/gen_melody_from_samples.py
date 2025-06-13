@@ -221,17 +221,17 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
     """
     S_LIST = [
         "Soprano Sax",
-        "Pipe Organ",
-        "Accordion",
-        "Viola",
-        "Trumpet",
-        "Muted Trumpet",
-        "Oboe",
-        "Clarinet",
-        "Piccolo",
-        "Pan Flute",
-        "Harmonica",
-        "Choir Aahs",
+        # "Pipe Organ",
+        # "Accordion",
+        # "Viola",
+        # "Trumpet",
+        # "Muted Trumpet",
+        # "Oboe",
+        # "Clarinet",
+        # "Piccolo",
+        # "Pan Flute",
+        # "Harmonica",
+        # "Choir Aahs",
     ]
 
     generators = []
@@ -268,3 +268,6 @@ if __name__ == "__main__":
     # gen_directory_with_dataset_input(
     #     "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
     # )
+    gen_directory_with_dataset_input(
+        "../data/insnotes_0_nth_val", data_dir="../data/Nottingham/melody"
+    )

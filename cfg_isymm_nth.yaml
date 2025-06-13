@@ -5,7 +5,8 @@ debug: False
 random_seed: 
 
 dataloader: "insnotes_nth_dataloader"
-data_dir: "../data/insnotes_nth_val"
+data_dir: "../data/insnotes_0_nth_val"
+
 method: "ISymm"
 
 device: "cuda"
