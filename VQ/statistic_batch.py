@@ -9,17 +9,25 @@ from dataloader_plus import Dataset
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_blur",
-    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_blur",
-    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_blur",
-    "2025.06.11_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_blur",
-
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.1",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.2",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.3",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.4",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.5",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.6",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.7",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.8",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_train0.9",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.1",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.2",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.3",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.4",
 ]
 EVAL_RECORD_NAME = 'plus_eval.txt'
 
-# EVAL_KEYS = ['train_accu', 'eval_accu']
+EVAL_KEYS = ['train_accu', 'eval_accu']
 
-EVAL_KEYS = ['train_accu', 'eval_accu', 'eval_accu_2']
+# EVAL_KEYS = ['train_accu', 'eval_accu', 'eval_accu_2']
 
 
 def batch_statistic():
