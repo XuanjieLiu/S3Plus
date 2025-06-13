@@ -2,13 +2,13 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet_trainAll/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1",
-    'plus_eval_set_path_2': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2",
-    'is_random_split_data': True,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
-    'train_data_ratio': 0.4,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
-    'is_online_blur': False,  # 是否在训练时模糊处理图像
+    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/train",
+    'single_img_eval_set_path': f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
+    'plus_eval_set_path': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
+    'plus_eval_set_path_2': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2",
+    'is_random_split_data': False,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
+    'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
+    'is_online_blur': True,  # 是否在训练时模糊处理图像
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -58,7 +58,6 @@ CONFIG = {
     'is_full_symm': True,
     'is_pure_assoc': False,
     'is_twice_oper': False,
-    'img_noise': 0.0,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,

@@ -17,7 +17,7 @@ from shared import *
 from two_dim_num_vis import plot_z_against_label
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
-from common_func import add_gaussian_noise
+from common_func import add_gaussian_noise, random_gaussian_blur_batch
 from eval.dec_vis_eval_2digit import plot_dec_img
 
 
@@ -167,6 +167,7 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
+        self.is_online_blur = config['is_online_blur']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -189,6 +190,8 @@ class PlusTrainer:
                 print(batch_ndx)
                 print(len(sample[0][0]))
             data, labels = sample
+            if self.is_online_blur:
+                data = [random_gaussian_blur_batch(d) for d in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)

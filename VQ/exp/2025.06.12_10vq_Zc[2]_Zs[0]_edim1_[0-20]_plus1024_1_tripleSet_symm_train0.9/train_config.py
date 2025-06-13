@@ -8,6 +8,7 @@ CONFIG = {
     'plus_eval_set_path_2': f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2",
     'is_random_split_data': True,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
     'train_data_ratio': 0.9,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
+    'is_online_blur': False,  # 是否在训练时模糊处理图像
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,

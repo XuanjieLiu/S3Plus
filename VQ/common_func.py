@@ -7,6 +7,8 @@ from shared import DEVICE
 from loss_counter import read_record, find_optimal_checkpoint
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
+import cv2
+
 
 DATASET_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/')
 EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
@@ -36,6 +38,31 @@ def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
     # 保证像素范围在 [0, 1]
     noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
     return noisy_images
+
+
+def random_gaussian_blur_batch(img_batch):
+    """
+    对一个批次的图像 (batch_size, 3, 64, 64) 应用相同参数的随机高斯模糊。
+    :param img_batch: torch.Tensor，形状为 (batch_size, 3, 64, 64)，像素值范围 [0, 1]
+    :return: 处理后的图像，torch.Tensor，形状相同
+    """
+    batch_size = img_batch.size(0)
+    # 输出列表
+    blurred_list = []
+    for i in range(batch_size):
+        # 随机选择模糊参数
+        kernel_size = np.random.choice([5, 7, 9])
+        sigma = np.random.uniform(0.5, 3.0)
+
+        img = img_batch[i].permute(1, 2, 0).cpu().numpy()  # (3, 64, 64) -> (64, 64, 3)
+        img = (img * 255).astype(np.uint8)
+        # 应用高斯模糊
+        blurred = cv2.GaussianBlur(img, (kernel_size, kernel_size), sigma)
+        # 转换回 tensor 并添加到列表
+        blurred_tensor = torch.from_numpy(blurred.astype(np.float32) / 255.0).permute(2, 0, 1)  # (3, 64, 64)
+        blurred_list.append(blurred_tensor)
+    return torch.stack(blurred_list).to(DEVICE)  # (batch_size, 3, 64, 64)
+
 
 def read_specific_checkpoint(sub_exp_path):
     path = os.path.join(sub_exp_path, SPECIFIC_CHECKPOINT_TXT_PATH)
