@@ -16,6 +16,7 @@ DEFAULT_CHECKPOINTS_NUM = [n*2000 for n in range(50)]
 DEFAULT_KEYS = ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED']
 DEFAULT_RECORD_NAME = 'Train_record.txt'
 SPECIFIC_CHECKPOINT_TXT_PATH = 'specific_checkpoint.txt'
+ITER_AFTER = 0.3
 
 
 def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
@@ -102,7 +103,8 @@ def find_optimal_checkpoint_num_by_train_config(
     checkpoint_interval = train_config['checkpoint_interval']
     max_iter_num = train_config['max_iter_num']
     check_points_num = int(max_iter_num / checkpoint_interval)
-    check_points = [checkpoint_interval * i for i in range(check_points_num)]
+    iter_start = int(ITER_AFTER * check_points_num)
+    check_points = [checkpoint_interval * i for i in range(iter_start, check_points_num)]
     return find_optimal_checkpoint_num(sub_exp_path, record_name, keys, check_points)
 
 
