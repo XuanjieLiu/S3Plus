@@ -13,7 +13,7 @@ import cv2
 DATASET_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/')
 EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 DEFAULT_CHECKPOINTS_NUM = [n*2000 for n in range(50)]
-DEFAULT_KEYS = ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED']
+DEFAULT_KEYS = ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED']
 DEFAULT_RECORD_NAME = 'Train_record.txt'
 SPECIFIC_CHECKPOINT_TXT_PATH = 'specific_checkpoint.txt'
 
