@@ -65,20 +65,27 @@ def make_arabic_num_dataset(data_path, numbers, colors):
             plot_arabic_numbers(i, fig_path, color)
 
 
-def make_ZHENG_num_dataset(data_path, numbers, colors):
+def make_ZHENG_num_dataset(data_path, numbers, colors, marker_name='zheng'):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
         for color in colors:
-            fig_path = os.path.join(data_path, f'{i}-default-{color}')
+            fig_path = os.path.join(data_path, f'{i}-{marker_name}-{color}')
             plot_lines(ZHENG_POSITIONS[i], fig_path, color)
 
-def make_EU_tally_mark_num_dataset(data_path, numbers, colors):
+def make_EU_tally_mark_num_dataset(data_path, numbers, colors, maker_name='eutally'):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
         for color in colors:
-            fig_path = os.path.join(data_path, f'{i}-default-{color}')
-            plot_lines(EU_tally_mark_POSITIONS[i], fig_path, color, linewidth=1.5)
+            fig_path = os.path.join(data_path, f'{i}-{maker_name}-{color}')
+            plot_lines(EU_tally_mark_POSITIONS[i], fig_path, color, line_width=1.5)
 
 if __name__ == "__main__":
-    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-oneStyle_EU_tally'
+    """
+    make FixedPos-oneStyle_EU_tally
+    """
+    # data_path = f'{DATA_ROOT}/(0,20)-FixedPos-oneStyle_EU_tally'
+    # make_EU_tally_mark_num_dataset(data_path, range(0, 21), ['blue'])
+
+    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-mahjong'
     make_EU_tally_mark_num_dataset(data_path, range(0, 21), ['blue'])
+    make_ZHENG_num_dataset(data_path, range(0, 21), ['blue'])

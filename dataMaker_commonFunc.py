@@ -135,7 +135,7 @@ def Five(center: tuple, interval: float = 0.125):
 
 
 def zheng_0(center: tuple = (0, 0), scalar: float = 1.):
-    return np.array([[[-0.02, 0.], [0.02, 0.0]]]) * scalar + np.array(center)
+    return np.array([[[-0.03, 0.], [0.03, 0.0]]]) * scalar + np.array(center)
 
 
 def zheng_1(center: tuple = (0, 0), scalar: float = 1.):
@@ -171,7 +171,7 @@ def zheng_5(center: tuple = (0, 0), scalar: float = 1.):
 
 
 def EU_tally_mark_0(center: tuple = (0, 0), scalar: float = 1.):
-    return np.array([[[-0.02, 0.], [0.02, 0.0]]]) * scalar + np.array(center)
+    return np.array([[[0.0, -0.03], [0.0, 0.03]]]) * scalar + np.array(center)
 
 
 def EU_tally_mark_1(center: tuple = (0, 0), scalar: float = 1.):
@@ -201,8 +201,6 @@ def EU_tally_mark_5(center: tuple = (0, 0), scalar: float = 1.):
         EU_tally_mark_4(center, scalar),
         np.array([[[-0.2, -0.05], [0.2, 0.05]]]) * scalar + np.array(center)
     ))
-
-
 
 
 

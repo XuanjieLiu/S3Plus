@@ -312,22 +312,24 @@ def render_arabic_num_dataset(data_list: List[PairData], data_root: str, composi
         draw_arabic_data(a, b, color, data_path, compositional_func)
 
 
-def render_lines_num_dataset(data_list: List[PairData], data_root: str, compositional_func, line_positions, line_width=2.):
+def render_lines_num_dataset(data_list: List[PairData], data_root: str, compositional_func,
+                             line_positions, line_width=2., marker_name='default'):
     for data in tqdm(data_list, desc=data_root):
         a = data.a
         b = data.b
         color = data.color
-        data_name = f'{a}-{b}-default-{color}'
+        data_name = f'{a}-{b}-{marker_name}-{color}'
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
         draw_lines_data(a, b, color, data_path, compositional_func, line_positions, line_width)
 
 def render_ZHENG_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
-    return render_lines_num_dataset(data_list, data_root, compositional_func, ZHENG_POSITIONS)
+    return render_lines_num_dataset(data_list, data_root, compositional_func, ZHENG_POSITIONS, marker_name='zheng')
 
 
 def render_EU_tally_mark_num_dataset(data_list: List[PairData], data_root: str, compositional_func):
-    return render_lines_num_dataset(data_list, data_root, compositional_func, EU_tally_mark_POSITIONS, 1.5)
+    return render_lines_num_dataset(data_list, data_root, compositional_func, EU_tally_mark_POSITIONS,
+                                    line_width=1.5, marker_name='eutally')
 
 
 def sum_pairs(min_number):

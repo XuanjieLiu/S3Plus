@@ -7,7 +7,7 @@ from dataMaker_commonFunc import *
 from tqdm import tqdm
 import torch
 from dataMaker_fixedPosition_plusPair import DATA_ROOT, PairData, render_dataset, comp_plus, render_arabic_num_dataset, \
-    comp_minus, render_lines_num_dataset, render_EU_tally_mark_num_dataset
+    comp_minus, render_lines_num_dataset, render_EU_tally_mark_num_dataset, render_ZHENG_num_dataset
 
 matplotlib.use('AGG')
 import os
@@ -122,15 +122,29 @@ def render_new_dataset_from_old_dataset(
         )
 
 if __name__ == "__main__":
+
     render_new_dataset_from_old_dataset(
         ['train', 'test_1', 'test_2'],
-        os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_ZHENG'),
-        os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_EU_tally'),
+        os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet'),
+        os.path.join(DATA_ROOT, 'multi_style_pairs(0,20)_tripleSet_mahjong'),
         ['default'],
         ['b'],
         comp_plus,  # remember to change the comp_plus to comp_minus or reverse
         render_EU_tally_mark_num_dataset
     )
+
+    """
+    Make EU tally mark dataset from single style pairs dataset.
+    """
+    # render_new_dataset_from_old_dataset(
+    #     ['train', 'test_1', 'test_2'],
+    #     os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_ZHENG'),
+    #     os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_EU_tally'),
+    #     ['default'],
+    #     ['b'],
+    #     comp_plus,  # remember to change the comp_plus to comp_minus or reverse
+    #     render_EU_tally_mark_num_dataset
+    # )
 
     # source_dataset = os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet')
     # train_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'train'))
