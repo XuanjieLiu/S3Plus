@@ -9,15 +9,11 @@ from dataloader_plus import Dataset
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocFullsymmCommu_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_noise0.4",
-    "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_noise0.4",
-    "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
-    "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
-    "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_OnlineBlur",
-    "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_OnlineBlur",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.5",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.6",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.7",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.8",
+    "2025.06.12_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_symm_train0.9",
 ]
 EVAL_RECORD_NAME = 'plus_eval.txt'
 

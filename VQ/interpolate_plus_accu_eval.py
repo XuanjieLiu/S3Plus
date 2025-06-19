@@ -146,7 +146,6 @@ class InterpolatePlusAccuEval:
     def eval(self, checkpoint_path):
         self.model_reload(checkpoint_path)
         self.init_num_dict()
-        self.gen_train_interpolate_dataset()
         all_itp_a, all_itp_b, all_itp_c = self.gen_all_interpolate_dataset()
         train_itp_a, train_itp_b, train_itp_c = self.gen_train_interpolate_dataset()
         accu_all = self.eval_interpolated_plus(all_itp_a, all_itp_b, all_itp_c)
