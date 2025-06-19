@@ -44,9 +44,9 @@ C_LIST = [
     "F#",
     "G",
     "G#",
-    "A",
-    "A#",
-    "B",
+    # "A",
+    # "A#",
+    # "B", # The last three are for OOD
 ]
 
 

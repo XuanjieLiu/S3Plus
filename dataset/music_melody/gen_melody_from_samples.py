@@ -1,4 +1,5 @@
 import os
+import argparse
 from tqdm import tqdm
 
 import numpy as np
@@ -177,9 +178,10 @@ class PseudoMelGen:
             return np.array(envelope)
 
 
-def gen_directory(save_dir):
+def gen_directory(save_dir, mode="major", ood=False):
     """
-    generate a directory maybe for testing
+    generate a directory maybe for testing, mode scales
+    if ood is True, generate out-of-distribution keys (for now they are A, A#, B)
     """
     S_LIST = [
         "Soprano Sax",
@@ -202,10 +204,23 @@ def gen_directory(save_dir):
 
     for round in tqdm(range(10)):
         for i in range(len(S_LIST)):
-            for j in range(12):
-                audio, contents = generators[i].gen_melody(mel_len=90, root=j)
-                # save to npy for now
-                np.save(os.path.join(save_dir, f"ins{i}_root{j}_{round}.npy"), audio)
+            if not ood:
+                for j in range(9):
+                    audio, contents = generators[i].gen_melody(
+                        mel_len=90, mode=mode, root=j
+                    )
+                    # save to npy for now
+                    np.save(
+                        os.path.join(save_dir, f"ins{i}_root{j}_{round}.npy"), audio
+                    )
+                for j in range(9, 12):  # A, A#, B
+                    audio, contents = generators[i].gen_melody(
+                        mel_len=90, mode=mode, root=j
+                    )
+                    # save to npy for now
+                    np.save(
+                        os.path.join(save_dir, f"ins{i}_root{j}_{round}.npy"), audio
+                    )
     # # write one sample to wav
     # audio = audio.reshape(-1)
     # write(
@@ -262,12 +277,19 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
 
 
 if __name__ == "__main__":
-    os.makedirs("../data/insnotes_val", exist_ok=True)
-    os.makedirs("../data/insnotes_nth_val", exist_ok=True)
-    # gen_directory("../data/insnotes_val_major")
+    parser = argparse.ArgumentParser()
+
+    os.makedirs("../data/insnotes_major_val", exist_ok=True)
+    gen_directory("../data/insnotes_major_val")
+    print("Generated insnotes_major_val")
+    os.makedirs("../data/insnotes_major_ood", exist_ok=True)
+    gen_directory("../data/insnotes_major_ood")
+    print("Generated insnotes_major_ood")
+
+    # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
     # gen_directory_with_dataset_input(
     #     "../data/insnotes_nth_val", data_dir="../data/Nottingham/melody"
     # )
-    gen_directory_with_dataset_input(
-        "../data/insnotes_0_nth_val", data_dir="../data/Nottingham/melody"
-    )
+    # gen_directory_with_dataset_input(
+    #     "../data/insnotes_0_nth_val", data_dir="../data/Nottingham/melody"
+    # )
