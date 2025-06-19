@@ -283,7 +283,7 @@ if __name__ == "__main__":
     gen_directory("../data/insnotes_major_val")
     print("Generated insnotes_major_val")
     os.makedirs("../data/insnotes_major_ood", exist_ok=True)
-    gen_directory("../data/insnotes_major_ood")
+    gen_directory("../data/insnotes_major_ood", ood=True)
     print("Generated insnotes_major_ood")
 
     # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
