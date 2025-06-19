@@ -213,6 +213,7 @@ def gen_directory(save_dir, mode="major", ood=False):
                     np.save(
                         os.path.join(save_dir, f"ins{i}_root{j}_{round}.npy"), audio
                     )
+            else:
                 for j in range(9, 12):  # A, A#, B
                     audio, contents = generators[i].gen_melody(
                         mel_len=90, mode=mode, root=j
