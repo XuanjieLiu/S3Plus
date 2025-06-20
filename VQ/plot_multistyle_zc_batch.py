@@ -12,22 +12,32 @@ from torch.utils.data import DataLoader
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
 ]
+
+# EVAL_SETS = [
+#     {
+#         'name': 'Train_style',
+#         'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_TrainStyle')
+#     }, {
+#         'name': 'New_color',
+#         'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newColor')
+#     }, {
+#         'name': 'New_shape',
+#         'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newShape')
+#     }, {
+#         'name': 'New_shape_color',
+#         'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newShapeColor')
+#     },
+# ]
 
 EVAL_SETS = [
     {
         'name': 'Train_style',
-        'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_TrainStyle')
-    }, {
-        'name': 'New_color',
-        'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newColor')
-    }, {
-        'name': 'New_shape',
-        'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newShape')
-    }, {
-        'name': 'New_shape_color',
-        'path': os.path.join(DATASET_ROOT, 'multi_style_eval_(0,20)_FixedPos_newShapeColor')
+        'path': os.path.join(DATASET_ROOT, '(0,20)-FixedPos-mahjong')
     },
 ]
 
