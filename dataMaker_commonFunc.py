@@ -30,6 +30,12 @@ MARK_NAME_SPACE = {
     'X': 'x_filled',
 }
 
+MARK_NAME_SPACE_MAHJONG = {
+    'o': 'circle',
+    's': 'zheng',
+    '+': 'eutally',
+}
+
 
 def plot_arabic_numbers(num, save_dir, color: str):
     fig = plt.figure(figsize=(0.64, 0.64))

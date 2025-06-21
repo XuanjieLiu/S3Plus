@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from eval_common import CommonEvaler, draw_scatter_point_line
-from dataMaker_commonFunc import MARK_NAME_SPACE
+from dataMaker_commonFunc import MARK_NAME_SPACE, MARK_NAME_SPACE_MAHJONG
 from common_func import EXP_ROOT, KMMatcher
 from shared import *
 from importlib import reload
@@ -84,6 +84,8 @@ class MultiStyleZcEvaler(CommonEvaler):
         reordered_embs = self.reorder_emb(num_emb_idx, num_labels)
         if is_plot_graph:
             shape_dict = dict_switch_key_value(MARK_NAME_SPACE)
+            if 'mahjong' in self.config['single_img_eval_set_path']:
+                shape_dict = dict_switch_key_value(MARK_NAME_SPACE_MAHJONG)
             shape_marks = [shape_dict[shape] for shape in shapes]
             plot_plusZ_against_label(num_emb_idx, num_labels, colors, shape_marks,
                                      eval_path=f'{save_path}_{round(emb_efficiency, 2)}',
