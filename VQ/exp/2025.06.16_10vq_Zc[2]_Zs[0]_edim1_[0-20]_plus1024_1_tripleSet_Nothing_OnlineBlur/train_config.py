@@ -9,6 +9,8 @@ CONFIG = {
     'is_random_split_data': False,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
     'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
     'is_online_blur': True,  # 是否在训练时模糊处理图像
+    'blur_kernels': (5, 7, 9),  # 高斯模糊的核大小列表
+    'blur_sigma': (0.5, 3.0),  # 高斯模糊的sigma范围
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,

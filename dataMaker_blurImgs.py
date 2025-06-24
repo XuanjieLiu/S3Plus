@@ -4,16 +4,16 @@ import cv2
 import numpy as np
 from VQ.common_func import parse_label
 
-def random_gaussian_blur(image):
+def random_gaussian_blur(image, kernel_size=(5, 7, 9), sigma_range=(0.5, 3.0)):
     """
     对输入的图像应用随机高斯模糊。
     :param image: 输入的图像数据
     :return: 经过随机高斯模糊处理后的图像
     """
     # 随机选择高斯核的大小，核大小必须是正奇数
-    kernel_size = np.random.choice([5, 7, 9])
+    kernel_size = np.random.choice(kernel_size)
     # 随机选择标准差，这里设置范围在 0.5 到 3.0 之间
-    sigma = np.random.uniform(0.5, 3.0)
+    sigma = np.random.uniform(*sigma_range)
     # 应用高斯模糊
     blurred_image = cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
     return blurred_image
@@ -155,29 +155,30 @@ if __name__ == "__main__":
     '''
         复制并虚化 single_style_pairs(0,20)_tripleSet_trainAll
     '''
-    source_tripleSet_directory_path = './dataset/single_style_pairs(0,20)_tripleSet_trainAll'
-    target_tripleSet_directory_path = './dataset/blur-single_style_pairs(0,20)_tripleSet_trainAll'
-    os.makedirs(target_tripleSet_directory_path, exist_ok=True)
-    copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/train',
-                                f'{target_tripleSet_directory_path}/train', 16)
-    copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/test_1',
-                                f'{target_tripleSet_directory_path}/test_1', 16)
-    copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/test_2',
-                                f'{target_tripleSet_directory_path}/test_2', 16)
-    # 虚化
-    process_png_files(target_tripleSet_directory_path, skip_function=lambda x: parse_label(x) == 0)
+    # source_tripleSet_directory_path = './dataset/single_style_pairs(0,20)_tripleSet_trainAll'
+    # target_tripleSet_directory_path = './dataset/blur-single_style_pairs(0,20)_tripleSet_trainAll'
+    # os.makedirs(target_tripleSet_directory_path, exist_ok=True)
+    # copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/train',
+    #                             f'{target_tripleSet_directory_path}/train', 16)
+    # copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/test_1',
+    #                             f'{target_tripleSet_directory_path}/test_1', 16)
+    # copy_subdirectories_n_times(f'{source_tripleSet_directory_path}/test_2',
+    #                             f'{target_tripleSet_directory_path}/test_2', 16)
+    # # 虚化
+    # process_png_files(target_tripleSet_directory_path, skip_function=lambda x: parse_label(x) == 0)
 
-
-# 读取图片
-#     image = cv2.imread('./z_test/17.png')
-#     if image is not None:
-#         # 应用随机高斯模糊
-#         # blurred_image = random_gaussian_blur(image)
-#         blurred_image = cv2.GaussianBlur(image, (5, 5), 3)  # 使用固定的核大小和标准差
-#         # 显示原始图片和模糊后的图片
-#         cv2.imshow('Original Image', image)
-#         cv2.imshow('Blurred Image', blurred_image)
-#         cv2.waitKey(0)
-#         cv2.destroyAllWindows()
-#     else:
-#         print("无法读取图片，请检查图片路径。")
+    '''
+        读取测试图片
+    '''
+    image = cv2.imread('./z_test/1-circle-blue.png')
+    if image is not None:
+        # 应用随机高斯模糊
+        # blurred_image = random_gaussian_blur(image)
+        blurred_image = cv2.GaussianBlur(image, (19, 19), 19)  # 使用固定的核大小和标准差
+        # 显示原始图片和模糊后的图片
+        cv2.imshow('Original Image', image)
+        cv2.imshow('Blurred Image', blurred_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        print("无法读取图片，请检查图片路径。")

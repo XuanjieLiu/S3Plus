@@ -191,7 +191,9 @@ class PlusTrainer:
                 print(len(sample[0][0]))
             data, labels = sample
             if self.is_online_blur:
-                data = [random_gaussian_blur_batch(d) for d in data]
+                blur_kernels = self.config['blur_kernels']
+                blur_sigma = self.config['blur_sigma']
+                data = [random_gaussian_blur_batch(d, blur_kernels, blur_sigma) for d in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)

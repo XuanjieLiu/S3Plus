@@ -41,9 +41,11 @@ def add_gaussian_noise(images, mean=0.0, std=102.0 / 255.0):
     return noisy_images
 
 
-def random_gaussian_blur_batch(img_batch):
+def random_gaussian_blur_batch(img_batch, blur_kernel_sizes=(5, 7, 9), blur_sigma_range=(0.5, 3.0)):
     """
     对一个批次的图像 (batch_size, 3, 64, 64) 应用相同参数的随机高斯模糊。
+    :param blur_sigma_range: 高斯模糊的 sigma 范围，元组 (min_sigma, max_sigma)
+    :param blur_kernel_sizes: 可选的高斯核大小列表，必须是正奇数
     :param img_batch: torch.Tensor，形状为 (batch_size, 3, 64, 64)，像素值范围 [0, 1]
     :return: 处理后的图像，torch.Tensor，形状相同
     """
@@ -52,8 +54,8 @@ def random_gaussian_blur_batch(img_batch):
     blurred_list = []
     for i in range(batch_size):
         # 随机选择模糊参数
-        kernel_size = np.random.choice([5, 7, 9])
-        sigma = np.random.uniform(0.5, 3.0)
+        kernel_size = np.random.choice(blur_kernel_sizes)
+        sigma = np.random.uniform(*blur_sigma_range)
 
         img = img_batch[i].permute(1, 2, 0).cpu().numpy()  # (3, 64, 64) -> (64, 64, 3)
         img = (img * 255).astype(np.uint8)
