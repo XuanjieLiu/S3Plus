@@ -169,7 +169,7 @@ class SymmCSAEwithPrior(nn.Module):
             )
 
         else:
-            self.prior = nn.RNN(
+            self.prior = nn.RNk(
                 input_size=self.d_zc,
                 hidden_size=self.d_zc,
                 num_layers=self.n_layers_rnn,
