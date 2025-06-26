@@ -9,9 +9,10 @@ from common_func import load_config_from_exp_name, record_num_list, EXP_ROOT, fi
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_noise0.4",
-    "2025.06.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_noise0.4",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
 ]
 ITP_PLUS_RECORD_PATH_ALL = 'interpolate_plus_accu_all.txt'
 ITP_PLUS_RECORD_PATH_TRAIN = 'interpolate_plus_accu_train.txt'
