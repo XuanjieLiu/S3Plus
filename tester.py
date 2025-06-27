@@ -120,7 +120,7 @@ class Tester:
                     :, :12, :
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
                 predictions = self.model.unroll(prompt, 12)
-                predictions_vq = self.model.quantize(predictions)
+                predictions_vq = self.model.quantize(predictions)[0]
                 self.predictions.append(predictions_vq.cpu().numpy())
                 self.ground_truth_futures.append(zc_vq[:, 12:, :].cpu().numpy())
 
