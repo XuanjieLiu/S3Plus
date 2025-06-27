@@ -6,6 +6,7 @@ import logging
 import torch.distributed
 import itertools
 import yaml
+from tqdm import tqdm
 from importlib import import_module
 
 import numpy as np
@@ -104,7 +105,7 @@ class Tester:
         self.ground_truth_futures = []
         self.predictions = []
 
-        for i, batch in enumerate(self.test_loader):
+        for i, batch in tqdm(enumerate(self.test_loader)):
             batch_data, c_labels, s_labels = batch
             # Move data to device
             batch_data = batch_data.to(device=self.device)
