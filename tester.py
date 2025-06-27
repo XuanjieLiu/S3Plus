@@ -111,9 +111,9 @@ class Tester:
             batch_data = batch_data.to(device=self.device)
             # forward
             with torch.no_grad():
-                losses = self.loss.compute_loss(
-                    self.current_step, self.model, batch_data
-                )
+                # losses = self.loss.compute_loss(
+                #     self.current_step, self.model, batch_data
+                # )
                 zc_vq, indices, commit_loss, zs = self.model.encode(
                     batch_data, quantize=True
                 )
