@@ -93,6 +93,8 @@ class Tester:
         # loss function
         self.loss = Loss(loss_config, use_isymm="ISymm" in method_specs)
 
+        print("Testing checkpoint ", config["active_checkpoint"], "\n")
+
     def test(self, future_pred_acc=False, vis_tsne=False, confusion_mtx=False):
         """
         testing loop
