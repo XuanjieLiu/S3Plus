@@ -177,7 +177,7 @@ def get_dataloader(
             num_workers=num_workers,
             worker_init_fn=worker_init_fn,
         )
-        return itertools.cycle(dataloader)
+        return dataloader
 
 
 if __name__ == "__main__":

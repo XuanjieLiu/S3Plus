@@ -114,6 +114,7 @@ class Trainer:
         # check how many steps in the validation dataloader if using "whole" as the validation strategy
         if config["val_steps"] == "whole":
             self.config["val_steps"] = len(self.val_loader)
+        self.val_loader = itertools.cycle(self.val_loader)  # cycle for validation
         logging.info("Validation dataloader ready.")
 
     def build_model(self):
