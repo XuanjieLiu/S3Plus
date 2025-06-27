@@ -54,6 +54,7 @@ if __name__ == "__main__":
 
     with open(known_args.config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+    config["active_checkpoint"] = known_args.active_checkpoint
 
     # Update config with additional arguments
     for key, value in additional_args.items():
