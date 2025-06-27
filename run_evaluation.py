@@ -16,7 +16,7 @@ if __name__ == "__main__":
         "--config",
         type=str,
         default="config.yaml",
-        helper="if using active_checkpoint, this is ignored",
+        help="if using active_checkpoint, this is ignored",
     )
     parser.add_argument(
         "--future_pred_acc",
