@@ -62,7 +62,6 @@ class InsNotesDataset(IterableDataset):
     def __init__(self, n_segments=90, transform=None):
         """
         data_dir: directory directly containing .npy files
-        n_segments: number of segments there are in each sample. Note that although we have this known, it's not used in training.
 
         sr=16000
         """
@@ -104,7 +103,6 @@ class InsNotesTestDataset(Dataset):
     def __init__(self, data_dir, n_segments=90, transform=None, mode="major"):
         """
         data_dir: directory directly containing .npy files
-        n_segments: number of segments there are in each sample. Note that although we have this known, it's not used in training.
 
         sr=16000
         """
@@ -133,7 +131,7 @@ class InsNotesTestDataset(Dataset):
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
         audio = audio[
             : self.n_segments, :, :32
-        ]  # remove the last column because it's always zero. Only for Melspec. also, cut the length to 64 for now
+        ]  # remove the last column because it's always zero. Only for Melspec. also, cut the length to 32 for now
         audio = torch.log(audio + 1e-6)  # log spectrogram
         audio = audio.unsqueeze(1)  # add channel dimension
         style = int(data_name.split("_")[0][3:])
