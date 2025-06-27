@@ -39,6 +39,7 @@ if __name__ == "__main__":
             "*.yaml",
         )
     )
+    print(f"Config files found: {config_path}")
     known_args.config = (
         config_path[0] if config_path else known_args.config
     )  # use the first found config file if active_checkpoint is provided
