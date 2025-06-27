@@ -142,15 +142,16 @@ class Tester:
         # compute the accuracies
         acc = []
         for i in range(predictions.shape[1]):
-            acc.append(
-                np.mean(
+            acc = np.mean(
+                [
                     np.allclose(
-                        predictions[:, i, :],
-                        ground_truth_futures[:, i, :],
+                        predictions[j, i, :],
+                        ground_truth_futures[j, i, :],
                         atol=1e-3,
                         rtol=1e-3,
                     )
-                )
+                    for j in range(predictions.shape[0])
+                ],
             )
 
         print(f"Future prediction accuracies: {acc}")
