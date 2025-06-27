@@ -64,6 +64,7 @@ class Tester:
             num_workers=config["num_workers"],
             test=True,
         )
+        print(len(self.test_loader), "test batches loaded")
 
     def build_model(self):
         """
