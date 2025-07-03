@@ -158,6 +158,36 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
     return round(ks_mean, 4), round(accu_mean, 4)
 
 
+def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
+    """
+    Calculate the accuracy of plus operation based. A label can be represented by multiple embeddings.
+    An embedding can only represent one label, determined by the mode of the label it represents.
+    :param enc_z:
+    :param plus_z:
+    :return: accu: float, the accuracy of plus operation.
+    """
+    # 先确认每个 emb 对应的 labels
+    emb_dict = {}
+    for item in enc_z:
+        if item.z not in emb_dict:
+            emb_dict[item.z] = []
+        emb_dict[item.z].append(item.label)
+    # 根据每个 emb 表示的 label 的众数确定其唯一对应的 label
+    emb_label_dict = {}
+    for emb, labels in emb_dict.items():
+        mode_label = stats.mode(labels, keepdims=False)[0]
+        emb_label_dict[emb] = mode_label
+    # 根据 emb_label_dict 计算 plus_z 的准确率
+    n_correct = 0
+    n_total = len(plus_z)
+    assert n_total != 0, "plus_z is empty."
+    for item in plus_z:
+        label_z = emb_label_dict.get(item.plus_c_z)
+        if label_z is not None and int(label_z) == int(item.label_c):
+            n_correct += 1
+    return n_correct / n_total
+
+
 class VQvaePlusEval:
     def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.zc_dim = config['latent_embedding_1'] * config['embedding_dim']

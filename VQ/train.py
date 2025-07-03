@@ -117,7 +117,7 @@ class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
         self.batch_size = config['batch_size']
-        self.loader, self.plus_eval_loader, self.plus_eval_loader_2 = init_plus_dataloaders(config)
+        self.train_loader, self.plus_eval_loader, self.plus_eval_loader_2 = init_plus_dataloaders(config)
         single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
         self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=self.batch_size)
         self.min_loss_scalar = config['min_loss_scalar']
@@ -263,7 +263,7 @@ class PlusTrainer:
                 self.model.train()
                 if self.is_save_img:
                     self.plot_enc_z(epoch_num, self.single_img_eval_loader)
-                    train_ks, train_accu = self.plot_plus_idx(epoch_num, self.loader, self.train_result_path)
+                    train_ks, train_accu = self.plot_plus_idx(epoch_num, self.train_loader, self.train_result_path)
                     eval_ks, eval_accu = self.plot_plus_idx(epoch_num, self.plus_eval_loader, self.eval_result_path, "plus_idx")
                     loss_values = [train_ks, train_accu, eval_ks, eval_accu]
                     if self.plus_eval_loader_2 is not None:
@@ -277,7 +277,7 @@ class PlusTrainer:
                             self.plot_plus_z(epoch_num, self.plus_eval_loader_2, self.eval_result_path, 'plus_z_2')
 
             # Training phase
-            self.one_epoch(epoch_num, train_loss_counter, self.loader, is_log, train_vis_img, optimizer)
+            self.one_epoch(epoch_num, train_loss_counter, self.train_loader, is_log, train_vis_img, optimizer)
 
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')
