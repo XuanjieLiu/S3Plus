@@ -1,5 +1,5 @@
 log_dir: "./logs"
-project: "ISymm"
+project: "ISymmXY"
 name: "ISymm_melody"
 debug: False
 random_seed: 
