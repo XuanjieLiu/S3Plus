@@ -87,7 +87,9 @@ class SymmLoss:
             assert p_t <= zc.shape[1] - p_r + 1, (
                 f"p_t ({p_t}) must be less than or equal to zc.shape[1] - p_r + 1 ({zc.shape[1] - p_r + 1})"
             )
-            start_cursor = torch.randint(p_t, zc.shape[1] - p_r + 1)
+            start_cursor = torch.randint(
+                p_t, zc.shape[1] - p_r + 1, size=()
+            ).item()  # TODO: use different cursor for each batch item
             zc_observed_with_p_t = zc[:, start_cursor - p_t : start_cursor + p_r, :]
             # T then R
             # T

@@ -280,7 +280,7 @@ class Trainer:
             # validation loop
             if (
                 step % config["val_every_n_steps"] == 1
-            ):  # make sure to validate at the beginning
+            ):  # make sure to validate after 1 step
                 self.model.eval()
                 running_losses_val = {}
                 val_loader = self.val_loader
@@ -342,7 +342,7 @@ class Trainer:
                     title="AE content confusion matrix",
                 )
 
-                # plot prior content confusion mtx (TODO)
+                # plot prior content confusion mtx TODO:
 
                 self._write_summary(
                     step + self.start_step,
