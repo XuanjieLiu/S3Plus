@@ -235,10 +235,6 @@ class Trainer:
         while step < n_steps:
             # training loop
 
-            # scheduler step
-            step += 1
-            self.scheduler.step()
-
             batch_data, c_labels, s_labels = next(train_loader)
             # Move data to device
             batch_data = batch_data.to(device=self.device)
@@ -257,6 +253,8 @@ class Trainer:
                 self.scaler.scale(losses["total_loss"]).backward()
             # grad clipping
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=10.0)
+
+            # optimizer step
             self.scaler.step(self.optimizer)
             self.scaler.update()
 
@@ -359,6 +357,10 @@ class Trainer:
 
                 gc.collect()
                 self.model.train()
+
+            # scheduler step
+            step += 1
+            self.scheduler.step()
 
     def _write_summary(self, i_step, losses, partition="train", fig=None, plot=None):
         if self.config["debug"]:
