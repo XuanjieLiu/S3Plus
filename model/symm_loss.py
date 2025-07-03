@@ -23,24 +23,28 @@ class SymmLoss:
         z is a tensor of shape (B, N, D). We sample lengths on N.
         """
         N = z.shape[1]
-        if "length_sampling" in self.config.keys():
-            if self.config["length_sampling"] == "short":
-                p1 = torch.randint(3, 4, size=())
-                g1 = torch.randint(5, 6, size=())
-                p2 = torch.randint(5, 6, size=())
-                g2 = torch.randint(3, 4, size=())
-            elif self.config["length_sampling"] == "long":
-                p1 = torch.randint(7, 9, size=())
-                g1 = torch.randint(9, 11, size=())
-                p2 = torch.randint(9, 11, size=())
-                g2 = torch.randint(7, 9, size=())
-            elif self.config["length_sampling"] == "mixed":
-                p1 = torch.randint(3, 4, size=())
-                g1 = torch.randint(9, 11, size=())
-                p2 = torch.randint(9, 11, size=())
-                g2 = torch.randint(3, 4, size=())
+        # if "length_sampling" in self.config.keys():
+        #     if self.config["length_sampling"] == "short":
+        #         p_t = torch.randint(3, 4, size=())
+        #         g_t = torch.randint(5, 6, size=())
+        #         p_r = torch.randint(5, 6, size=())
+        #         g_r = torch.randint(3, 4, size=())
+        #     elif self.config["length_sampling"] == "long":
+        #         p_t = torch.randint(7, 9, size=())
+        #         g_t = torch.randint(9, 11, size=())
+        #         p_r = torch.randint(9, 11, size=())
+        #         g_r = torch.randint(7, 9, size=())
+        #     elif self.config["length_sampling"] == "mixed":
+        #         p_t = torch.randint(3, 4, size=())
+        #         g_t = torch.randint(9, 11, size=())
+        #         p_r = torch.randint(9, 11, size=())
+        #         g_r = torch.randint(3, 4, size=())
+        p_t = torch.randint(7, 8, size=())
+        g_t = torch.randint(1, 3, size=())
+        p_r = torch.randint(7, 8, size=())
+        g_r = torch.randint(4, 8, size=())
 
-        return p1, g1, p2, g2
+        return p_t, g_t, p_r, g_r
 
     def compute_loss(self, step, model, x):
         """
@@ -57,26 +61,62 @@ class SymmLoss:
 
         if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             # prior symm output
-            p1, g1, p2, g2 = self.sample_lengths(self, zc)
+            p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
 
-            global_prompt = zc[:, : max(p1, p2), :].clone()
-            # 1 then 2
-            zc_g1_tr = model.unroll(global_prompt[:, -p1:, :], g1)
-            zc_p2_tr = torch.cat([global_prompt[:, -p1:, :], zc_g1_tr], dim=1)[
-                :, -p2:, :
-            ]
-            zc_g2_tr = model.unroll(zc_p2_tr, g2)
-            zc_tr = torch.cat([global_prompt, zc_g1_tr, zc_g2_tr], dim=1)
+            # Old and probably wrong way to do it
+            # global_prompt = zc[:, : max(p_t, p_r), :].clone()
+            # # 1 then 2
+            # zc_g_t_tr = model.unroll(global_prompt[:, -p_t:, :], g_t)
+            # zc_p_r_tr = torch.cat([global_prompt[:, -p_t:, :], zc_g_t_tr], dim=1)[
+            #     :, -p_r:, :
+            # ]
+            # zc_g_r_tr = model.unroll(zc_p_r_tr, g_r)
+            # zc_tr = torch.cat([global_prompt, zc_g_t_tr, zc_g_r_tr], dim=1)
 
-            # 2 then 1
-            zc_g2_rt = model.unroll(global_prompt[:, -p2:, :], g2)
-            zc_p1_rt = torch.cat([global_prompt[:, -p2:, :], zc_g2_rt], dim=1)[
-                :, -p1:, :
-            ]
-            zc_g1_rt = model.unroll(zc_p1_rt, g1)
-            zc_rt = torch.cat([global_prompt, zc_g2_rt, zc_g1_rt], dim=1)
+            # # 2 then 1
+            # zc_g_r_rt = model.unroll(global_prompt[:, -p_r:, :], g_r)
+            # zc_p_t_rt = torch.cat([global_prompt[:, -p_r:, :], zc_g_r_rt], dim=1)[
+            #     :, -p_t:, :
+            # ]
+            # zc_g_t_rt = model.unroll(zc_p_t_rt, g_t)
+            # zc_rt = torch.cat([global_prompt, zc_g_r_rt, zc_g_t_rt], dim=1)
 
-            isymm_loss = F.mse_loss(zc_tr, zc_rt, reduction="mean")
+            # New way to do it
+
+            # Pick a random subsequence of zc of length p_r, with at least p_t tokens before it
+            assert p_t <= zc.shape[1] - p_r + 1, (
+                f"p_t ({p_t}) must be less than or equal to zc.shape[1] - p_r + 1 ({zc.shape[1] - p_r + 1})"
+            )
+            start_cursor = torch.randint(p_t, zc.shape[1] - p_r + 1)
+            zc_observed_with_p_t = zc[:, start_cursor - p_t : start_cursor + p_r, :]
+            # T then R
+            # T
+            zc_observed_t = []
+            for i in range(p_r):
+                zc_observed_t.append(
+                    model.unroll(zc_observed_with_p_t[:, i : p_t + i, :], g_t)[:, -1, :]
+                )
+            zc_observed_t = torch.stack(zc_observed_t, dim=1)  # (B, p_r, d_zc)
+            # R:
+            zc_observed_tr = model.unroll(zc_observed_t, g_r)
+
+            # R then T
+            # R
+            zc_observed = zc_observed_with_p_t[:, -p_r:, :]
+            zc_observed_r = model.unroll(zc_observed, g_r)  # (B, g_r, d_zc)
+            zc_observed_r_with_p = torch.cat(
+                [zc_observed_with_p_t, zc_observed_r], dim=1
+            )
+            zc_observed_rt = []
+            for i in range(g_r):
+                zc_observed_rt.append(
+                    model.unroll(
+                        zc_observed_r_with_p[:, -i - 1 - p_t : -i - 1, :], g_t
+                    )[:, -1, :]
+                )
+            zc_observed_rt = torch.stack(zc_observed_rt, dim=1)
+
+            isymm_loss = F.mse_loss(zc_observed_rt, zc_observed_tr, reduction="mean")
 
         losses = {}
         total_loss = 0

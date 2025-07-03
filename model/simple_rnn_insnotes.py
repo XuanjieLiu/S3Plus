@@ -35,104 +35,6 @@ def repeat_one_dim(z, repeat_times=None, sample_range=None):
     return r_tensor.repeat(1, repeat_times, 1)
 
 
-# class Encoder(nn.Module):
-#     def __init__(self, config):
-#         super(Encoder, self).__init__()
-#         self.config = config
-#         self.d_hidden = config["d_hidden_rnn"]
-#         self.n_layers_rnn = config["n_layers_rnn"]
-#         self.n_atoms = config["n_atoms"]
-#         self.base_len = config["base_len"]
-
-#         self.encoder = nn.Sequential(
-#             # 512
-#             nn.Conv2d(
-#                 IMG_CHANNEL,
-#                 CHANNELS[0],
-#                 kernel_size=(5, 5),
-#                 stride=2,
-#                 padding=(1, 0),
-#             ),
-#             nn.ReLU(),
-#             # 256
-#             nn.Conv2d(
-#                 CHANNELS[0], CHANNELS[1], kernel_size=(8, 1), stride=4, padding=(2, 0)
-#             ),
-#             nn.ReLU(),
-#             # 64
-#             nn.Conv2d(
-#                 CHANNELS[1], CHANNELS[2], kernel_size=(4, 1), stride=2, padding=(1, 0)
-#             ),
-#             nn.ReLU(),
-#             # 32
-#             nn.Conv2d(
-#                 CHANNELS[2], CHANNELS[-1], kernel_size=(4, 1), stride=2, padding=(1, 0)
-#             ),
-#             # 16
-#             nn.ReLU(),
-#         )
-#         self.fc1 = nn.Linear(CHANNELS[-1] * LAST_H * LAST_W, self.d_hidden)
-
-#     def forward(self, x):
-#         """
-#         Basic forward without going through the prior
-#         """
-#         z = self.encoder(x)
-#         z = z.view(z.size(0), -1)
-#         z = self.fc1(z)
-#         return z
-
-
-# class Decoder(nn.Module):
-#     def __init__(self, config):
-#         super(Decoder, self).__init__()
-#         self.config = config
-#         self.d_hidden = config["d_hidden_rnn"]
-#         self.n_layers_rnn = config["n_layers_rnn"]
-#         self.n_atoms = config["n_atoms"]
-#         self.base_len = config["base_len"]
-
-#         self.fc = nn.Sequential(
-#             nn.Linear(self.d_hidden, 16),
-#             nn.ReLU(),
-#             nn.Linear(16, 64),
-#             nn.ReLU(),
-#             nn.Linear(64, 256),
-#             nn.ReLU(),
-#             nn.Linear(256, 1024),
-#             nn.ReLU(),
-#             nn.Linear(1024, CHANNELS[-1] * LAST_H * LAST_W),
-#         )
-#         self.cnn = nn.Sequential(
-#             nn.ConvTranspose2d(
-#                 CHANNELS[-1], CHANNELS[-2], kernel_size=(4, 1), stride=2, padding=(1, 0)
-#             ),
-#             nn.ReLU(),
-#             nn.ConvTranspose2d(
-#                 CHANNELS[-2], CHANNELS[-3], kernel_size=(4, 1), stride=2, padding=(1, 0)
-#             ),
-#             nn.ReLU(),
-#             nn.ConvTranspose2d(
-#                 CHANNELS[-3], CHANNELS[-4], kernel_size=(8, 1), stride=4, padding=(2, 0)
-#             ),
-#             nn.ReLU(),
-#             nn.ConvTranspose2d(
-#                 CHANNELS[-4],
-#                 IMG_CHANNEL,
-#                 kernel_size=(5, 5),
-#                 stride=4,
-#                 padding=(1, 0),
-#             ),
-#         )
-
-#     def forward(self, z):
-#         z = self.fc(z)
-#         z = z.view(z.size(0) * z.size(1), CHANNELS[-1], LAST_H, LAST_W)
-#         z = self.cnn(z)
-#         z = z.view(z.size(0), z.size(1), IMG_CHANNEL, LAST_H, LAST_W)
-#         return z
-
-
 class SymmCSAEwithPrior(nn.Module):
     def __init__(self, config):
         super(SymmCSAEwithPrior, self).__init__()
@@ -179,16 +81,6 @@ class SymmCSAEwithPrior(nn.Module):
     def get_model_size(self):
         size = sum(p.numel() for p in self.parameters())
         return "Number of trainable parameters: {:.2f} M".format(size / 1024**2)
-
-        # self.decoder = Decoder(config)
-
-    # def save_tensor(self, tensor, path):
-    #     """保存 tensor 对象到文件"""
-    #     torch.save(tensor, path)
-
-    # def load_tensor(self, path):
-    #     """从文件读取 tensor 对象"""
-    #     return torch.load(path, map_location=DEVICE)
 
     def encode(self, x, quantize=True):
         """
@@ -259,6 +151,8 @@ class SymmCSAEwithPrior(nn.Module):
     def unroll(self, z, n_steps, z_future_gt=None):
         """
         Unroll the RNN for n_steps autoregressively.
+        Return only the future predictions.
+
         The z should be the quantized z sequence (prompt) of shape (B, T, d)
         z_future_gt is the ground truth future z sequence of shape (B, n_steps, d) for teacher forcing.
         If z_future_gt is None, the model will predict the future z sequence.
