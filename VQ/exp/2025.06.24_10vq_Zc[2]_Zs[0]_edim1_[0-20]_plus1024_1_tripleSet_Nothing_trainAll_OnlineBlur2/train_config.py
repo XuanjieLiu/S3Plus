@@ -76,4 +76,14 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
+    'eval_config': {
+        'pipline_result_path': 'PIPLINE_EVAL',
+        'plus_eval_config': {
+            'eval_set_path_list': [
+
+            ],
+            'one2n_accu_result_name': 'one2n_accu',
+            'one2one_accu_result_name': 'one2one_accu',
+        }
+    },
 }

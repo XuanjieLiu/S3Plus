@@ -169,9 +169,9 @@ def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
     # 先确认每个 emb 对应的 labels
     emb_dict = {}
     for item in enc_z:
-        if item.z not in emb_dict:
-            emb_dict[item.z] = []
-        emb_dict[item.z].append(item.label)
+        if int(item.z.item()) not in emb_dict:
+            emb_dict[int(item.z.item())] = []
+        emb_dict[int(item.z.item())].append(item.label)
     # 根据每个 emb 表示的 label 的众数确定其唯一对应的 label
     emb_label_dict = {}
     for emb, labels in emb_dict.items():
@@ -182,7 +182,7 @@ def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
     n_total = len(plus_z)
     assert n_total != 0, "plus_z is empty."
     for item in plus_z:
-        label_z = emb_label_dict.get(item.plus_c_z)
+        label_z = emb_label_dict.get(int(item.plus_c_z.item()))
         if label_z is not None and int(label_z) == int(item.label_c):
             n_correct += 1
     return n_correct / n_total
@@ -190,6 +190,7 @@ def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
 
 class VQvaePlusEval:
     def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
+        self.config = config
         self.zc_dim = config['latent_embedding_1'] * config['embedding_dim']
         if loaded_model is not None:
             self.model = loaded_model
@@ -244,6 +245,11 @@ class VQvaePlusEval:
     def eval(self, eval_path, dataloader: DataLoader):
         all_enc_z, all_plus_z = self.load_plusZ_eval_data(dataloader)
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path)
+
+    def eval_multi_emb_accu(self, eval_data_loader: DataLoader):
+        all_enc_z, all_plus_z = self.load_plusZ_eval_data(eval_data_loader, is_find_index=True)
+        accu = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
+        return accu
 
 # if __name__ == "__main__":
 #     os.makedirs(EVAL_ROOT, exist_ok=True)
