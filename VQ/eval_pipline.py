@@ -11,7 +11,6 @@ from torch.utils.data import ConcatDataset
 from torch.utils.data import DataLoader
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-
 EXP_NAME_LIST = [
     "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
     "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
@@ -25,6 +24,8 @@ EXP_NAME_LIST = [
     "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
     "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_OnlineBlur",
     "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_OnlineBlur",
+    "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
 ]
 
 if __name__ == "__main__":
@@ -34,7 +35,7 @@ if __name__ == "__main__":
         eval_config = config['eval_config']
         pipline_result_path = os.path.join(exp_path, eval_config['pipline_result_path'])
         os.makedirs(pipline_result_path, exist_ok=True)
-
+        optimal_checkpoint_finding_config = eval_config['optimal_checkpoint_finding_config']
         # eval plus accu
         if eval_config.get('plus_eval_config') is not None:
             evaler = VQvaePlusEval(config)
@@ -49,7 +50,7 @@ if __name__ == "__main__":
             one2one_accu_list = []
             for sub_exp in EXP_NUM_LIST:
                 sub_exp_path = os.path.join(exp_path, sub_exp)
-                optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config)
+                optimal_checkpoint_num = find_optimal_checkpoint_num_by_train_config(sub_exp_path, config, optimal_checkpoint_finding_config)
                 print(f'Optimal checkpoint number for {sub_exp}: {optimal_checkpoint_num}')
                 checkpoint_path = os.path.join(exp_path, sub_exp, f'checkpoint_{optimal_checkpoint_num}.pt')
                 evaler.reload_model(checkpoint_path)

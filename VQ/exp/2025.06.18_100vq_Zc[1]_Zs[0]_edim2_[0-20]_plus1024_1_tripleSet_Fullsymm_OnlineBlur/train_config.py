@@ -78,6 +78,12 @@ CONFIG = {
     },
     'eval_config': {
         'pipline_result_path': 'PIPLINE_EVAL',
+        'optimal_checkpoint_finding_config': {
+            'optimal_checkpoint_num': 'find_by_keys',
+            'record_name': 'Train_record.txt',
+            'keys': ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED'],
+            'iter_after': 0.3,
+        },
         'plus_eval_config': {
             'eval_set_path_list': [
                 f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",

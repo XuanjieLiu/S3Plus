@@ -76,6 +76,12 @@ CONFIG = {
     },
     'eval_config': {
         'pipline_result_path': 'PIPLINE_EVAL',
+        'optimal_checkpoint_finding_config': {
+            'optimal_checkpoint_num': 'find_by_keys',
+            'record_name': 'Train_record.txt',
+            'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'],
+            'iter_after': 0.0,
+        },
         'plus_eval_config': {
             'eval_set_path_list': [
                 f"{data_root}/multi_style_pairs(0,20)_mahjong/test",

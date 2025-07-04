@@ -96,16 +96,23 @@ def find_optimal_checkpoint_num(
 def find_optimal_checkpoint_num_by_train_config(
     sub_exp_path,
     train_config,
-    keys=None,
+    checkpoint_finding_config=None,
 ):
+    if checkpoint_finding_config is None:
+        keys = DEFAULT_KEYS
+        iter_after = ITER_AFTER
+        record_name = train_config['train_record_path']
+    else:
+        keys = checkpoint_finding_config['keys']
+        iter_after = checkpoint_finding_config['iter_after']
+        record_name = checkpoint_finding_config['record_name']
     specific_checkpoint = read_specific_checkpoint(sub_exp_path)
     if specific_checkpoint is not None:
         return specific_checkpoint
-    record_name = train_config['train_record_path']
     checkpoint_interval = train_config['checkpoint_interval']
     max_iter_num = train_config['max_iter_num']
     check_points_num = int(max_iter_num / checkpoint_interval)
-    iter_start = int(ITER_AFTER * check_points_num)
+    iter_start = int(iter_after * check_points_num)
     check_points = [checkpoint_interval * i for i in range(iter_start, check_points_num)]
     return find_optimal_checkpoint_num(sub_exp_path, record_name, keys, check_points)
 
