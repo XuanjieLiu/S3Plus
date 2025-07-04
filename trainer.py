@@ -342,7 +342,7 @@ class Trainer:
                     title="AE content confusion matrix",
                 )
 
-                # plot prior content confusion mtx TODO:
+                # TODO: plot prior content confusion mtx
 
                 self._write_summary(
                     step + self.start_step,

@@ -119,12 +119,12 @@ class Tester:
                     batch_data, quantize=True
                 )
                 prompt = zc_vq[
-                    :, :12, :
+                    :, :7, :
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
-                predictions = self.model.unroll(prompt, 12)
+                predictions = self.model.unroll(prompt, 7)
                 predictions_vq = self.model.quantize(predictions)[0]
                 self.predictions.append(predictions_vq.cpu().numpy())
-                self.ground_truth_futures.append(zc_vq[:, 12:, :].cpu().numpy())
+                self.ground_truth_futures.append(zc_vq[:, 7:14, :].cpu().numpy())
 
         self.predictions = np.concatenate(self.predictions, axis=0)
         self.ground_truth_futures = np.concatenate(self.ground_truth_futures, axis=0)
