@@ -160,9 +160,9 @@ class SymmCSAEwithPrior(nn.Module):
         """
         h_0 = torch.zeros(self.n_layers_rnn, z.size(0), self.d_zc, device=z.device)
         output, h_n = self.prior(z, h_0)
-        predictions = []
         last_output = self.quantize(output[:, -1, :], freeze_codebook=True)[0]
-        for i in range(n_steps):
+        predictions = [last_output]
+        for i in range(n_steps - 1):
             last_output = last_output.unsqueeze(1)
             next_output, h_n = self.prior(last_output, h_n)
             next_output = self.quantize(next_output, freeze_codebook=True)[0]
