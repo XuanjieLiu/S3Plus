@@ -134,7 +134,7 @@ class SymmCSAEwithPrior(nn.Module):
 
         for t in range(1, T):
             output, h = self.prior(input_t, h)  # output: (B, 1, D)
-            output = self.quantize(output, freeze_codebook=True)[0]
+            # output = self.quantize(output, freeze_codebook=True)[0]
             pred_t = output[:, 0, :]  # (B, D)
             preds.append(pred_t)
 
