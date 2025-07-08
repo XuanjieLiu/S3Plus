@@ -1,5 +1,5 @@
 log_dir: "./logs"
-project: "ISymmXY" # XY represents R and T operates at different axes
+project: "ISymmXYFixed" # XY represents R and T operates at different axes
 name: "ISymm_melody"
 debug: False
 random_seed: 
