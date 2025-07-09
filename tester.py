@@ -15,6 +15,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.cuda.amp import GradScaler
+import librosa as lr
 from matplotlib import pyplot as plt
 import seaborn as sns
 import wandb
@@ -103,8 +104,10 @@ class Tester:
         """
         config = self.config
 
-        self.ground_truth_futures = []
-        self.predictions = []
+        self.zc_future_gt = []  #
+        self.zc_future_pred = []
+        self.c_labels_future_gt = []
+        self.x_future_pred = []
 
         for i, batch in tqdm(enumerate(self.test_loader)):
             batch_data, c_labels, s_labels = batch
@@ -118,26 +121,30 @@ class Tester:
                 zc_vq, indices, commit_loss, zs = self.model.encode(
                     batch_data, quantize=True
                 )
-                prompt = zc_vq[
+                zc_prompt = zc_vq[
                     :, :7, :
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
-                predictions = self.model.unroll(prompt, 7)
-                predictions_vq = self.model.quantize(predictions)[0]
-                self.predictions.append(predictions_vq.cpu().numpy())
-                self.ground_truth_futures.append(zc_vq[:, 7:14, :].cpu().numpy())
+                zc_future_pred = self.model.unroll(zc_prompt, 7)
+                zc_future_pred_vq = self.model.quantize(zc_future_pred)[0]
+                x_future_pred = self.model.decode(zc_future_pred_vq)
+                self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
+                self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
+                self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
+                self.x_future_pred.append(x_future_pred.cpu().numpy())
 
-        self.predictions = np.concatenate(self.predictions, axis=0)
-        self.ground_truth_futures = np.concatenate(self.ground_truth_futures, axis=0)
+        self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
+        self.zc_future_gt = np.concatenate(self.zc_future_gt, axis=0)
 
         if future_pred_acc:
-            self.future_pred_acc()
+            self.future_pred_acc_z()
+            self.future_pred_acc_x()
 
-    def future_pred_acc(self):
+    def future_pred_acc_z(self):
         """
-        Compute the future prediction accuracy.
+        Compute the future prediction accuracy on the zc level (representation level).
         """
-        predictions = self.predictions
-        ground_truth_futures = self.ground_truth_futures
+        predictions = self.zc_future_pred
+        ground_truth_futures = self.zc_future_gt
 
         # compute the accuracies
         acc = []
@@ -156,4 +163,10 @@ class Tester:
                 )
             )
 
-        print(f"Future prediction accuracies: {acc}")
+        print(f"Future prediction accuracies on Z: {acc}")
+
+    def future_pred_acc_x(self):
+        """
+        Compute the future prediction accuracy on the x level (behavioral level).
+        """
+        pass
