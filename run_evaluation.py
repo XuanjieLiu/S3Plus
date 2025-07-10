@@ -23,6 +23,15 @@ if __name__ == "__main__":
         action="store_true",
         help="whether to compute future prediction accuracy",
     )
+    parser.add_argument(
+        "--recon_waveform",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--future_pred_waveform",
+        action="store_true",
+        help="whether to compute future prediction accuracy on waveform level",
+    )
 
     parser.add_argument("--debug", action="store_true")
     # ........... can add more arguments here ...........
@@ -90,6 +99,8 @@ if __name__ == "__main__":
     tester.build_model()
     tester.test(
         future_pred_acc=known_args.future_pred_acc,
+        recon_waveform=known_args.recon_waveform,
+        future_pred_waveform=known_args.future_pred_waveform,
         vis_tsne=config.get("vis_tsne", False),
         confusion_mtx=config.get("confusion_mtx", False),
     )
