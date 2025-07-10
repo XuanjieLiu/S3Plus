@@ -1,71 +1,75 @@
-import os
-import random
-import sys
-import math
-from scipy.stats import mode
-import sys
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 
-# if len(sys.argv) < 2:
-#     print("Usage: python myscript.py arg1 arg2 ...")
-#     sys.exit()
+# profit = np.array([
+#     [5, 7, 9],
+#     [6, 4, 3],
+#     [2, 2, 2],
+#     [8, 5, 6],
+# ])
+# profit = np.array([
+#     [0, 6, 0, 0],
+#     [0, 0, 6, 0],
+#     [0, 6, 0, 0],
+# ])
 #
-# arg1 = sys.argv[1]
-# arg2 = sys.argv[2]
-# # 依次类推，可以根据需要读取更多的命令行参数
+# C = profit.max() - profit
+# row_ind, col_ind = linear_sum_assignment(C)
 #
-# print("arg List: ", sys.argv)
-# print("arg1 =", arg1)
-# print("arg2 =", arg2)
-# # 输出读取到的命令行参数
-
-
-# class TestA:
-#     def __init__(self, a):
-#         self.a = a
+# total_profit = profit[row_ind, col_ind].sum()
+# min_total_cost = C[row_ind, col_ind].sum()  # 等价于 3 * profit.max() - total_profit
+# max_profit = profit.sum()
 #
-# x = TestA(3)
-# y = [x for n in range(2)]
-# for item in y:
-#     print(item.a)
-# x.a = 8
-# for item in y:
-#     print(item.a)
+# print("匹配对：", list(zip(row_ind, col_ind)))
+# print("总收益：", total_profit)
+# print("总收益率", total_profit / max_profit)
+# print("最小成本（等价于最大收益的转换损失）：", min_total_cost)
 
-# d = {
-#     '1': 1,
-#     '2': 2,
-#     '1.4': 1.5,
-# }
-#
-# print(d[str(1.4)])
+def solve_label_emb_one2one_matching(num_emb_idx, num_labels):
+    """
+    Solve the one-to-one matching problem for label-embedding pairs using the Hungarian algorithm.
+    :param num_emb_idx: List of numerical indices for embeddings.
+    :param num_labels: List of numerical labels corresponding to the embeddings.
+    :return: A tuple containing the mapping of labels to embeddings and the km_score.
+    1. The mapping is a list of tuples where each tuple contains a label and its corresponding embedding index.
+    2. The km_score is the ratio of total profit to maximum profit.
+    """
+    # Assemble a label embedding matrix based on the provided embedding indices and labels.
+    all_embs = list(set(num_emb_idx))
+    emb_idx2col_idx = {emb: i for i, emb in enumerate(all_embs)}
+    all_labels = list(set(num_labels))
+    label_idx2row_idx = {label: i for i, label in enumerate(all_labels)}
+    label_emb_matrix = np.zeros((len(all_labels), len(all_embs)))
+    for label, emb in zip(num_labels, num_emb_idx):
+        label_midx = label_idx2row_idx[label]
+        emb_midx = emb_idx2col_idx[emb]
+        label_emb_matrix[label_midx, emb_midx] += 1
+    print("Label-Embedding Matrix:\n", label_emb_matrix)
 
-# a = pow(math.pi, 2)
-# b = pow(math.pi, 2.5)
-# c = pow(math.e, 3)
-# print(pow(a, 2) + pow(b, 2), pow(c, 2))
-# print(pow(math.pi, 3))
+    # Solve the assignment problem using the Hungarian algorithm.
+    profit = label_emb_matrix
+    C = profit.max() - profit
+    row_ind, col_ind = linear_sum_assignment(C)
 
+    # Return the mapping from matrix indices to embedding and label indices, remove profit of 0.
+    non_zero_label_emb_pairs = []
+    for i, j in zip(row_ind, col_ind):
+        if profit[i, j] > 0:
+            non_zero_label_emb_pairs.append((i, j))
+    col_idx2emb_idx = {i: emb for i, emb in enumerate(all_embs)}
+    row_idx2label_idx = {i: label for i, label in enumerate(all_labels)}
+    mapping = [(row_idx2label_idx[i], col_idx2emb_idx[j]) for i, j in non_zero_label_emb_pairs]
 
-# import numpy as np
-# # L2 norm
-# def l2_norm(a):
-#     return np.linalg.norm(a)
-#
-# def relative_change(a, b):
-#     return l2_norm(a-b) / l2_norm(b)
-#
-# # random a vector
-# a = np.random.rand(10)
-# b = np.random.rand(10)
-# c = 3*b
-#
-# print(relative_change(c, b))
-# #print(relative_change(a*2, b*2))
+    # Calculate km_score, the ratio of total profit to max profit.
+    total_profit = profit[row_ind, col_ind].sum()
+    max_profit = profit.sum()
+    km_score = total_profit / max_profit
 
+    return mapping, km_score
 
-# test mode
-labels = [2,2,3,3,2,4,5,3,3,2]
-mode_label = mode(labels, keepdims=False)[0]
-print (f"Mode label: {mode_label}")
-
+if __name__ == "__main__":
+    num_emb_idx = [0, 1, 2, 0, 1, 2, 3, 3,]
+    num_labels = [1, 2, 3, 1, 2, 3, 1, 1,]
+    mapping, km_score = solve_label_emb_one2one_matching(num_emb_idx, num_labels)
+    print("Label-Embedding Mapping:", mapping)
+    print("KM Score:", km_score)

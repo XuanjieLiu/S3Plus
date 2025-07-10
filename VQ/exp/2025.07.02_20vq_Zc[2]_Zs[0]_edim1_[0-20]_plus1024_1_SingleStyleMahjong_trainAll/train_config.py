@@ -75,4 +75,39 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
+    'eval_config': {
+        'pipeline_result_path': 'PIPELINE_EVAL',
+        'optimal_checkpoint_finding_config': {
+            'optimal_checkpoint_num': 'find_by_keys',
+            'record_name': 'Train_record.txt',
+            'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'],
+            'iter_after': 0.0,
+        },
+        'plus_eval_configs': [
+            {
+                'name': 'eval_set',
+                'eval_set_path_list': [
+                    f"{data_root}/multi_style_pairs(0,20)_mahjong/test",
+                ],
+            },
+        ],
+        'emb_matching_rate_configs': [
+            {
+                'name': 'emb_matching_rate',
+                'eval_set_path_list': [
+                    f"{data_root}/(0,20)-FixedPos-mahjong",
+                ],
+            },
+        ],
+        'orderliness_configs': [
+            {
+                'name': 'orderliness',
+                'img_dir_name': 'orderliness',
+                'eval_set_path_list': [
+                    f"{data_root}/(0,20)-FixedPos-mahjong",
+                ],
+                'is_add_noise': False,
+            },
+        ],
+    },
 }

@@ -16,7 +16,7 @@ import matplotlib
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from scipy import stats
-from common_func import parse_label
+from common_func import parse_label, solve_label_emb_one2one_matching
 
 matplotlib.use('AGG')
 MODEL_PATH = 'curr_model.pt'
@@ -178,6 +178,28 @@ def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
         mode_label = stats.mode(labels, keepdims=False)[0]
         emb_label_dict[emb] = mode_label
     # 根据 emb_label_dict 计算 plus_z 的准确率
+    n_correct = 0
+    n_total = len(plus_z)
+    assert n_total != 0, "plus_z is empty."
+    for item in plus_z:
+        label_z = emb_label_dict.get(int(item.plus_c_z.item()))
+        if label_z is not None and int(label_z) == int(item.label_c):
+            n_correct += 1
+    return n_correct / n_total
+
+def calc_one2one_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
+    """
+    Calculate the accuracy of plus operation based on one-to-one matching.
+    Each embedding corresponds to a unique label, and each label can only be represented by one embedding.
+    This function uses the Hungarian algorithm to solve the one-to-one matching problem.
+    :param enc_z: List of EncZ objects, each containing a label and an embedding index.
+    :param plus_z: List of PlusZ objects, each containing a label and an embedding index for the plus operation.
+    :return: accu: float, the accuracy of plus operation based on one-to-one matching.
+    """
+    emb_idx_list = [int(item.z.item()) for item in enc_z]
+    label_list = [item.label for item in enc_z]
+    emb_label_pairs, _ = solve_label_emb_one2one_matching(emb_idx_list, label_list)
+    emb_label_dict = {emb: label for label, emb in emb_label_pairs}
     n_correct = 0
     n_total = len(plus_z)
     assert n_total != 0, "plus_z is empty."

@@ -3,6 +3,7 @@ import os
 from typing import List
 import torch
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 from shared import DEVICE
 from loss_counter import read_record, find_optimal_checkpoint
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
@@ -303,6 +304,48 @@ def keep_max_in_matrix_colum(matrix):
     for i, idx in enumerate(max_values_idx):
         result[idx, i] = matrix[idx, i]
     return result
+
+
+def solve_label_emb_one2one_matching(num_emb_idx, num_labels):
+    """
+    Solve the one-to-one matching problem for label-embedding pairs using the Hungarian algorithm.
+    :param num_emb_idx: List of numerical indices for embeddings.
+    :param num_labels: List of numerical labels corresponding to the embeddings.
+    :return: A tuple containing the mapping of labels to embeddings and the km_score.
+    1. The mapping is a list of tuples where each tuple contains a label and its corresponding embedding index.
+    2. The km_score is the ratio of total profit to maximum profit.
+    """
+    # Assemble a label embedding matrix based on the provided embedding indices and labels.
+    all_embs = list(set(num_emb_idx))
+    emb_idx2col_idx = {emb: i for i, emb in enumerate(all_embs)}
+    all_labels = list(set(num_labels))
+    label_idx2row_idx = {label: i for i, label in enumerate(all_labels)}
+    label_emb_matrix = np.zeros((len(all_labels), len(all_embs)))
+    for label, emb in zip(num_labels, num_emb_idx):
+        label_midx = label_idx2row_idx[label]
+        emb_midx = emb_idx2col_idx[emb]
+        label_emb_matrix[label_midx, emb_midx] += 1
+
+    # Solve the assignment problem using the Hungarian algorithm.
+    profit = label_emb_matrix
+    C = profit.max() - profit
+    row_ind, col_ind = linear_sum_assignment(C)
+
+    # Return the mapping from matrix indices to embedding and label indices, remove profit of 0.
+    non_zero_label_emb_pairs = []
+    for i, j in zip(row_ind, col_ind):
+        if profit[i, j] > 0:
+            non_zero_label_emb_pairs.append((i, j))
+    col_idx2emb_idx = {i: emb for i, emb in enumerate(all_embs)}
+    row_idx2label_idx = {i: label for i, label in enumerate(all_labels)}
+    mapping = [(row_idx2label_idx[i], col_idx2emb_idx[j]) for i, j in non_zero_label_emb_pairs]
+
+    # Calculate km_score, the ratio of total profit to max profit.
+    total_profit = profit[row_ind, col_ind].sum()
+    max_profit = profit.sum()
+    km_score = total_profit / max_profit
+
+    return mapping, km_score
 
 
 if __name__ == "__main__":

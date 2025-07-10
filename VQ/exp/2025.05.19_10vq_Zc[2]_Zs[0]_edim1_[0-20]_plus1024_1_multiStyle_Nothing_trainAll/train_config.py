@@ -72,7 +72,7 @@ CONFIG = {
         }
     },
     'eval_config': {
-        'pipline_result_path': 'PIPLINE_EVAL',
+        'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',
             'record_name': 'Train_record.txt',
