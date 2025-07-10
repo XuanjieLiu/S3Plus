@@ -137,8 +137,8 @@ class Tester:
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
                 zc_future_pred = self.model.unroll(zc_prompt, 7)
                 zc_future_pred_vq = self.model.quantize(zc_future_pred)[0]
-                x_future_pred = self.model.decode(zc_future_pred_vq)
-                x_prompt_recon = self.model.decode(zc_prompt)
+                x_future_pred = self.model.decode(zc_future_pred_vq, zs)
+                x_prompt_recon = self.model.decode(zc_prompt, zs)
             self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
             self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
             self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
