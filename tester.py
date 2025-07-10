@@ -233,6 +233,9 @@ class Tester:
             hop_length = 256
             win_length = 1024
             n_fft = 1024
+            # remove the added channel dimension
+            x_prompt_gt = x_prompt_gt.squeeze()
+            x_prompt_recon = x_prompt_recon.squeeze()
 
         for i in range(n_samples):
             waveform_gt = []
@@ -285,6 +288,8 @@ class Tester:
             hop_length = 256
             win_length = 1024
             n_fft = 1024
+            # remove the added channel dimension
+            x_future_pred = x_future_pred.squeeze()
 
         for i in range(n_samples):
             waveform_pred = []
