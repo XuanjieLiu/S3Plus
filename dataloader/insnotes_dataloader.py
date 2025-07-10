@@ -44,9 +44,9 @@ C_LIST = [
     "F#",
     "G",
     "G#",
-    # "A",
-    # "A#",
-    # "B", # The last three are for OOD
+    "A",
+    "A#",
+    "B",  # The last three are for OOD
 ]
 
 
@@ -82,7 +82,7 @@ class InsNotesDataset(IterableDataset):
 
         while True:
             i = random.randint(0, len(S_LIST) - 1)  # instrument
-            j = random.randint(0, len(C_LIST) - 1)  # root
+            j = random.randint(0, len(C_LIST) - 4)  # root
             audio, contents = generators[i].gen_melody(mel_len=self.n_segments, root=j)
             audio = torch.tensor(audio)
             audio = self.transform(audio)  # spectrogram

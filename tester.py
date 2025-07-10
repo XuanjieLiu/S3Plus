@@ -112,8 +112,10 @@ class Tester:
         """
         config = self.config
 
-        self.zc_future_gt = []  #
+        self.zc_future_gt = []
         self.zc_future_pred = []
+        self.zc_idx_future_gt = []
+        self.zc_idx_future_pred = []
         self.c_labels_future_gt = []
         self.x_future_pred = []
 
@@ -136,18 +138,24 @@ class Tester:
                     :, :7, :
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
                 zc_future_pred = self.model.unroll(zc_prompt, 7)
-                zc_future_pred_vq = self.model.quantize(zc_future_pred)[0]
+                zc_future_pred_vq, zc_idx_future_pred = self.model.quantize(
+                    zc_future_pred
+                )
                 x_future_pred = self.model.decode(zc_future_pred_vq, zs)
                 x_prompt_recon = self.model.decode(zc_prompt, zs)
-            self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
             self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
+            self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
+            self.zc_idx_future_gt.append(indices[:, 7:14].cpu().numpy())
+            self.zc_idx_future_pred.append(zc_idx_future_pred.cpu().numpy())
             self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
             self.x_future_pred.append(x_future_pred.cpu().numpy())
             self.x_prompt_gt.append(batch_data[:, :7, :].cpu().numpy())
             self.x_prompt_recon.append(x_prompt_recon.cpu().numpy())
 
-        self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
         self.zc_future_gt = np.concatenate(self.zc_future_gt, axis=0)
+        self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
+        self.zc_idx_future_gt = np.concatenate(self.zc_idx_future_gt, axis=0)
+        self.zc_idx_future_pred = np.concatenate(self.zc_idx_future_pred, axis=0)
         self.c_labels_future_gt = np.concatenate(self.c_labels_future_gt, axis=0)
         self.x_future_pred = np.concatenate(self.x_future_pred, axis=0)
         self.x_prompt_gt = np.concatenate(self.x_prompt_gt, axis=0)
@@ -162,31 +170,47 @@ class Tester:
         if future_pred_waveform:
             self.future_pred_waveform(n_samples=10)
 
-    def future_pred_acc_z(self):
+    def future_pred_acc_z(self, assign_z_to_c=True):
         """
         Compute the future prediction accuracy on the zc level (representation level).
+        assign_z_to_c: whether to assign the zc to the c labels and compute the accuracy based on their c labels
         """
-        zc_future_pred = self.zc_future_pred
-        zc_future_gt = self.zc_future_gt
+        if not assign_z_to_c:
+            zc_future_pred = self.zc_future_pred
+            zc_future_gt = self.zc_future_gt
 
-        # compute the accuracies
-        acc = []
-        for i in range(zc_future_pred.shape[1]):
-            acc.append(
-                np.mean(
-                    [
-                        np.allclose(
-                            zc_future_pred[j, i, :],
-                            zc_future_gt[j, i, :],
-                            atol=1e-3,
-                            rtol=1e-3,
-                        )
-                        for j in range(zc_future_pred.shape[0])
-                    ],
+            # compute the accuracies
+            acc = []
+            for i in range(zc_future_pred.shape[1]):
+                acc.append(
+                    np.mean(
+                        [
+                            np.allclose(
+                                zc_future_pred[j, i, :],
+                                zc_future_gt[j, i, :],
+                                atol=1e-3,
+                                rtol=1e-3,
+                            )
+                            for j in range(zc_future_pred.shape[0])
+                        ],
+                    )
                 )
+            print(f"Future prediction accuracies on Z alone: {acc}")
+        else:
+            zc_idx_future_pred = self.zc_idx_future_pred
+            c_labels_future_gt = self.c_labels_future_gt
+            config = self.config
+            assert zc_idx_future_pred.shape[0] == c_labels_future_gt.shape[0], (
+                "The number of future predictions and the number of ground truth labels must match."
+            )
+            confusion_mtx, perm = get_confusion_mtx(
+                n_pred=config["model_config"]["n_atoms"],
+                n_labels=len(self.C_LIST),
+                preds=zc_idx_future_pred,
+                labels=c_labels_future_gt,
             )
 
-        print(f"Future prediction accuracies on Z: {acc}")
+            a = 1
 
     def future_pred_acc_x(self, save_n_samples=10):
         """

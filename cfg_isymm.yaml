@@ -35,7 +35,7 @@ model_config:
   d_zc: 512
   d_zs: 512
   n_layers_rnn: 2
-  n_atoms: 60 # 5 * 12
+  n_atoms: 24
   vq_ema_decay: 0.98
   threshold_ema_dead_code: 2
   GRU: True
