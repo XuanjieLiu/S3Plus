@@ -1,7 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import collections as matcoll
-from VQ.VQVAE import VQVAE
+from VQVAE import VQVAE
 from shared import *
 
 
