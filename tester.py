@@ -16,6 +16,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.cuda.amp import GradScaler
 import librosa as lr
+from soundfile import write
 from matplotlib import pyplot as plt
 import seaborn as sns
 import wandb
@@ -98,7 +99,14 @@ class Tester:
 
         print("Testing checkpoint ", config["active_checkpoint"], "\n")
 
-    def test(self, future_pred_acc=False, vis_tsne=False, confusion_mtx=False):
+    def test(
+        self,
+        future_pred_acc=False,
+        recon_waveform=True,
+        future_pred_waveform=True,
+        vis_tsne=False,
+        confusion_mtx=False,
+    ):
         """
         testing loop
         """
@@ -108,6 +116,9 @@ class Tester:
         self.zc_future_pred = []
         self.c_labels_future_gt = []
         self.x_future_pred = []
+
+        self.x_prompt_gt = []
+        self.x_prompt_recon = []
 
         for i, batch in tqdm(enumerate(self.test_loader)):
             batch_data, c_labels, s_labels = batch
@@ -127,10 +138,13 @@ class Tester:
                 zc_future_pred = self.model.unroll(zc_prompt, 7)
                 zc_future_pred_vq = self.model.quantize(zc_future_pred)[0]
                 x_future_pred = self.model.decode(zc_future_pred_vq)
-                self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
-                self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
-                self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
-                self.x_future_pred.append(x_future_pred.cpu().numpy())
+                x_prompt_recon = self.model.decode(zc_prompt)
+            self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
+            self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
+            self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
+            self.x_future_pred.append(x_future_pred.cpu().numpy())
+            self.x_prompt_gt.append(batch_data[:, :7, :].cpu().numpy())
+            self.x_prompt_recon.append(x_prompt_recon.cpu().numpy())
 
         self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
         self.zc_future_gt = np.concatenate(self.zc_future_gt, axis=0)
@@ -139,34 +153,152 @@ class Tester:
             self.future_pred_acc_z()
             self.future_pred_acc_x()
 
+        if recon_waveform:
+            self.recon_waveform(n_samples=10)
+        if future_pred_waveform:
+            self.future_pred_waveform(n_samples=10)
+
     def future_pred_acc_z(self):
         """
         Compute the future prediction accuracy on the zc level (representation level).
         """
-        predictions = self.zc_future_pred
-        ground_truth_futures = self.zc_future_gt
+        zc_future_pred = self.zc_future_pred
+        zc_future_gt = self.zc_future_gt
 
         # compute the accuracies
         acc = []
-        for i in range(predictions.shape[1]):
+        for i in range(zc_future_pred.shape[1]):
             acc.append(
                 np.mean(
                     [
                         np.allclose(
-                            predictions[j, i, :],
-                            ground_truth_futures[j, i, :],
+                            zc_future_pred[j, i, :],
+                            zc_future_gt[j, i, :],
                             atol=1e-3,
                             rtol=1e-3,
                         )
-                        for j in range(predictions.shape[0])
+                        for j in range(zc_future_pred.shape[0])
                     ],
                 )
             )
 
         print(f"Future prediction accuracies on Z: {acc}")
 
-    def future_pred_acc_x(self):
+    def future_pred_acc_x(self, save_n_samples=10):
         """
         Compute the future prediction accuracy on the x level (behavioral level).
+        if save_n_samples > 0, save these audio files of the predictions.
         """
+        c_labels_future_gt = self.c_labels_future_gt
+        x_future_pred = self.x_future_pred
+
+        config = self.config
+        if config["dataloader"] == "insnotes_dataloader":
+            sr = 16000
+            hop_length = 256
+            win_length = 1024
+            n_fft = 1024
+
+        acc = []
+        n_saved_examples = 0
+        for i in range(x_future_pred.shape[1]):
+            waveforms = [
+                lr.feature.inverse.mel_to_audio(
+                    x_i,
+                    sr=sr,
+                    n_fft=n_fft,
+                    hop_length=hop_length,
+                    win_length=win_length,
+                )
+                for x_i in x_future_pred[:, i, :]
+            ]
+
         pass
+        # TODO
+
+    def recon_waveform(self, n_samples=10):
+        """
+        Save some x-level inputs and reconstructions for checking.
+        """
+        x_prompt_gt = self.x_prompt_gt
+        x_prompt_recon = self.x_prompt_recon
+
+        config = self.config
+        if config["dataloader"] == "insnotes_dataloader":
+            sr = 16000
+            hop_length = 256
+            win_length = 1024
+            n_fft = 1024
+
+        for i in range(n_samples):
+            waveform_gt = []
+            waveform_recon = []
+            for j in range(x_prompt_gt[i].shape[0]):
+                waveform_gt.append(
+                    lr.feature.inverse.mel_to_audio(
+                        x_prompt_gt[i][j, :],
+                        sr=sr,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                    )
+                )
+                waveform_recon.append(
+                    lr.feature.inverse.mel_to_audio(
+                        x_prompt_recon[i][j, :],
+                        sr=sr,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                    )
+                )
+            waveform_gt = np.concatenate(waveform_gt, axis=0)
+            waveform_recon = np.concatenate(waveform_recon, axis=0)
+            write(
+                os.path.join(self.output_dir, f"x_prompt_gt_{i}.wav"),
+                waveform_gt,
+                sr,
+            )
+            write(
+                os.path.join(self.output_dir, f"x_prompt_recon_{i}.wav"),
+                waveform_recon,
+                sr,
+            )
+
+        print(
+            f"Saved {n_samples} x-level inputs and reconstructions to {self.output_dir}"
+        )
+
+    def future_pred_waveform(self, n_samples=10):
+        """
+        Save some x-level future predictions for checking.
+        """
+        x_future_pred = self.x_future_pred
+
+        config = self.config
+        if config["dataloader"] == "insnotes_dataloader":
+            sr = 16000
+            hop_length = 256
+            win_length = 1024
+            n_fft = 1024
+
+        for i in range(n_samples):
+            waveform_pred = []
+            for j in range(x_future_pred[i].shape[0]):
+                waveform_pred.append(
+                    lr.feature.inverse.mel_to_audio(
+                        x_future_pred[i][j, :],
+                        sr=sr,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                    )
+                )
+            waveform_pred = np.concatenate(waveform_pred, axis=0)
+            write(
+                os.path.join(self.output_dir, f"x_future_pred_{i}.wav"),
+                waveform_pred,
+                sr,
+            )
+
+        print(f"Saved {n_samples} x-level future predictions to {self.output_dir}")
