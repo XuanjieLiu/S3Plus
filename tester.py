@@ -209,6 +209,26 @@ class Tester:
                 preds=zc_idx_future_pred.flatten(),
                 labels=c_labels_future_gt.flatten(),
             )
+            mapper = {v: i for i, v in enumerate(perm)}
+            zc_idx_future_pred = np.vectorize(mapper.get)(zc_idx_future_pred)
+            # for i in range(zc_idx_future_pred.shape[0]):
+            #     for j in range(zc_idx_future_pred.shape[1]):
+            #         zc_idx_future_pred[i, j] = perm.index(zc_idx_future_pred[i, j])
+
+            assignments = np.argmax(confusion_mtx, axis=1)
+
+            acc = []
+            for i in range(zc_idx_future_pred.shape[1]):
+                acc.append(
+                    np.mean(
+                        [
+                            assignments[zc_idx_future_pred[j, i]]
+                            == c_labels_future_gt[j, i]
+                            for j in range(zc_idx_future_pred.shape[0])
+                        ],
+                    )
+                )
+            print(f"Future prediction accuracies on Z assigned to C: {acc}")
 
             a = 1
 
