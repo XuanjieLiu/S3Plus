@@ -148,6 +148,10 @@ class Tester:
 
         self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
         self.zc_future_gt = np.concatenate(self.zc_future_gt, axis=0)
+        self.c_labels_future_gt = np.concatenate(self.c_labels_future_gt, axis=0)
+        self.x_future_pred = np.concatenate(self.x_future_pred, axis=0)
+        self.x_prompt_gt = np.concatenate(self.x_prompt_gt, axis=0)
+        self.x_prompt_recon = np.concatenate(self.x_prompt_recon, axis=0)
 
         if future_pred_acc:
             self.future_pred_acc_z()
