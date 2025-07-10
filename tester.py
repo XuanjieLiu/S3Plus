@@ -170,7 +170,7 @@ class Tester:
         if future_pred_waveform:
             self.future_pred_waveform(n_samples=10)
 
-    def future_pred_acc_z(self, assign_z_to_c=True):
+    def future_pred_acc_z(self, assign_z_to_c=False):
         """
         Compute the future prediction accuracy on the zc level (representation level).
         assign_z_to_c: whether to assign the zc to the c labels and compute the accuracy based on their c labels
