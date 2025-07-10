@@ -206,8 +206,8 @@ class Tester:
             confusion_mtx, perm = get_confusion_mtx(
                 n_pred=config["model_config"]["n_atoms"],
                 n_labels=len(self.C_LIST),
-                preds=zc_idx_future_pred,
-                labels=c_labels_future_gt,
+                preds=zc_idx_future_pred.flatten(),
+                labels=c_labels_future_gt.flatten(),
             )
 
             a = 1
