@@ -3,7 +3,7 @@ import os
 import numpy as np
 import json
 
-from VQ.plot_multistyle_zc import MultiStyleZcEvaler
+from plot_multistyle_zc import MultiStyleZcEvaler
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from interpolate_plus_accu_eval import InterpolatePlusAccuEval
