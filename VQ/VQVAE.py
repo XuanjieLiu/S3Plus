@@ -2,7 +2,7 @@ import sys
 from os import path
 from typing import List
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), '../../'))
-
+sys.path.append(path.join(path.dirname(path.abspath(__file__)), '../'))
 import numpy as np
 import torch
 import torch.nn as nn
