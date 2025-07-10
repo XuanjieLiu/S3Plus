@@ -138,7 +138,7 @@ class Tester:
                     :, :7, :
                 ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
                 zc_future_pred = self.model.unroll(zc_prompt, 7)
-                zc_future_pred_vq, zc_idx_future_pred = self.model.quantize(
+                zc_future_pred_vq, zc_idx_future_pred, _ = self.model.quantize(
                     zc_future_pred
                 )
                 x_future_pred = self.model.decode(zc_future_pred_vq, zs)
