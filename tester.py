@@ -155,7 +155,7 @@ class Tester:
 
         if future_pred_acc:
             self.future_pred_acc_z()
-            self.future_pred_acc_x()
+            # self.future_pred_acc_x()
 
         if recon_waveform:
             self.recon_waveform(n_samples=10)
