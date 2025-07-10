@@ -248,6 +248,7 @@ class Tester:
                         n_fft=n_fft,
                         hop_length=hop_length,
                         win_length=win_length,
+                        n_iter=128,
                     )
                 )
                 waveform_recon.append(
@@ -257,6 +258,7 @@ class Tester:
                         n_fft=n_fft,
                         hop_length=hop_length,
                         win_length=win_length,
+                        n_iter=128,
                     )
                 )
             waveform_gt = np.concatenate(waveform_gt, axis=0)
@@ -301,6 +303,7 @@ class Tester:
                         n_fft=n_fft,
                         hop_length=hop_length,
                         win_length=win_length,
+                        n_iter=128,
                     )
                 )
             waveform_pred = np.concatenate(waveform_pred, axis=0)
