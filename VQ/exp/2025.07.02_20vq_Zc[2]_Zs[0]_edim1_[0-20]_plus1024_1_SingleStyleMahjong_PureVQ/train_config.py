@@ -90,6 +90,12 @@ CONFIG = {
                     f"{data_root}/multi_style_pairs(0,20)_mahjong/test",
                 ],
             },
+            {
+                'name': 'train_set',
+                'eval_set_path_list': [
+                    f"{data_root}/multi_style_pairs(0,20)_mahjong/train",
+                ],
+            },
         ],
         'emb_matching_rate_configs': [
             {
