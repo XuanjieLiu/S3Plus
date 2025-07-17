@@ -1,6 +1,7 @@
 import os
 import random
-from typing import List
+from collections import defaultdict
+from typing import List, Tuple, Dict
 
 import torch.nn as nn
 import torch
@@ -32,11 +33,17 @@ class EncZ:
 
 
 class PlusZ:
-    def __init__(self, label_a, label_b, plus_c_z):
+    def __init__(self, label_a, label_b, plus_c_z, plus_c_z_cycle=None):
+        """
+        Represents the result of a plus operation on two embeddings.
+        :param label_a: the label of a.
+        :param label_b: the label of b.
+        :param plus_c_z: the emb of plus operation of a and b.
+        :param plus_c_z_cycle: the encoded emb of the reconstruction of plus_c_z.
+        """
         self.plus_c_z = plus_c_z
         self.label_c = label_a + label_b
-
-
+        self.plus_c_z_cycle = plus_c_z_cycle
 
 
 # def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
@@ -158,56 +165,191 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
     return round(ks_mean, 4), round(accu_mean, 4)
 
 
-def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
-    """
-    Calculate the accuracy of plus operation based. A label can be represented by multiple embeddings.
-    An embedding can only represent one label, determined by the mode of the label it represents.
-    :param enc_z:
-    :param plus_z:
-    :return: accu: float, the accuracy of plus operation.
-    """
-    # 先确认每个 emb 对应的 labels
-    emb_dict = {}
-    for item in enc_z:
-        if int(item.z.item()) not in emb_dict:
-            emb_dict[int(item.z.item())] = []
-        emb_dict[int(item.z.item())].append(item.label)
-    # 根据每个 emb 表示的 label 的众数确定其唯一对应的 label
-    emb_label_dict = {}
-    for emb, labels in emb_dict.items():
-        mode_label = stats.mode(labels, keepdims=False)[0]
-        emb_label_dict[emb] = mode_label
-    # 根据 emb_label_dict 计算 plus_z 的准确率
-    n_correct = 0
-    n_total = len(plus_z)
-    assert n_total != 0, "plus_z is empty."
-    for item in plus_z:
-        label_z = emb_label_dict.get(int(item.plus_c_z.item()))
-        if label_z is not None and int(label_z) == int(item.label_c):
-            n_correct += 1
-    return n_correct / n_total
+# def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
+#     """
+#     Calculate the accuracy of plus operation based. A label can be represented by multiple embeddings.
+#     An embedding can only represent one label, determined by the mode of the label it represents.
+#     :param enc_z:
+#     :param plus_z:
+#     :return: accu: float, the accuracy of plus operation.
+#     :return: accu_cycle: float, the accuracy of plus operation with cycle sum_z.
+#     """
+#     # 先确认每个 emb 对应的 labels
+#     emb_dict = {}
+#     for item in enc_z:
+#         if int(item.z.item()) not in emb_dict:
+#             emb_dict[int(item.z.item())] = []
+#         emb_dict[int(item.z.item())].append(item.label)
+#     # 根据每个 emb 表示的 label 的众数确定其唯一对应的 label
+#     emb_label_dict = {}
+#     for emb, labels in emb_dict.items():
+#         mode_label = stats.mode(labels, keepdims=False)[0]
+#         emb_label_dict[emb] = mode_label
+#     # 根据 emb_label_dict 计算 plus_z 的准确率
+#     n_correct = 0
+#     n_correct_cycle = 0
+#     n_total = len(plus_z)
+#     assert n_total != 0, "plus_z is empty."
+#     for item in plus_z:
+#         sum_c_z = item.plus_c_z
+#         label_z = emb_label_dict.get(int(sum_c_z.item()))
+#         sum_c_z_cycle = item.plus_c_z_cycle
+#         label_z_cycle = emb_label_dict.get(int(sum_c_z_cycle.item()))
+#         if label_z is not None and int(label_z) == int(item.label_c):
+#             n_correct += 1
+#         if label_z_cycle is not None and int(label_z_cycle) == int(item.label_c):
+#             n_correct_cycle += 1
+#     accu = n_correct / n_total
+#     accu_cycle = n_correct_cycle / n_total
+#     return accu, accu_cycle
+#
+#
+# def calc_one2one_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
+#     """
+#     Calculate the accuracy of plus operation based on one-to-one matching.
+#     Each embedding corresponds to a unique label, and each label can only be represented by one embedding.
+#     This function uses the Hungarian algorithm to solve the one-to-one matching problem.
+#     :param enc_z: List of EncZ objects, each containing a label and an embedding index.
+#     :param plus_z: List of PlusZ objects, each containing a label and an embedding index for the plus operation.
+#     :return: accu: float, the accuracy of plus operation based on one-to-one matching.
+#     :return: accu_cycle: float, the accuracy of plus operation based on one-to-one matching with cycle sum_z.
+#     """
+#     emb_idx_list = [int(item.z.item()) for item in enc_z]
+#     label_list = [item.label for item in enc_z]
+#     emb_label_pairs, _ = solve_label_emb_one2one_matching(emb_idx_list, label_list)
+#     emb_label_dict = {emb: label for label, emb in emb_label_pairs}
+#     n_correct = 0
+#     n_correct_cycle = 0
+#     n_total = len(plus_z)
+#     assert n_total != 0, "plus_z is empty."
+#     for item in plus_z:
+#         sum_c_z = item.plus_c_z
+#         sum_c_z_cycle = item.plus_c_z_cycle
+#         label_z = emb_label_dict.get(int(sum_c_z.item()))
+#         label_z_cycle = emb_label_dict.get(int(sum_c_z_cycle.item()))
+#         if label_z is not None and int(label_z) == int(item.label_c):
+#             n_correct += 1
+#         if label_z_cycle is not None and int(label_z_cycle) == int(item.label_c):
+#             n_correct_cycle += 1
+#     accu = n_correct / n_total
+#     accu_cycle = n_correct_cycle / n_total
+#     return accu, accu_cycle
 
-def calc_one2one_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
+def _mode_emb_label_dict(enc_z: List[EncZ]) -> Dict[int, int]:
     """
-    Calculate the accuracy of plus operation based on one-to-one matching.
-    Each embedding corresponds to a unique label, and each label can only be represented by one embedding.
-    This function uses the Hungarian algorithm to solve the one-to-one matching problem.
-    :param enc_z: List of EncZ objects, each containing a label and an embedding index.
-    :param plus_z: List of PlusZ objects, each containing a label and an embedding index for the plus operation.
-    :return: accu: float, the accuracy of plus operation based on one-to-one matching.
+    根据 enc_z 中每个 embedding 的 label 众数，返回 emb → label 的映射。
+    """
+    emb_to_labels = defaultdict(list)
+    for item in enc_z:
+        emb_to_labels[int(item.z.item())].append(item.label)
+    # 取众数
+    return {
+        emb: int(stats.mode(labels, keepdims=False)[0])
+        for emb, labels in emb_to_labels.items()
+    }
+
+
+def _one2one_emb_label_dict(enc_z: List[EncZ]) -> Dict[int, int]:
+    """
+    调用 Hungarian 算法，返回一对一匹配的 emb → label 映射。
     """
     emb_idx_list = [int(item.z.item()) for item in enc_z]
     label_list = [item.label for item in enc_z]
     emb_label_pairs, _ = solve_label_emb_one2one_matching(emb_idx_list, label_list)
-    emb_label_dict = {emb: label for label, emb in emb_label_pairs}
-    n_correct = 0
+    # emb_label_pairs 是 (label, emb) 对
+    return {emb: int(label) for label, emb in emb_label_pairs}
+
+
+def _plus_accuracy(
+        emb_label_dict: Dict[int, int],
+        plus_z: List[PlusZ]
+) -> Tuple[float, float]:
+    """
+    统一的准确率计算逻辑：对 plus_c_z 与 plus_c_z_cycle 两种情况分别计数。
+    """
     n_total = len(plus_z)
-    assert n_total != 0, "plus_z is empty."
+    if n_total == 0:
+        raise ValueError("plus_z is empty.")
+    n_correct = 0
+    n_correct_cycle = 0
+
     for item in plus_z:
-        label_z = emb_label_dict.get(int(item.plus_c_z.item()))
-        if label_z is not None and int(label_z) == int(item.label_c):
+        true_label = int(item.label_c)
+        z1 = int(item.plus_c_z.item())
+        z2 = int(item.plus_c_z_cycle.item())
+        if emb_label_dict.get(z1) == true_label:
             n_correct += 1
-    return n_correct / n_total
+        if emb_label_dict.get(z2) == true_label:
+            n_correct_cycle += 1
+
+    return n_correct / n_total, n_correct_cycle / n_total
+
+
+def calc_multi_emb_plus_accu(
+        enc_z: List[EncZ],
+        plus_z: List[PlusZ]
+) -> Tuple[float, float]:
+    """
+    多 Embedding → 多 Label 情形：embedding 通过众数关联 label。
+    """
+    emb_label_dict = _mode_emb_label_dict(enc_z)
+    return _plus_accuracy(emb_label_dict, plus_z)
+
+
+def calc_one2one_plus_accu(
+        enc_z: List[EncZ],
+        plus_z: List[PlusZ]
+) -> Tuple[float, float]:
+    """
+    一对一情形：使用 Hungarian 算法匹配 embedding 与 label。
+    """
+    emb_label_dict = _one2one_emb_label_dict(enc_z)
+    return _plus_accuracy(emb_label_dict, plus_z)
+
+
+def calc_plus_z_self_cycle_consistency(plus_z: List[PlusZ]):
+    assert len(plus_z) != 0, "plus_z is empty."
+    n_total = len(plus_z)
+    n_consistent = 0
+    for item in plus_z:
+        if int(item.plus_c_z.item()) == int(item.plus_c_z_cycle.item()):
+            n_consistent += 1
+    return n_consistent / n_total
+
+
+def calc_plus_z_mode_emb_label_cycle_consistency(enc_z: List[EncZ], plus_z: List[PlusZ]):
+    """
+    计算 plus_z 中的 plus_c_z 与 plus_c_z_cycle 的一致性。
+    通过 enc_z 中的 embedding 众数来确定每个 embedding 对应的 label。
+    根据判断 plus_c_z 和 plus_c_z_cycle 是否对应同一个 label 计算 consistency。
+    :param enc_z: List of EncZ objects, each containing a label and an embedding index.
+    :param plus_z: List of PlusZ objects, each containing a label and embedding indices for the plus operation.
+    :return: Tuple of three floats:
+        - consistency: float, the proportion of plus_c_z and plus_c_z_cycle that match the same label.
+        - recognized_c_z: float, the proportion of plus_c_z that are recognized by enc_z.
+        - recognized_c_z_cycle: float, the proportion of plus_c_z_cycle that are recognized by enc_z.
+    """
+    assert len(plus_z) != 0, "plus_z is empty."
+    assert len(enc_z) != 0, "enc_z is empty."
+
+    emb_label_dict = _mode_emb_label_dict(enc_z)
+    n_total = len(plus_z)
+    n_consistent = 0
+    n_recognized_c_z = 0
+    n_recognized_c_z_cycle = 0
+    for item in plus_z:
+        z1 = int(item.plus_c_z.item())
+        z2 = int(item.plus_c_z_cycle.item())
+        label1 = emb_label_dict.get(z1)
+        label2 = emb_label_dict.get(z2)
+        if label1 is not None:
+            n_recognized_c_z += 1
+        if label2 is not None:
+            n_recognized_c_z_cycle += 1
+        if label1 is not None and label2 is not None and label1 == label2:
+            n_consistent += 1
+    return n_consistent / n_total, n_recognized_c_z / n_total, n_recognized_c_z_cycle / n_total
+
 
 
 class VQvaePlusEval:
@@ -224,6 +366,7 @@ class VQvaePlusEval:
             self.model = VQVAE(config).to(DEVICE)
             print("No model is loaded")
         self.model.eval()
+        self.isVQStyle = config['isVQStyle']
 
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
@@ -238,6 +381,9 @@ class VQvaePlusEval:
             za = self.model.batch_encode_to_z(data[0])[0]
             zb = self.model.batch_encode_to_z(data[1])[0]
             zc = self.model.batch_encode_to_z(data[2])[0]
+            z_s = zc[..., self.zc_dim:]
+            if self.isVQStyle:
+                z_s = self.model.vq_layer(z_s)[0]
             za = za[..., 0:self.zc_dim]
             zb = zb[..., 0:self.zc_dim]
             zc = zc[..., 0:self.zc_dim]
@@ -245,21 +391,27 @@ class VQvaePlusEval:
             label_b = [parse_label(x) for x in labels[1]]
             label_c = [parse_label(x) for x in labels[2]]
             plus_c = self.model.plus(za, zb)[0]
+            plus_c_cycle = self.model.batch_encode_to_z(
+                self.model.batch_decode_from_z(torch.cat((plus_c, z_s), -1))
+            )[0]
+            plus_c_cycle = plus_c_cycle[..., 0:self.zc_dim]
             if is_find_index:
                 idx_z_a = self.model.find_indices(za, False)
                 idx_z_b = self.model.find_indices(zb, False)
                 idx_z_c = self.model.find_indices(zc, False)
                 idx_plus_c = self.model.find_indices(plus_c, False)
+                idx_plus_c_cycle = self.model.find_indices(plus_c_cycle, False)
             else:
                 idx_z_a = za
                 idx_z_b = zb
                 idx_z_c = zc
                 idx_plus_c = plus_c
+                idx_plus_c_cycle = plus_c_cycle
             for i in range(0, za.size(0)):
                 enc_z_list.append(EncZ(label_a[i], idx_z_a[i]))
                 enc_z_list.append(EncZ(label_b[i], idx_z_b[i]))
                 enc_z_list.append(EncZ(label_c[i], idx_z_c[i]))
-                plus_z_list.append(PlusZ(label_a[i], label_b[i], idx_plus_c[i]))
+                plus_z_list.append(PlusZ(label_a[i], label_b[i], idx_plus_c[i], idx_plus_c_cycle[i]))
             all_enc_z.extend(enc_z_list)
             all_plus_z.extend(plus_z_list)
         return all_enc_z, all_plus_z
