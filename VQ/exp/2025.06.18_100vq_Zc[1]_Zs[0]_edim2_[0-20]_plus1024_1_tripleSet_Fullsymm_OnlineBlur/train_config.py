@@ -82,7 +82,7 @@ CONFIG = {
             'optimal_checkpoint_num': 'find_by_keys',
             'record_name': 'Train_record.txt',
             'keys': ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED'],
-            'iter_after': 0.3,
+            'iter_after': 0.5,
         },
         'plus_eval_configs': [
             {

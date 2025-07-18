@@ -46,35 +46,6 @@ class PlusZ:
         self.plus_c_z_cycle = plus_c_z_cycle
 
 
-# def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
-#     ks_mean, _ = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
-#     dim_z = all_enc_z[0].z.size(0)
-#     fig, axs = plt.subplots(1, dim_z, sharey='none', figsize=(dim_z * 5, 5))
-#     if dim_z == 1:
-#         axs = [axs]
-#     enc_x = [ob.label for ob in all_enc_z]
-#     plus_x = [ob.label_c for ob in all_plus_z]
-#     for i in range(0, dim_z):
-#         enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
-#         plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
-#         axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='Encoder output', facecolors='none', s=60)
-#         axs[i].scatter(plus_x, plus_y, edgecolors='red', label='Plus output', facecolors='none', s=20)
-#         axs[i].set(xlabel='Num of Points on the card', xticks=range(0, max(enc_x) + 1))
-#         if eval_helper is not None:
-#             eval_helper.draw_scatter_point_line(axs[i], i, [*enc_x, *plus_x], [*enc_y, *plus_y])
-#             eval_helper.set_axis(axs[i], i)
-#         else:
-#             axs[i].grid(True)
-#             axs[i].set_title(f"z_c ({i + 1})")
-#     # for ax in axs.flat:
-#     #     ax.label_outer()
-#     plt.legend()
-#     plt.savefig(f'{eval_path}_ks_{ks_mean}.png')
-#     plt.cla()
-#     plt.clf()
-#     plt.close()
-
-
 def plot_plusZ_against_label(
         all_enc_z,
         all_plus_z,
@@ -165,75 +136,6 @@ def calc_ks_enc_plus_z(enc_z: List[EncZ], plus_z: List[PlusZ]):
     return round(ks_mean, 4), round(accu_mean, 4)
 
 
-# def calc_multi_emb_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
-#     """
-#     Calculate the accuracy of plus operation based. A label can be represented by multiple embeddings.
-#     An embedding can only represent one label, determined by the mode of the label it represents.
-#     :param enc_z:
-#     :param plus_z:
-#     :return: accu: float, the accuracy of plus operation.
-#     :return: accu_cycle: float, the accuracy of plus operation with cycle sum_z.
-#     """
-#     # 先确认每个 emb 对应的 labels
-#     emb_dict = {}
-#     for item in enc_z:
-#         if int(item.z.item()) not in emb_dict:
-#             emb_dict[int(item.z.item())] = []
-#         emb_dict[int(item.z.item())].append(item.label)
-#     # 根据每个 emb 表示的 label 的众数确定其唯一对应的 label
-#     emb_label_dict = {}
-#     for emb, labels in emb_dict.items():
-#         mode_label = stats.mode(labels, keepdims=False)[0]
-#         emb_label_dict[emb] = mode_label
-#     # 根据 emb_label_dict 计算 plus_z 的准确率
-#     n_correct = 0
-#     n_correct_cycle = 0
-#     n_total = len(plus_z)
-#     assert n_total != 0, "plus_z is empty."
-#     for item in plus_z:
-#         sum_c_z = item.plus_c_z
-#         label_z = emb_label_dict.get(int(sum_c_z.item()))
-#         sum_c_z_cycle = item.plus_c_z_cycle
-#         label_z_cycle = emb_label_dict.get(int(sum_c_z_cycle.item()))
-#         if label_z is not None and int(label_z) == int(item.label_c):
-#             n_correct += 1
-#         if label_z_cycle is not None and int(label_z_cycle) == int(item.label_c):
-#             n_correct_cycle += 1
-#     accu = n_correct / n_total
-#     accu_cycle = n_correct_cycle / n_total
-#     return accu, accu_cycle
-#
-#
-# def calc_one2one_plus_accu(enc_z: List[EncZ], plus_z: List[PlusZ]):
-#     """
-#     Calculate the accuracy of plus operation based on one-to-one matching.
-#     Each embedding corresponds to a unique label, and each label can only be represented by one embedding.
-#     This function uses the Hungarian algorithm to solve the one-to-one matching problem.
-#     :param enc_z: List of EncZ objects, each containing a label and an embedding index.
-#     :param plus_z: List of PlusZ objects, each containing a label and an embedding index for the plus operation.
-#     :return: accu: float, the accuracy of plus operation based on one-to-one matching.
-#     :return: accu_cycle: float, the accuracy of plus operation based on one-to-one matching with cycle sum_z.
-#     """
-#     emb_idx_list = [int(item.z.item()) for item in enc_z]
-#     label_list = [item.label for item in enc_z]
-#     emb_label_pairs, _ = solve_label_emb_one2one_matching(emb_idx_list, label_list)
-#     emb_label_dict = {emb: label for label, emb in emb_label_pairs}
-#     n_correct = 0
-#     n_correct_cycle = 0
-#     n_total = len(plus_z)
-#     assert n_total != 0, "plus_z is empty."
-#     for item in plus_z:
-#         sum_c_z = item.plus_c_z
-#         sum_c_z_cycle = item.plus_c_z_cycle
-#         label_z = emb_label_dict.get(int(sum_c_z.item()))
-#         label_z_cycle = emb_label_dict.get(int(sum_c_z_cycle.item()))
-#         if label_z is not None and int(label_z) == int(item.label_c):
-#             n_correct += 1
-#         if label_z_cycle is not None and int(label_z_cycle) == int(item.label_c):
-#             n_correct_cycle += 1
-#     accu = n_correct / n_total
-#     accu_cycle = n_correct_cycle / n_total
-#     return accu, accu_cycle
 
 def _mode_emb_label_dict(enc_z: List[EncZ]) -> Dict[int, int]:
     """
@@ -331,10 +233,10 @@ def calc_plus_z_mode_emb_label_cycle_consistency(enc_z: List[EncZ], plus_z: List
     """
     assert len(plus_z) != 0, "plus_z is empty."
     assert len(enc_z) != 0, "enc_z is empty."
-
     emb_label_dict = _mode_emb_label_dict(enc_z)
-    n_total = len(plus_z)
     n_consistent = 0
+    n_consistent_total = 0
+    n_total = len(plus_z)
     n_recognized_c_z = 0
     n_recognized_c_z_cycle = 0
     for item in plus_z:
@@ -346,10 +248,12 @@ def calc_plus_z_mode_emb_label_cycle_consistency(enc_z: List[EncZ], plus_z: List
             n_recognized_c_z += 1
         if label2 is not None:
             n_recognized_c_z_cycle += 1
-        if label1 is not None and label2 is not None and label1 == label2:
-            n_consistent += 1
-    return n_consistent / n_total, n_recognized_c_z / n_total, n_recognized_c_z_cycle / n_total
-
+        if label1 is not None and label2 is not None:
+            n_consistent_total += 1
+            if label1 == label2:
+                n_consistent += 1
+    consistent_rate = n_consistent / n_consistent_total if n_consistent_total > 0 else 0
+    return consistent_rate, n_recognized_c_z / n_total, n_recognized_c_z_cycle / n_total
 
 
 class VQvaePlusEval:
@@ -381,7 +285,7 @@ class VQvaePlusEval:
             za = self.model.batch_encode_to_z(data[0])[0]
             zb = self.model.batch_encode_to_z(data[1])[0]
             zc = self.model.batch_encode_to_z(data[2])[0]
-            z_s = zc[..., self.zc_dim:]
+            z_s = za[..., self.zc_dim:]
             if self.isVQStyle:
                 z_s = self.model.vq_layer(z_s)[0]
             za = za[..., 0:self.zc_dim]

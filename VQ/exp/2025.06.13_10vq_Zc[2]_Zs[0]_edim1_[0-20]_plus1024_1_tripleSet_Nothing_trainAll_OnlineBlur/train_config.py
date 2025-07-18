@@ -77,20 +77,39 @@ CONFIG = {
         }
     },
     'eval_config': {
-        'pipline_result_path': 'PIPLINE_EVAL',
+        'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',
             'record_name': 'Train_record.txt',
             'keys': ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED'],
-            'iter_after': 0.3,
+            'iter_after': 0.5,
         },
-        'plus_eval_config': {
-            'eval_set_path_list': [
-                f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
-                f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2"
-            ],
-            'one2n_accu_result_name': 'one2n_accu',
-            'one2one_accu_result_name': 'one2one_accu',
-        }
+        'plus_eval_configs': [
+            {
+                'name': 'eval_set',
+                'eval_set_path_list': [
+                    f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
+                    f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2",
+                ],
+            },
+        ],
+        'emb_matching_rate_configs': [
+            {
+                'name': 'emb_matching_rate',
+                'eval_set_path_list': [
+                    f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
+                ],
+            },
+        ],
+        'orderliness_configs': [
+            {
+                'name': 'orderliness',
+                'img_dir_name': 'orderliness',
+                'eval_set_path_list': [
+                    f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
+                ],
+                'is_add_noise': False,
+            },
+        ],
     },
 }
