@@ -4,7 +4,7 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 from importlib import reload
 from common_func import load_config_from_exp_name, EXP_ROOT, record_num_list, find_optimal_checkpoint_num_by_train_config
 from loss_counter import read_record
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
@@ -40,8 +40,8 @@ def batch_statistic():
                     value = eval_record[key].filter_Y_by_X_nums([optimal_checkpoint_num])[1][0]
                     record_lists[i].append(value)
         if is_summary_two_eval:
-            eval_size_1 = len(Dataset(config['plus_eval_set_path']))
-            eval_size_2 = len(Dataset(config['plus_eval_set_path_2']))
+            eval_size_1 = len(MultiImgDataset(config['plus_eval_set_path']))
+            eval_size_2 = len(MultiImgDataset(config['plus_eval_set_path_2']))
             idx_1 = EVAL_KEYS.index('eval_accu')
             idx_2 = EVAL_KEYS.index('eval_accu_2')
             idx_accu_all = EVAL_KEYS.index('eval_accu_all')

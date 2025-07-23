@@ -1,36 +1,51 @@
 import sys
 import os
+from typing import Dict, Callable, Any
+
 import numpy as np
 import json
-
+from torchvision import transforms
 from plot_multistyle_zc import MultiStyleZcEvaler
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from interpolate_plus_accu_eval import InterpolatePlusAccuEval
-from common_func import (load_config_from_exp_name, record_num_list, EXP_ROOT,
+from common_func import (load_config_from_exp_name, record_num_list, EXP_ROOT, RandomGaussianBlur, make_dataset_trans,
                          find_optimal_checkpoint_num_by_train_config, solve_label_emb_one2one_matching)
 from eval_plus_nd import VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, \
     calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset, load_enc_eval_data_with_style
 from torch.utils.data import ConcatDataset
 from torch.utils.data import DataLoader
 from two_dim_num_vis import MumEval
 
 
-EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-# EXP_NUM_LIST = ['1']
+# EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
-    # "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
-    "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
-    "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
-    "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
-    "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
 ]
+
+def make_data_loader(sub_cfg: Dict[str, Any],
+                dataset_cls: Callable[..., Any]) -> DataLoader:
+    aug_t = sub_cfg.get('augment_times', 1)
+    path_list = sub_cfg['eval_set_path_list']
+    is_blur = sub_cfg.get('is_blur', False)
+    blur_cfg = sub_cfg.get('blur_config', {})
+    trans = make_dataset_trans(is_blur, blur_cfg)
+    # 如果有多个 set_path, 创建多个 dataset 并合并
+    datasets = ConcatDataset([dataset_cls(path, augment_times=aug_t, transform=trans)
+                              for path in path_list])
+    data_loader = DataLoader(datasets, batch_size=128, shuffle=False)
+    return data_loader
 
 
 def find_ckpt(config, exp_path, sub_exp):
@@ -89,17 +104,13 @@ if __name__ == "__main__":
         os.makedirs(pipeline_dir, exist_ok=True)
         all_results = {}
         all_ckpts = find_all_ckpts(config, exp_path)
-
         # eval plus accu
         if eval_config.get('plus_eval_configs') is not None:
             plus_evaler = VQvaePlusEval(config)
             plus_eval_configs = eval_config['plus_eval_configs']
             for sub_config in plus_eval_configs:
                 name = sub_config['name']
-                plus_eval_set_path_list = sub_config['eval_set_path_list']
-                # 如果有多个 set_path, 创建多个 dataset 并合并
-                datasets = ConcatDataset([Dataset(path) for path in plus_eval_set_path_list])
-                data_loader = DataLoader(datasets, batch_size=config['batch_size'], shuffle=False)
+                data_loader = make_data_loader(sub_config, MultiImgDataset)
                 one2n_accu_result_name = f"{name}_one2n_accu"
                 one2one_accu_result_name = f"{name}_one2one_accu"
                 one2n_accu_result_name_cycle = f"{name}_one2n_accu_cycle"
@@ -150,10 +161,7 @@ if __name__ == "__main__":
             emb_matching_rate_configs = eval_config['emb_matching_rate_configs']
             for sub_config in emb_matching_rate_configs:
                 name = sub_config['name']
-                eval_set_path_list = sub_config['eval_set_path_list']
-                # 如果有多个 set_path, 创建多个 dataset 并合并
-                datasets = ConcatDataset([SingleImgDataset(path) for path in eval_set_path_list])
-                data_loader = DataLoader(datasets, batch_size=config['batch_size'], shuffle=False)
+                data_loader = make_data_loader(sub_config, SingleImgDataset)
                 one2n_matching_rate_list = []
                 one2one_matching_rate_list = []
                 for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
@@ -181,21 +189,12 @@ if __name__ == "__main__":
                 name = sub_config['name']
                 img_dir_path = os.path.join(pipeline_dir, sub_config['img_dir_name'])
                 os.makedirs(img_dir_path, exist_ok=True)
-                eval_set_path_list = sub_config['eval_set_path_list']
-                is_add_noise = sub_config.get('is_add_noise', False)
-                # 如果有多个 set_path, 创建多个 dataset 并合并
-                datasets = ConcatDataset([SingleImgDataset(path) for path in eval_set_path_list])
-                data_loader = DataLoader(datasets, batch_size=config['batch_size'], shuffle=False)
+                data_loader = make_data_loader(sub_config, SingleImgDataset)
                 orderliness_list = []
                 for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
                     img_path = os.path.join(img_dir_path, f'{sub_exp}.png')
                     orderliness_evaler.reload_model(ckpt_path)
-                    if is_add_noise:
-                        nna_score = orderliness_evaler.num_eval_two_dim_with_gaussian_noise(
-                            data_loader, img_path, noise_batch=1
-                        )
-                    else:
-                        nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
+                    nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
                     orderliness_list.append(nna_score)
                 all_results[f'{name}'] = orderliness_list
 

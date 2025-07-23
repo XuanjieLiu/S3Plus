@@ -1,6 +1,10 @@
 import sys
 import os
-from typing import List
+import random
+from typing import List, Dict, Callable, Any
+
+from torch.utils.data import DataLoader, ConcatDataset
+from torchvision import transforms
 import torch
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -66,6 +70,52 @@ def random_gaussian_blur_batch(img_batch, blur_kernel_sizes=(5, 7, 9), blur_sigm
         blurred_tensor = torch.from_numpy(blurred.astype(np.float32) / 255.0).permute(2, 0, 1)  # (3, 64, 64)
         blurred_list.append(blurred_tensor)
     return torch.stack(blurred_list).to(DEVICE)  # (batch_size, 3, 64, 64)
+
+
+class RandomGaussianBlur:
+    """
+    Apply random Gaussian blur to a given image with a certain probability.
+
+    Args:
+        kernel_size_choices (tuple or list of int, optional):
+            A list of possible odd kernel sizes to choose from. Larger values lead to stronger spatial blur.
+            Default is (5, 7, 9).
+        sigma_range (tuple of float, optional):
+            A tuple (min_sigma, max_sigma) defining the range from which to sample the standard deviation (sigma)
+            of the Gaussian kernel. Default is (0.5, 3.0).
+        p_no_blur (float, optional):
+            Probability of skipping the blur and returning the original image. Should be between 0.0 and 1.0.
+            Default is 0.0 (always apply blur).
+    """
+
+    def __init__(
+        self,
+        kernel_size_choices=(5, 7, 9),
+        sigma_range=(0.5, 3.0),
+        p_no_blur=0.0
+    ):
+        self.kernel_size_choices = kernel_size_choices
+        self.sigma_range = sigma_range
+        self.p_no_blur = p_no_blur
+
+    def __call__(self, img):
+        """
+        Apply random Gaussian blur to the given image.
+
+        Args:
+            img (PIL.Image): Input image.
+
+        Returns:
+            PIL.Image: Blurred image or the original image, depending on sampling.
+        """
+        if random.random() < self.p_no_blur:
+            return img  # return original image without blur
+
+        kernel_size = random.choice(self.kernel_size_choices)
+        sigma = random.uniform(*self.sigma_range)
+
+        blur = transforms.GaussianBlur(kernel_size=kernel_size, sigma=sigma)
+        return blur(img)
 
 
 def read_specific_checkpoint(sub_exp_path):
@@ -172,6 +222,19 @@ def calc_tensor_seq_limits(tensor_seq, margin=0.1):
 
 def dict_switch_key_value(d):
     return {v: k for k, v in d.items()}
+
+
+def make_dataset_trans(
+        is_blur: bool = False,
+        blur_cfg: Dict[str, Any] = None,
+    ) -> transforms.Compose:
+    # augmentation
+    transform_steps = []
+    if is_blur:
+        transform_steps.append(RandomGaussianBlur(**blur_cfg))
+    transform_steps.append(transforms.ToTensor())
+    transform = transforms.Compose(transform_steps)
+    return transform
 
 
 '''

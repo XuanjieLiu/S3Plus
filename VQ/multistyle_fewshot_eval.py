@@ -1,7 +1,7 @@
 from train import PlusTrainer
 from common_func import DATASET_ROOT, EXP_ROOT, load_config_from_exp_name
 from dataMaker_newStyle_from_knownPairs import load_data_pairs_from_dataset
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset, load_enc_eval_data, load_enc_eval_data_with_style
 from VQVAE import VQVAE
 import torch
@@ -32,7 +32,7 @@ class FewShotEvaler(PlusTrainer):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
         original_train_set_path = config['train_data_path']
-        original_train_set = Dataset(original_train_set_path)
+        original_train_set = MultiImgDataset(original_train_set_path)
         self.original_train_loader = DataLoader(original_train_set, batch_size=self.batch_size)
 
         comb_old_set, _ = split_train_eval(original_train_set_path, 0.1, random_seed=41)
@@ -135,7 +135,7 @@ FEW_SHOT_EXP = [
 RESULT_ROOT = f'few_shot_eval_result_lr-{EVAL_CONFIG["learning_rate"]}_fixVQ-{EVAL_CONFIG["is_fix_vq"]}_normalTrain-{EVAL_CONFIG["is_normal_train"]}_trainRatio-{EVAL_CONFIG["train_ratio"]}'
 
 def split_train_eval(data_path, train_ratio, random_seed=42):
-    dataset = Dataset(data_path)
+    dataset = MultiImgDataset(data_path)
     n_train = int(len(dataset) * train_ratio)
     n_eval = len(dataset) - n_train
     # 创建一个生成器并设置种子

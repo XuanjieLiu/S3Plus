@@ -1,7 +1,11 @@
 import os
 import random
 import sys
-from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z
+
+from VQ.plot_multistyle_zc import MultiStyleZcEvaler
+from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z, calc_multi_emb_plus_accu, \
+    calc_one2one_plus_accu, calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency
+
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.nn as nn
 import numpy as np
@@ -9,15 +13,15 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
-from dataloader_plus import Dataset
-from dataloader import SingleImgDataset, load_enc_eval_data
+from dataloader_plus import MultiImgDataset
+from dataloader import SingleImgDataset, load_enc_eval_data, load_enc_eval_data_with_style
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from VQVAE import VQVAE
 from shared import *
-from two_dim_num_vis import plot_z_against_label
+from two_dim_num_vis import plot_z_against_label, MumEval
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
-from common_func import add_gaussian_noise, random_gaussian_blur_batch
+from common_func import make_dataset_trans, random_gaussian_blur_batch, solve_label_emb_one2one_matching
 from eval.dec_vis_eval_2digit import plot_dec_img
 
 
@@ -83,43 +87,37 @@ def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
     return a_switch, b_switch
 
 
-def init_plus_eval_loader_2(config, key, batch_size, shuffle=True):
-    if config[key] is None:
-        print(f"Key {key} is None")
-        return None
-    else:
-        return DataLoader(Dataset(config[key]), batch_size=batch_size, shuffle=shuffle)
-
-
-def init_plus_dataloaders(config):
+def init_dataloaders(config):
+    aug_t = config['augment_times']
+    blur_cfg = config['blur_config']
+    is_blur = config['is_blur']
+    trans = make_dataset_trans(is_blur, blur_cfg)
     batch_size = config['batch_size']
     if config['is_random_split_data']:
         print("Using random split data")
         train_ratio = config['train_data_ratio']
-        dataset_all = Dataset(config['train_data_path'])
+        dataset_all = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
         train_size = int(len(dataset_all) * train_ratio)
         eval_size = len(dataset_all) - train_size
         train_dataset, eval_dataset = torch.utils.data.random_split(dataset_all, [train_size, eval_size])
-        loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True)
-        plus_eval_loader_2 = None
     else:
         print("Using predefined datasets")
-        dataset = Dataset(config['train_data_path'])
-        plus_eval_set = Dataset(config['plus_eval_set_path'])
-        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
+        plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
+        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True)
         plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True)
-        plus_eval_loader_2 = init_plus_eval_loader_2(config, 'plus_eval_set_path_2', batch_size=batch_size, shuffle=True)
-    return loader, plus_eval_loader, plus_eval_loader_2
+    single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
+    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size)
+    return plus_train_loader, plus_eval_loader, single_img_eval_loader
 
 
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
         self.batch_size = config['batch_size']
-        self.train_loader, self.plus_eval_loader, self.plus_eval_loader_2 = init_plus_dataloaders(config)
-        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'])
-        self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=self.batch_size)
+        self.train_loader, self.plus_eval_loader, self.single_img_eval_loader = init_dataloaders(config)
         self.min_loss_scalar = config['min_loss_scalar']
         self.model = VQVAE(config).to(DEVICE)
         self.train_result_path = config['train_result_path']
@@ -167,7 +165,6 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
-        self.is_online_blur = config['is_online_blur']
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -190,10 +187,6 @@ class PlusTrainer:
                 print(batch_ndx)
                 print(len(sample[0][0]))
             data, labels = sample
-            if self.is_online_blur:
-                blur_kernels = self.config['blur_kernels']
-                blur_sigma = self.config['blur_sigma']
-                data = [random_gaussian_blur_batch(d, blur_kernels, blur_sigma) for d in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
@@ -241,10 +234,11 @@ class PlusTrainer:
         loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
         train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
         eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
-        special_loss_counter_keys = ['train_ks', 'train_accu', 'eval_ks', 'eval_accu']
-        if self.plus_eval_loader_2 is not None:
-            special_loss_counter_keys.extend(['eval_ks_2', 'eval_accu_2'])
-        special_loss_counter = LossCounter(special_loss_counter_keys, self.plus_accu_record_path)
+        eval_keys = ['one2n_accu', 'one2n_accu_cycle', 'one2one_accu', 'one2one_accu_cycle',
+                'emb_self_consistency', 'emb_label_consistency', 'z_c_recognition_rate', 'z_c_cycle_recognition_rate']
+        eval_loss_counter_keys = ([f'train_{key}' for key in eval_keys] + [f'eval_{key}' for key in eval_keys] +
+                                  ['one2n_match_rate', 'one2one_matching_rate', 'nna_score'])
+        special_loss_counter = LossCounter(eval_loss_counter_keys, self.plus_accu_record_path)
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         if optimizer is None:
             optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
@@ -259,22 +253,20 @@ class PlusTrainer:
             # Evaluation phase
             if is_log:
                 self.model.eval()
+                print('Eval phase')
                 self.one_epoch(epoch_num, eval_loss_counter, self.plus_eval_loader, True, eval_vis_img, None)
                 self.model.train()
                 if self.is_save_img:
-                    self.plot_enc_z(epoch_num, self.single_img_eval_loader)
-                    train_ks, train_accu = self.plot_plus_idx(epoch_num, self.train_loader, self.train_result_path)
-                    eval_ks, eval_accu = self.plot_plus_idx(epoch_num, self.plus_eval_loader, self.eval_result_path, "plus_idx")
-                    loss_values = [train_ks, train_accu, eval_ks, eval_accu]
-                    if self.plus_eval_loader_2 is not None:
-                        eval_ks_2, eval_accu_2 = self.plot_plus_idx(epoch_num, self.plus_eval_loader_2, self.eval_result_path, "plus_idx_2")
-                        loss_values.extend([eval_ks_2, eval_accu_2])
-                    special_loss_counter.add_values(loss_values)
-                    special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
-                    if self.is_plot_zc_value:
-                        self.plot_plus_z(epoch_num, self.plus_eval_loader, self.eval_result_path, 'plus_z')
-                        if self.plus_eval_loader_2 is not None:
-                            self.plot_plus_z(epoch_num, self.plus_eval_loader_2, self.eval_result_path, 'plus_z_2')
+                    with torch.no_grad():
+                        # self.plot_enc_z(epoch_num, self.single_img_eval_loader)
+                        train_plus_results = self.overall_plus_eval(epoch_num, self.train_loader, self.train_result_path)
+                        eval_plus_results = self.overall_plus_eval(epoch_num, self.plus_eval_loader, self.eval_result_path)
+                        single_img_results = self.single_img_eval()
+                        loss_values = train_plus_results + eval_plus_results + single_img_results
+                        special_loss_counter.add_values(loss_values)
+                        special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
+                        if self.is_plot_zc_value:
+                            self.plot_plus_z(epoch_num, self.plus_eval_loader, self.eval_result_path, 'plus_z')
 
             # Training phase
             self.one_epoch(epoch_num, train_loss_counter, self.train_loader, is_log, train_vis_img, optimizer)
@@ -314,14 +306,36 @@ class PlusTrainer:
         ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
         return ks, accu
 
-    def plot_plus_idx(self, epoch_num, data_loader, result_path, result_name="plus_idx"):
+    def overall_plus_eval(self, epoch_num, data_loader, result_path):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
         all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, True)
-        ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
-        eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}_ks_{ks}')
+        one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
+        one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
+        emb_self_consistency = calc_plus_z_self_cycle_consistency(all_plus_z)
+        emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate = (
+            calc_plus_z_mode_emb_label_cycle_consistency(all_enc_z, all_plus_z))
+        eval_path = os.path.join(result_path, f'{epoch_num}_accu_{one2n_accu_cycle}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path,
                                  is_scatter_lines=True, y_label="Emb idx")
-        return ks, accu
+        return [one2n_accu, one2n_accu_cycle, one2one_accu, one2one_accu_cycle,
+                emb_self_consistency, emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate]
+
+    def single_img_eval(self):
+        mr_evaler = MultiStyleZcEvaler(self.config, loaded_model=self.model)
+        num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
+            self.single_img_eval_loader,
+            lambda x: mr_evaler.model.find_indices(
+                mr_evaler.model.batch_encode_to_z(x)[0],
+                True, False
+            )
+        )
+        num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
+        one2n_match_rate = mr_evaler.calc_emb_matching_score(num_emb_idx, num_labels)
+        one2one_matching_rate = solve_label_emb_one2one_matching(num_emb_idx, num_labels)[1]
+
+        orderliness_evaler = MumEval(self.config, loaded_model=self.model)
+        nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, self.train_result_path)
+        return [one2n_match_rate, one2one_matching_rate, nna_score]
 
     def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)

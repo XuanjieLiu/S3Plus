@@ -68,8 +68,8 @@ def plot_plusZ_against_label(
 
 
 class MultiStyleZcEvaler(CommonEvaler):
-    def __init__(self, config, model_path=None):
-        super(MultiStyleZcEvaler, self).__init__(config, model_path)
+    def __init__(self, config, model_path=None, loaded_model=None):
+        super(MultiStyleZcEvaler, self).__init__(config, model_path, loaded_model)
 
     def eval(self, data_loader, save_path, figure_title='', is_shift=True, is_plot_graph=True):
         num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(

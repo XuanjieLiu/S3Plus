@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *

@@ -1,0 +1,90 @@
+{
+    "eval_set_one2n_accu": {
+        "value": "0.73 \\pm 0.0",
+        "mean": 0.7300613496932515,
+        "std": 0.0,
+        "max": 0.7300613496932515,
+        "min": 0.7300613496932515,
+        "count": 1
+    },
+    "eval_set_one2one_accu": {
+        "value": "0.5 \\pm 0.0",
+        "mean": 0.5038343558282209,
+        "std": 0.0,
+        "max": 0.5038343558282209,
+        "min": 0.5038343558282209,
+        "count": 1
+    },
+    "eval_set_one2n_accu_cycle": {
+        "value": "0.98 \\pm 0.0",
+        "mean": 0.977760736196319,
+        "std": 0.0,
+        "max": 0.977760736196319,
+        "min": 0.977760736196319,
+        "count": 1
+    },
+    "eval_set_one2one_accu_cycle": {
+        "value": "0.81 \\pm 0.0",
+        "mean": 0.8140337423312883,
+        "std": 0.0,
+        "max": 0.8140337423312883,
+        "min": 0.8140337423312883,
+        "count": 1
+    },
+    "eval_set_emb_self_consistency": {
+        "value": "0.53 \\pm 0.0",
+        "mean": 0.5272239263803681,
+        "std": 0.0,
+        "max": 0.5272239263803681,
+        "min": 0.5272239263803681,
+        "count": 1
+    },
+    "eval_set_emb_label_consistency": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 1
+    },
+    "eval_set_z_c_recognition_rate": {
+        "value": "0.74 \\pm 0.0",
+        "mean": 0.7392638036809815,
+        "std": 0.0,
+        "max": 0.7392638036809815,
+        "min": 0.7392638036809815,
+        "count": 1
+    },
+    "eval_set_z_c_cycle_recognition_rate": {
+        "value": "0.99 \\pm 0.0",
+        "mean": 0.9869631901840491,
+        "std": 0.0,
+        "max": 0.9869631901840491,
+        "min": 0.9869631901840491,
+        "count": 1
+    },
+    "emb_matching_rate_one2n": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 1
+    },
+    "emb_matching_rate_one2one": {
+        "value": "0.92 \\pm 0.0",
+        "mean": 0.9166666666666666,
+        "std": 0.0,
+        "max": 0.9166666666666666,
+        "min": 0.9166666666666666,
+        "count": 1
+    },
+    "orderliness": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 1
+    }
+}

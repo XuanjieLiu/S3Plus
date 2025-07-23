@@ -178,7 +178,7 @@ def multiple_nearest_neighbor_analysis(num_z_c, num_labels, n_times=10):
     return mean_score
 
 class MumEval:
-    def __init__(self, config, model_path):
+    def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.config = config
         self.embedding_dim = config['embedding_dim']
         self.multi_num_embeddings = config['multi_num_embeddings']
@@ -187,9 +187,15 @@ class MumEval:
         else:
             self.latent_embedding_1 = len(self.multi_num_embeddings)
         self.latent_code_1 = self.latent_embedding_1 * self.embedding_dim
-        self.model = VQVAE(config).to(DEVICE)
-        if model_path is not None:
+        if loaded_model is not None:
+            self.model = loaded_model
+        elif model_path is not None:
+            self.model = VQVAE(config).to(DEVICE)
             self.reload_model(model_path)
+            print(f"Model is loaded from {model_path}")
+        else:
+            self.model = VQVAE(config).to(DEVICE)
+            print("No model is loaded")
         self.model.eval()
 
     def reload_model(self, model_path):

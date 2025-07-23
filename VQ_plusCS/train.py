@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
@@ -53,7 +53,7 @@ def split_into_three(tensor):
 class PlusTrainer:
     def __init__(self, config, is_train=True):
         self.config = config
-        dataset = Dataset(config['train_data_path'])
+        dataset = MultiImgDataset(config['train_data_path'])
         eval_set_1 = SingleImgDataset(config['single_img_eval_set_path'])
         self.batch_size = config['batch_size']
         self.min_loss_scalar = config['min_loss_scalar']

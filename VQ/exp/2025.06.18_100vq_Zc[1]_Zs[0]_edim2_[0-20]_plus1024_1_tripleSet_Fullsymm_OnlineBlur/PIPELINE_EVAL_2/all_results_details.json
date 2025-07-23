@@ -1,0 +1,38 @@
+{
+    "ckpts": [
+        "exp_1: checkpoint_24000.pt"
+    ],
+    "eval_set_one2n_accu": [
+        "exp_1: 0.73"
+    ],
+    "eval_set_one2one_accu": [
+        "exp_1: 0.504"
+    ],
+    "eval_set_one2n_accu_cycle": [
+        "exp_1: 0.978"
+    ],
+    "eval_set_one2one_accu_cycle": [
+        "exp_1: 0.814"
+    ],
+    "eval_set_emb_self_consistency": [
+        "exp_1: 0.527"
+    ],
+    "eval_set_emb_label_consistency": [
+        "exp_1: 1.0"
+    ],
+    "eval_set_z_c_recognition_rate": [
+        "exp_1: 0.739"
+    ],
+    "eval_set_z_c_cycle_recognition_rate": [
+        "exp_1: 0.987"
+    ],
+    "emb_matching_rate_one2n": [
+        "exp_1: 1.0"
+    ],
+    "emb_matching_rate_one2one": [
+        "exp_1: 0.917"
+    ],
+    "orderliness": [
+        "exp_1: 1.0"
+    ]
+}

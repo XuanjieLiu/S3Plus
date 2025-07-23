@@ -1,13 +1,11 @@
 import os
-import random
-import sys
 
 from torch import optim
 
 from VQVAE import VQVAE
 from shared import *
 from simple_FC import SimpleFC
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from torch.utils.data import DataLoader
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
@@ -42,8 +40,8 @@ class OtherTask:
         # self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
         task_name = other_task_config['task_name']
         self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
-        train_set = Dataset(other_task_config['train_data_path'])
-        eval_set = Dataset(other_task_config['eval_data_path'])
+        train_set = MultiImgDataset(other_task_config['train_data_path'])
+        eval_set = MultiImgDataset(other_task_config['eval_data_path'])
         self.batch_size = other_task_config['batch_size']
         self.train_loader = DataLoader(train_set, batch_size=self.batch_size)
         self.eval_loader = DataLoader(eval_set, batch_size=self.batch_size)
@@ -113,7 +111,7 @@ class OtherTask:
     def eval_dec_view(self, data_path, result_path):
         self.resume()
         os.makedirs(result_path, exist_ok=True)
-        dataset = Dataset(data_path)
+        dataset = MultiImgDataset(data_path)
         loader = DataLoader(dataset, batch_size=128, shuffle=False)
         styles = [('-').join(f.split('-')[2:]) for f in dataset.f_list]
         all_oper_result = []

@@ -6,7 +6,7 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 from eval_plus_nd import VQvaePlusEval, calc_ks_enc_plus_z, plot_plusZ_against_label
 from common_func import load_config_from_exp_name, record_num_list, DATASET_ROOT, EXP_ROOT, \
     find_optimal_checkpoint_num_by_train_config
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from VQVAE import VQVAE
@@ -63,7 +63,7 @@ def load_dataset():
     dataset_names = []
     for item in tqdm(EVAL_SETS, desc="Loading datasets"):
         dataset_names.append(item['name'])
-        dataset = Dataset(item['path'])
+        dataset = MultiImgDataset(item['path'])
         loader = DataLoader(dataset, batch_size=256, shuffle=True)
         dataset_loaders.append(loader)
     return dataset_names, dataset_loaders

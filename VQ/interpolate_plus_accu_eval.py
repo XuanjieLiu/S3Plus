@@ -3,7 +3,7 @@ import os
 from importlib import reload
 from torch.utils.data import DataLoader
 from dataloader import SingleImgDataset, load_enc_eval_data
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from VQ.VQVAE import VQVAE
 from shared import *
 from dataMaker_fixedPosition_plusPair import data_name_2_num
@@ -56,7 +56,7 @@ class InterpolatePlusAccuEval:
         self.data_set_path = data_set_path if data_set_path is not None else config['single_img_eval_set_path']
         single_img_eval_set = SingleImgDataset(self.data_set_path)
         self.single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=32)
-        self.train_set = Dataset(config['train_data_path'])
+        self.train_set = MultiImgDataset(config['train_data_path'])
         self.min_interpolated_num = None
         self.max_interpolated_num = None
         self.enc_num_dict = None

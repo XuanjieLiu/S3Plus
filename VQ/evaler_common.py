@@ -1,7 +1,7 @@
 import os
 from VQVAE import VQVAE
 from shared import *
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from torch.utils.data import DataLoader
 from common_func import parse_label, load_config_from_exp_name, EXP_ROOT
 from torchvision.utils import save_image
@@ -43,7 +43,7 @@ class CommonEval:
 
     def eval_oper(self, data_path, result_path):
         os.makedirs(result_path, exist_ok=True)
-        dataset = Dataset(data_path)
+        dataset = MultiImgDataset(data_path)
         loader = DataLoader(dataset, batch_size=128, shuffle=False)
         styles = [('-').join(f.split('-')[2:]) for f in dataset.f_list]
         all_oper_result = []

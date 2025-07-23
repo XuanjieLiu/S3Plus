@@ -1,0 +1,35 @@
+{
+    "eval_set_one2n_accu": [
+        0.7300613496932515
+    ],
+    "eval_set_one2one_accu": [
+        0.5038343558282209
+    ],
+    "eval_set_one2n_accu_cycle": [
+        0.977760736196319
+    ],
+    "eval_set_one2one_accu_cycle": [
+        0.8140337423312883
+    ],
+    "eval_set_emb_self_consistency": [
+        0.5272239263803681
+    ],
+    "eval_set_emb_label_consistency": [
+        1.0
+    ],
+    "eval_set_z_c_recognition_rate": [
+        0.7392638036809815
+    ],
+    "eval_set_z_c_cycle_recognition_rate": [
+        0.9869631901840491
+    ],
+    "emb_matching_rate_one2n": [
+        1.0
+    ],
+    "emb_matching_rate_one2one": [
+        0.9166666666666666
+    ],
+    "orderliness": [
+        1.0
+    ]
+}

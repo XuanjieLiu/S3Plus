@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import torch.optim as optim
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from loss_counter import LossCounter
 from VQVAE import VQVAE
 from shared import *
@@ -96,7 +96,7 @@ def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: Eval
 
 class PlusEval:
     def __init__(self, config, is_train=True):
-        dataset = Dataset(config['train_data_path'])
+        dataset = MultiImgDataset(config['train_data_path'])
         self.batch_size = config['batch_size']
         self.loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
         self.model = VQVAE(config).to(DEVICE)

@@ -8,7 +8,7 @@ import random
 import sys
 from torch import optim
 from simple_FC import SimpleFC
-from dataloader_plus import Dataset
+from dataloader_plus import MultiImgDataset
 from torch.utils.data import DataLoader
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
@@ -191,8 +191,8 @@ class CeilTester:
         self.simple_fc = SimpleFC(ceiling_test_config['fc_network_config'], self.num_dim * 2, self.num_class).to(DEVICE)
         task_name = ceiling_test_config['task_name']
         self.fc_model_path = name_appd(task_name, ceiling_test_config['fc_model_path'])
-        train_set = Dataset(ceiling_test_config['train_data_path'])
-        eval_set = Dataset(ceiling_test_config['eval_data_path'])
+        train_set = MultiImgDataset(ceiling_test_config['train_data_path'])
+        eval_set = MultiImgDataset(ceiling_test_config['eval_data_path'])
         self.batch_size = ceiling_test_config['batch_size']
         self.train_loader = DataLoader(train_set, batch_size=self.batch_size)
         self.eval_loader = DataLoader(eval_set, batch_size=self.batch_size)
