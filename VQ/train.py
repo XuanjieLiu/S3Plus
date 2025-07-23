@@ -261,7 +261,7 @@ class PlusTrainer:
                         # self.plot_enc_z(epoch_num, self.single_img_eval_loader)
                         train_plus_results = self.overall_plus_eval(epoch_num, self.train_loader, self.train_result_path)
                         eval_plus_results = self.overall_plus_eval(epoch_num, self.plus_eval_loader, self.eval_result_path)
-                        single_img_results = self.single_img_eval()
+                        single_img_results = self.single_img_eval(epoch_num)
                         loss_values = train_plus_results + eval_plus_results + single_img_results
                         special_loss_counter.add_values(loss_values)
                         special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
@@ -320,7 +320,7 @@ class PlusTrainer:
         return [one2n_accu, one2n_accu_cycle, one2one_accu, one2one_accu_cycle,
                 emb_self_consistency, emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate]
 
-    def single_img_eval(self):
+    def single_img_eval(self, epoch_num):
         mr_evaler = MultiStyleZcEvaler(self.config, loaded_model=self.model)
         num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
             self.single_img_eval_loader,
@@ -334,7 +334,8 @@ class PlusTrainer:
         one2one_matching_rate = solve_label_emb_one2one_matching(num_emb_idx, num_labels)[1]
 
         orderliness_evaler = MumEval(self.config, loaded_model=self.model)
-        nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, self.train_result_path)
+        save_path = os.path.join(self.eval_result_path, f'{epoch_num}')
+        nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, save_path)
         return [one2n_match_rate, one2one_matching_rate, nna_score]
 
     def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):
