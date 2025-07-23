@@ -101,7 +101,7 @@ class InsNotesDataset(IterableDataset):
             if not self.data_type:
                 j = random.randint(0, len(C_LIST) - 4)  # root
             elif isinstance(self.data_type, int):
-                j = random.randint(self.data_type)
+                j = random.randint(0, self.data_type - 1)
                 j = C_LIST.index(roots[j])
             audio, contents = generators[i].gen_melody(mel_len=self.n_segments, root=j)
             audio = torch.tensor(audio)
