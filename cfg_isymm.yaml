@@ -6,6 +6,7 @@ random_seed:
 
 dataloader: "insnotes_dataloader"
 data_dir: "../data/insnotes_major_val"
+data_type: 3 # means 3 scales in distribition, only for this dataset
 method: "ISymm"
 
 device: "cuda"

@@ -98,6 +98,7 @@ class Trainer:
             # data_dir=os.path.join(self.data_dir, "train"),
             batch_size=config["batch_size"],
             num_workers=config["num_workers"],
+            data_type=config["data_type"],
             # shuffle=True,  # when distributed, shuffle is omitted
             # distributed=False,
         )
@@ -107,6 +108,7 @@ class Trainer:
             data_dir=os.path.join(self.data_dir),
             batch_size=config["batch_size"],
             num_workers=config["num_workers"],
+            data_type=config["data_type"],
             # shuffle=False,  # when distributed, shuffle is omitted
             test=True,
             # distributed=False,

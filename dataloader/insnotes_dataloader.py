@@ -49,6 +49,21 @@ C_LIST = [
     "B",  # The last three are for OOD
 ]
 
+roots = [
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F#",
+    "C#",
+    "G#",
+    "D#",
+    "A#",
+    "F",
+]  # circle of fifths
+
 
 def worker_init_fn(worker_id):
     worker_info = get_worker_info()
@@ -59,13 +74,14 @@ def worker_init_fn(worker_id):
 
 
 class InsNotesDataset(IterableDataset):
-    def __init__(self, n_segments=90, transform=None):
+    def __init__(self, n_segments=90, transform=None, data_type=None):
         """
         data_dir: directory directly containing .npy files
 
         sr=16000
         """
         self.n_segments = n_segments
+        self.data_type = int(data_type)
         self.transform = nn.Sequential(
             Spectrogram(n_fft=1024, win_length=1024, hop_length=256),
             MelScale(n_mels=128, sample_rate=16000, f_min=0, f_max=8000, n_stft=513),
@@ -82,7 +98,11 @@ class InsNotesDataset(IterableDataset):
 
         while True:
             i = random.randint(0, len(S_LIST) - 1)  # instrument
-            j = random.randint(0, len(C_LIST) - 4)  # root
+            if not self.data_type:
+                j = random.randint(0, len(C_LIST) - 4)  # root
+            elif isinstance(self.data_type, int):
+                j = random.randint(self.data_type)
+                j = C_LIST.index(roots[j])
             audio, contents = generators[i].gen_melody(mel_len=self.n_segments, root=j)
             audio = torch.tensor(audio)
             audio = self.transform(audio)  # spectrogram
@@ -100,7 +120,9 @@ class InsNotesDataset(IterableDataset):
 
 
 class InsNotesTestDataset(Dataset):
-    def __init__(self, data_dir, n_segments=90, transform=None, mode="major"):
+    def __init__(
+        self, data_dir, n_segments=90, transform=None, data_type=None, mode="major"
+    ):
         """
         data_dir: directory directly containing .npy files
 
@@ -153,13 +175,16 @@ def get_dataloader(
     n_segments=24,
     # transform=FrequencyMasking(freq_mask_param=15),
     transform=None,
+    data_type=None,
     num_workers=4,
     test=False,
     data_dir=None,
     mode="major",
 ):
     if not test:
-        dataset = InsNotesDataset(n_segments=n_segments, transform=transform)
+        dataset = InsNotesDataset(
+            n_segments=n_segments, transform=transform, data_type=data_type
+        )
         dataloader = DataLoader(
             dataset,
             batch_size=batch_size,
@@ -169,7 +194,11 @@ def get_dataloader(
         return iter(dataloader)
     else:
         dataset = InsNotesTestDataset(
-            data_dir=data_dir, n_segments=n_segments, transform=transform, mode=mode
+            data_dir=data_dir,
+            n_segments=n_segments,
+            transform=transform,
+            data_type=data_type,
+            mode=mode,
         )
         dataloader = DataLoader(
             dataset,
