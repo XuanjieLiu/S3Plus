@@ -54,7 +54,7 @@ optimizer_config:
   lr_anneal_min_factor: 0.01
   lr_decay_factor: 0.99
   lr_decay_steps: 10
-  lr_decay_min_factor: 0.01
+  lr_decay_min_factor: 0.001
   warmup_steps: 10
   warmup_factor: 0.1
 
