@@ -334,7 +334,7 @@ class PlusTrainer:
         one2one_matching_rate = solve_label_emb_one2one_matching(num_emb_idx, num_labels)[1]
 
         orderliness_evaler = MumEval(self.config, loaded_model=self.model)
-        save_path = os.path.join(self.eval_result_path, f'{epoch_num}')
+        save_path = os.path.join(self.train_result_path, f'{epoch_num}')
         nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, save_path)
         return [one2n_match_rate, one2one_matching_rate, nna_score]
 
