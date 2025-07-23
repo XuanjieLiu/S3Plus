@@ -231,6 +231,92 @@ def gen_directory(save_dir, mode="major", ood=False):
     # )
 
 
+def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major"):
+    """
+    generate multiple directories of mode scales, including val and ood sets
+    val: from 3 scales to 11 scales
+    ood: from 9 scales to 1 scale
+
+    """
+    S_LIST = [
+        "Soprano Sax",
+        "Pipe Organ",
+        "Accordion",
+        "Viola",
+        "Trumpet",
+        "Muted Trumpet",
+        "Oboe",
+        "Clarinet",
+        "Piccolo",
+        "Pan Flute",
+        "Harmonica",
+        "Choir Aahs",
+    ]
+
+    C_LIST = [
+        "C",
+        "C#",
+        "D",
+        "D#",
+        "E",
+        "F",
+        "F#",
+        "G",
+        "G#",
+        "A",
+        "A#",
+        "B",
+    ]
+
+    roots = [
+        "C",
+        "G",
+        "D",
+        "A",
+        "E",
+        "B",
+        "F#",
+        "C#",
+        "G#",
+        "D#",
+        "A#",
+        "F",
+    ]  # circle of fifths
+
+    generators = []
+    for i in range(len(S_LIST)):
+        generators.append(PseudoMelGen(ins_index=i))
+
+    for num_vals in range(3, 12):  # from 3 to 11 scales
+        save_dir_val = os.path.join(save_dir, save_name + "val" + str(num_vals))
+        os.makedirs(save_dir_val, exist_ok=True)
+        for round in tqdm(range(10)):  # number of rounds for larger dataset
+            for i in range(len(S_LIST)):  # instrument
+                for j in range(num_vals):  # in-distribution roots
+                    r = C_LIST.index(roots[j])
+                    audio, contents = generators[i].gen_melody(
+                        mel_len=90, mode=mode, root=r
+                    )
+                    # save to npy for now
+                    np.save(
+                        os.path.join(save_dir, f"ins{i}_root{r}_{round}.npy"), audio
+                    )
+        save_dir_ood = os.path.join(save_dir, save_name + "ood" + str(12 - num_vals))
+        os.makedirs(save_dir_ood, exist_ok=True)
+        for round in tqdm(range(10)):
+            for i in range(len(S_LIST)):
+                for j in range(num_vals, 12):  # ood roots
+                    r = C_LIST.index(roots[j])
+                    audio, contents = generators[i].gen_melody(
+                        mel_len=90, mode=mode, root=r
+                    )
+                    # save to npy for now
+                    np.save(
+                        os.path.join(save_dir_ood, f"ins{i}_root{r}_{round}.npy"), audio
+                    )
+        print("Generated", save_dir_val, "and", save_dir_ood)
+
+
 def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melody"):
     """
     generate a directory maybe for testing
@@ -280,12 +366,18 @@ def gen_directory_with_dataset_input(save_dir, data_dir="../data/Nottingham/melo
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    os.makedirs("../data/insnotes_major_val", exist_ok=True)
-    gen_directory("../data/insnotes_major_val")
-    print("Generated insnotes_major_val")
-    os.makedirs("../data/insnotes_major_ood", exist_ok=True)
-    gen_directory("../data/insnotes_major_ood", ood=True)
-    print("Generated insnotes_major_ood")
+    # os.makedirs("../data/insnotes_major_val", exist_ok=True)
+    # gen_directory("../data/insnotes_major_val")
+    # print("Generated insnotes_major_val")
+    # os.makedirs("../data/insnotes_major_ood", exist_ok=True)
+    # gen_directory("../data/insnotes_major_ood", ood=True)
+    # print("Generated insnotes_major_ood")
+
+    gen_directories_val_ood_spectrum(
+        save_dir="../data/insnotes_major_val_ood_spectrum",
+        save_name="insnotes_major_",
+        mode="major",
+    )
 
     # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
     # gen_directory_with_dataset_input(
