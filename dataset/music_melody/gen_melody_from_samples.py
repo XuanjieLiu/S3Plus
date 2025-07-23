@@ -299,7 +299,7 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major"):
                     )
                     # save to npy for now
                     np.save(
-                        os.path.join(save_dir, f"ins{i}_root{r}_{round}.npy"), audio
+                        os.path.join(save_dir_val, f"ins{i}_root{r}_{round}.npy"), audio
                     )
         save_dir_ood = os.path.join(save_dir, save_name + "ood" + str(12 - num_vals))
         os.makedirs(save_dir_ood, exist_ok=True)
