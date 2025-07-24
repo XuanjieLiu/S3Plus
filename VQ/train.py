@@ -93,6 +93,7 @@ def init_dataloaders(config):
     is_blur = config['is_blur']
     trans = make_dataset_trans(is_blur, blur_cfg)
     batch_size = config['batch_size']
+    n_workers = config['num_workers']
     if config['is_random_split_data']:
         print("Using random split data")
         train_ratio = config['train_data_ratio']
@@ -100,16 +101,16 @@ def init_dataloaders(config):
         train_size = int(len(dataset_all) * train_ratio)
         eval_size = len(dataset_all) - train_size
         train_dataset, eval_dataset = torch.utils.data.random_split(dataset_all, [train_size, eval_size])
-        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True)
+        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
+        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
     else:
         print("Using predefined datasets")
         plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
         plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
-        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True)
-        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True)
+        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
+        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
     single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
-    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size)
+    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size, num_workers=n_workers, persistent_workers=True)
     return plus_train_loader, plus_eval_loader, single_img_eval_loader
 
 
@@ -274,8 +275,7 @@ class PlusTrainer:
 
             if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')
-
-    print("train ends")
+        print("train ends")
 
     def plot_enc_z(self, epoch_num, data_loader):
         num_z, num_labels = load_enc_eval_data(
