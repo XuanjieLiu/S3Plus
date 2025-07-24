@@ -12,9 +12,8 @@ EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp'
 sys.path.append(EXP_ROOT_PATH)
 EXP_NAME_LIST = sys.argv[1:]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-print(f'Experiment names: {EXP_NAME_LIST}')
 if __name__ == '__main__':
-
+    print(f'Experiment names: {EXP_NAME_LIST}')
     for exp_num in EXP_NUM_LIST:
         for exp_name in EXP_NAME_LIST:
             exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
