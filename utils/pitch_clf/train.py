@@ -50,9 +50,11 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-    steps = 10000
+    total_steps = 10000
 
-    for step in tqdm(range(steps)):
+    step = 0
+    while step < total_steps:
+        step += 1
         model.train()
         for batch in train_loader:
             audio, contents, styles = batch
