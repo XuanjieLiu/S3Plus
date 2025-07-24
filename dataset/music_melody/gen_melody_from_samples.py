@@ -205,7 +205,7 @@ def gen_directory(save_dir, mode="major", ood=False):
     for round in tqdm(range(10)):
         for i in range(len(S_LIST)):
             if not ood:
-                for j in range(9):
+                for j in range(12):
                     audio, contents = generators[i].gen_melody(
                         mel_len=90, mode=mode, root=j
                     )
@@ -373,11 +373,13 @@ if __name__ == "__main__":
     # gen_directory("../data/insnotes_major_ood", ood=True)
     # print("Generated insnotes_major_ood")
 
-    gen_directories_val_ood_spectrum(
-        save_dir="../data/insnotes_major_val_ood_spectrum",
-        save_name="insnotes_major_",
-        mode="major",
-    )
+    gen_directory("../data/insnotes_major_all", ood=False)
+
+    # gen_directories_val_ood_spectrum(
+    #     save_dir="../data/insnotes_major_val_ood_spectrum",
+    #     save_name="insnotes_major_",
+    #     mode="major",
+    # )
 
     # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
     # gen_directory_with_dataset_input(

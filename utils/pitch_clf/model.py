@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class MelCNNPitchClassifier(nn.Module):
-    def __init__(self, n_mels=128, n_frames=64, n_class=12):
+    def __init__(self, n_mels=128, n_frames=32, n_class=12):
         super().__init__()
         self.cnn = nn.Sequential(
             nn.Conv2d(1, 32, (5, 3), padding=(2, 1)),  # (batch, 1, n_mels, n_frames)
@@ -24,12 +24,13 @@ class MelCNNPitchClassifier(nn.Module):
         x = x.unsqueeze(1)  # (batch, 1, n_mels, n_frames)
         x = self.cnn(x)
         x = self.fc(x)
+
         return x
 
 
 # TODO: validate the model with a simple test case
 if __name__ == "__main__":
     model = MelCNNPitchClassifier()
-    x = torch.randn(8, 128, 64)  # batch size of 8, 10 frames, 128 mel bands
+    x = torch.randn(8, 128, 32)  # batch size of 8, 128 mel bands, 32 frames
     output = model(x)
     print(output.shape)  # should be (8, 12) for 12 classes

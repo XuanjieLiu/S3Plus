@@ -10,6 +10,7 @@ import itertools
 from glob import glob
 
 import numpy as np
+import librosa as lr
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -81,7 +82,10 @@ class InsNotesDataset(IterableDataset):
         sr=16000
         """
         self.n_segments = n_segments
-        self.data_type = int(data_type)
+        if data_type:
+            self.data_type = int(data_type)
+        else:
+            self.data_type = None
         self.transform = nn.Sequential(
             Spectrogram(n_fft=1024, win_length=1024, hop_length=256),
             MelScale(n_mels=128, sample_rate=16000, f_min=0, f_max=8000, n_stft=513),
