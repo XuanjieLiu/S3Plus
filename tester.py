@@ -252,6 +252,7 @@ class Tester:
 
         acc = 0
         x_future_pred = torch.tensor(x_future_pred).to(self.device).squeeze()
+        c_labels_future_gt = torch.tensor(c_labels_future_gt).to(self.device)
         for i in range(x_future_pred.shape[0]):
             x_i = x_future_pred[i, :]
             pred = torch.max(clf(x_i), 1)[1]
