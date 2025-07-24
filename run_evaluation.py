@@ -16,10 +16,22 @@ if __name__ == "__main__":
         "--config",
         type=str,
         default="config.yaml",
-        help="if using active_checkpoint, this is ignored",
+        help="if using active_checkpoint, this is ignored because the config is read from the checkpoint directory",
     )
     parser.add_argument(
+        "--save_results_at",
+        type=str,
+        default="test_results.csv",
+        help="csv file to save numerical results as a row with model name and result entries. Other kinds of results will be saved in the checkpoint directory",
+    )
+
+    parser.add_argument(
         "--future_pred_acc",
+        action="store_true",
+        help="whether to compute future prediction accuracy",
+    )
+    parser.add_argument(
+        "--recon_acc",
         action="store_true",
         help="whether to compute future prediction accuracy",
     )

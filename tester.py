@@ -1,12 +1,7 @@
 import os
-import gc
-import sys
-import datetime
-import logging
-import torch.distributed
-import itertools
-import yaml
+import csv
 from tqdm import tqdm
+from pathlib import Path
 from importlib import import_module
 
 import numpy as np
@@ -102,8 +97,9 @@ class Tester:
     def test(
         self,
         future_pred_acc=False,
-        recon_waveform=True,
-        future_pred_waveform=True,
+        recon_acc=False,
+        future_pred_waveform=False,
+        recon_waveform=False,
         vis_tsne=False,
         confusion_mtx=False,
     ):
@@ -162,8 +158,10 @@ class Tester:
         self.x_prompt_recon = np.concatenate(self.x_prompt_recon, axis=0)
 
         if future_pred_acc:
-            # self.future_pred_acc_z()
+            self.future_pred_acc_z()
             self.future_pred_acc_x()
+        if recon_acc:
+            self.recon_acc_x()
 
         if recon_waveform:
             self.recon_waveform(n_samples=10)
@@ -230,13 +228,17 @@ class Tester:
                 )
             print(f"Future prediction accuracies on Z assigned to C: {acc}")
 
+            self._save_results(
+                ["future_pred_acc_z_" + str(i) for i in range(len(acc))],
+                acc,
+            )
+
             a = 1
 
     def future_pred_acc_x(self, save_n_samples=10):
         """
         Compute the future prediction accuracy on the x level (behavioral level).
         if save_n_samples > 0, save these audio files of the predictions.
-        # TODO: write another func to test the pitch classifier on recons, to test if the
         """
         c_labels_future_gt = self.c_labels_future_gt
         x_future_pred = self.x_future_pred
@@ -261,6 +263,41 @@ class Tester:
             acc[i] /= x_future_pred.shape[0]
 
         print(f"Future prediction accuracy on X: {acc}")
+
+        self._save_results(
+            ["future_pred_acc_x_" + str(i) for i in range(len(acc))],
+            acc,
+        )
+
+    def recon_acc_x(self, save_n_samples=10):
+        x_prompt_gt = self.x_prompt_gt
+        x_prompt_recon = self.x_prompt_recon
+
+        from utils.pitch_clf.model import MelCNNPitchClassifier as Clf
+
+        ckpt_path = "logs/mel_cnn_pitch_classifier.pt"
+        clf = Clf(n_mels=128, n_frames=32, n_class=len(self.C_LIST))
+        clf.load_state_dict(torch.load(ckpt_path, map_location=self.device))
+
+        clf.to(self.device)
+        clf.eval()
+
+        acc = 0
+        x_prompt_gt = torch.tensor(x_prompt_gt).to(self.device).squeeze()
+        x_prompt_recon = torch.tensor(x_prompt_recon).to(self.device).squeeze()
+        for i in range(x_prompt_gt.shape[1]):
+            x_gt_i = x_prompt_gt[:, i]
+            pred_gt_i = torch.max(clf(x_gt_i), 1)[1]
+            x_recon_i = x_prompt_recon[:, i]
+            pred_recon_i = torch.max(clf(x_recon_i), 1)[1]
+            acc += (pred_gt_i == pred_recon_i).sum().item()
+        acc /= x_prompt_gt.shape[0] * x_prompt_gt.shape[1]
+
+        print(f"Reconstruction accuracy on X prompts: {acc}")
+        self._save_results(
+            "recon_acc_x",
+            acc,
+        )
 
         # config = self.config
         # if config["dataloader"] == "insnotes_dataloader":
@@ -377,3 +414,48 @@ class Tester:
             )
 
         print(f"Saved {n_samples} x-level future predictions to {self.output_dir}")
+
+    def _save_results(self, column_names, results_data):
+        model_id = os.path.basename(self.config["active_checkpoint"])
+        save_path = Path(self.config["save_results_at"])
+
+        # unify format
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        if not isinstance(results_data, (list, tuple)):
+            results_data = [results_data]
+
+        # read current data
+        existing_data = []
+        fieldnames = {"model_id"}  # make sure model_id is always present
+        fieldnames.update(column_names)
+
+        if save_path.exists():
+            with open(save_path, "r") as f:
+                reader = csv.DictReader(f)
+                if reader.fieldnames:
+                    fieldnames.update(reader.fieldnames)
+                existing_data = list(reader)
+
+        # look for existing model row
+        model_row_idx = None
+        for i, row in enumerate(existing_data):
+            if row.get("model_id") == model_id:
+                model_row_idx = i
+                break
+
+        # prepare new data
+        new_data = {"model_id": model_id}
+        new_data.update(dict(zip(column_names, results_data)))
+
+        # update or append
+        if model_row_idx is not None:
+            existing_data[model_row_idx].update(new_data)
+        else:
+            existing_data.append(new_data)
+
+        # write back to CSV
+        with open(save_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=list(fieldnames))
+            writer.writeheader()
+            writer.writerows(existing_data)
