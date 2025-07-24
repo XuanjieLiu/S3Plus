@@ -250,14 +250,15 @@ class Tester:
         clf.to(self.device)
         clf.eval()
 
-        acc = 0
+        acc = [0 for _ in range(x_future_pred.shape[1])]
         x_future_pred = torch.tensor(x_future_pred).to(self.device).squeeze()
         c_labels_future_gt = torch.tensor(c_labels_future_gt).to(self.device)
-        for i in range(x_future_pred.shape[0]):
-            x_i = x_future_pred[i, :]
+        for i in range(x_future_pred.shape[1]):
+            x_i = x_future_pred[:, i]
             pred = torch.max(clf(x_i), 1)[1]
-            acc += (pred == c_labels_future_gt[i]).sum().item()
-        acc /= x_future_pred.shape[0] * x_future_pred.shape[1]
+            acc[i] += (pred == c_labels_future_gt[:, i]).sum().item()
+        for i in range(len(acc)):
+            acc[i] /= x_future_pred.shape[0]
 
         print(f"Future prediction accuracy on X: {acc}")
 
