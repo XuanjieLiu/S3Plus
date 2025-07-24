@@ -5,18 +5,22 @@ import torch.nn as nn
 class MelCNNPitchClassifier(nn.Module):
     def __init__(self, n_mels=128, n_frames=32, n_class=12):
         super().__init__()
-        n_mels = 64 if n_mels == 128 # deliberately ignore higher frequency bands
+        if n_mels == 128:
+            n_mels = 64  # deliberately ignore higher frequency bands
         self.cnn = nn.Sequential(
             nn.Conv2d(1, 32, (5, 3), padding=(2, 1)),  # (batch, 1, n_mels, n_frames)
             nn.ReLU(),
+            nn.Dropout(0.2),
             nn.Conv2d(32, 64, (5, 3), padding=(2, 1)),
             nn.ReLU(),
+            nn.Dropout(0.2),
             nn.AdaptiveMaxPool2d((1, n_mels)),
         )
         self.fc = nn.Sequential(
             nn.Flatten(),
             nn.Linear(64 * n_mels, 128),
             nn.ReLU(),
+            nn.Dropout(0.2),
             nn.Linear(128, n_class),
         )
 
