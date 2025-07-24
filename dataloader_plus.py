@@ -77,7 +77,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
             # 从缓存中读取原始图像 tensor，再应用 transform
             raw_imgs, img_names = self.data_list[base_index]
             transformed_imgs = [
-                self.transform(transforms.ToPILImage()(img_tensor.cpu())).to(DEVICE) for img_tensor in raw_imgs
+                self.transform(transforms.ToPILImage()(img_tensor)) for img_tensor in raw_imgs
             ]
             return transformed_imgs, img_names
         else:
@@ -91,9 +91,9 @@ class MultiImgDataset(torch.utils.data.Dataset):
         for name in img_list:
             img = Image.open(os.path.join(data_path, name)).convert('RGB')
             if apply_transform:
-                img_tensor = self.transform(img).to(DEVICE)
+                img_tensor = self.transform(img)
             else:
-                img_tensor = transforms.ToTensor()(img).to(DEVICE)
+                img_tensor = transforms.ToTensor()(img)
             img_tensors.append(img_tensor)
 
         return img_tensors, img_list

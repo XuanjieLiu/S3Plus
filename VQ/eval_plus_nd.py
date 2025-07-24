@@ -282,6 +282,7 @@ class VQvaePlusEval:
             enc_z_list = []
             plus_z_list = []
             data, labels = sample
+            data = [x.to(DEVICE) for x in data]
             za = self.model.batch_encode_to_z(data[0])[0]
             zb = self.model.batch_encode_to_z(data[1])[0]
             zc = self.model.batch_encode_to_z(data[2])[0]

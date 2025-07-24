@@ -187,6 +187,7 @@ class PlusTrainer:
                 print(batch_ndx)
                 print(len(sample[0][0]))
             data, labels = sample
+            data = [x.to(DEVICE) for x in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)

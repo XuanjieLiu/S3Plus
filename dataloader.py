@@ -80,7 +80,7 @@ class SingleImgDataset(torch.utils.data.Dataset):
         if self.cache_all:
             # 从缓存读取 tensor，再施加 transform
             raw_tensor, name = self.data_list[base_index]
-            img = transforms.ToPILImage()(raw_tensor.cpu())
+            img = transforms.ToPILImage()(raw_tensor)
             transformed_tensor = self.transform(img)
             return transformed_tensor, name
         else:
