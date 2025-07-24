@@ -14,7 +14,7 @@ from utils.pitch_clf.pitch_clf import MelCNNPitchClassifier
 S_LIST = dataloader_module.S_LIST
 C_LIST = dataloader_module.C_LIST
 
-val_data_dir = "../data/insnotes_major_val"
+val_data_dir = "../data/insnotes_major_all"
 
 train_loader = dataloader_module.get_dataloader(
     batch_size=128, n_segments=24, num_workers=4, data_type=12

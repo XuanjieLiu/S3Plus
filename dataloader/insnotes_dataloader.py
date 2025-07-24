@@ -139,6 +139,7 @@ class InsNotesTestDataset(Dataset):
             Spectrogram(n_fft=1024, win_length=1024, hop_length=256),
             MelScale(n_mels=128, sample_rate=16000, f_min=0, f_max=8000, n_stft=513),
         )
+        self.mode = mode
 
     def __len__(self):
         return len(self.data_files)
@@ -155,19 +156,17 @@ class InsNotesTestDataset(Dataset):
         # audio = audio[
         #     :, :-1, :64
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
-        audio = audio[
-            : self.n_segments, :, :32
-        ]  # remove the last column because it's always zero. Only for Melspec. also, cut the length to 32 for now
+        audio = audio[: self.n_segments, :, :32]  # cut the length to 32 for now
         audio = torch.log(audio + 1e-6)  # log spectrogram
         audio = audio.unsqueeze(1)  # add channel dimension
         style = int(data_name.split("_")[0][3:])
         root = int(data_name.split("_")[1][4:])
 
-        p_list = [0, 2, 4, 5, 7, 9, 11]
-        # filler pitches for the content now. If we want genuine content pitches, we need to use hdf5
+        if self.mode == "major":
+            p_list = [0, 2, 4, 5, 7, 9, 11]
         pitches = [
             (p_list[i % len(p_list)] + root) % 12 for i in range(self.n_segments)
-        ]
+        ]  # this only works if we take the first self.n_segments pitches
         contents = torch.tensor(pitches)
         styles = torch.tensor([style for _ in range(self.n_segments)])
 
