@@ -240,10 +240,14 @@ class Tester:
         c_labels_future_gt = self.c_labels_future_gt
         x_future_pred = self.x_future_pred
 
-        model_module = import_module("utils.pitch_clf.model.MelCNNPitchClassifier")
+        from utils.pitch_clf.model import MelCNNPitchClassifier as Clf
+
         ckpt_path = "logs/mel_cnn_pitch_classifier.pt"
-        clf = model_module(n_mels=128, n_frames=32, n_class=len(self.C_LIST))
+        clf = Clf(n_mels=128, n_frames=32, n_class=len(self.C_LIST))
         clf.load_state_dict(torch.load(ckpt_path, map_location=self.device))
+
+        clf.to(self.device)
+        clf.eval()
 
         # config = self.config
         # if config["dataloader"] == "insnotes_dataloader":
