@@ -1,4 +1,5 @@
 import os
+import argparse
 from tqdm import tqdm
 
 import torch
@@ -11,16 +12,35 @@ import dataloader.insnotes_dataloader as dataloader_module
 from utils.pitch_clf.model import MelCNNPitchClassifier
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train MelCNN Pitch Classifier")
+    parser.add_argument(
+        "batch_size",
+        type=int,
+        default=128,
+        help="Batch size for training",
+    )
+    parser.add_argument(
+        "lr",
+        type=float,
+        default=1e-3,
+        help="Learning rate for the optimizer",
+    )
+    args = parser.parse_args()
+
     S_LIST = dataloader_module.S_LIST
     C_LIST = dataloader_module.C_LIST
 
     val_data_dir = "../data/insnotes_major_all"
 
     train_loader = dataloader_module.get_dataloader(
-        batch_size=128, n_segments=24, num_workers=4, data_type=12
+        batch_size=args.batch_size, n_segments=24, num_workers=4, data_type=12
     )
     val_loader = dataloader_module.get_dataloader(
-        batch_size=128, n_segments=24, num_workers=4, test=True, data_dir=val_data_dir
+        batch_size=args.batch_size,
+        n_segments=24,
+        num_workers=4,
+        test=True,
+        data_dir=val_data_dir,
     )
 
     model = MelCNNPitchClassifier(n_mels=128, n_frames=32, n_class=len(C_LIST))
@@ -28,7 +48,7 @@ if __name__ == "__main__":
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     steps = 10000
 
@@ -39,9 +59,7 @@ if __name__ == "__main__":
             audio = audio.reshape(
                 audio.shape[0] * audio.shape[1], audio.shape[-2], audio.shape[-1]
             )
-            contents = contents.reshape(
-                contents.shape[0] * contents.shape[1], contents.shape[-1]
-            )
+            contents = contents.reshape(contents.shape[0] * contents.shape[1])
             audio = audio.to(device)
             contents = contents.to(device)
             styles = styles.to(device)
