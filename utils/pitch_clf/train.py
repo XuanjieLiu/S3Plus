@@ -56,24 +56,24 @@ if __name__ == "__main__":
     while step < total_steps:
         step += 1
         model.train()
-        for batch in train_loader:
-            audio, contents, styles = batch
-            audio = audio.reshape(
-                audio.shape[0] * audio.shape[1], audio.shape[-2], audio.shape[-1]
-            )
-            contents = contents.reshape(contents.shape[0] * contents.shape[1])
-            audio = audio.to(device)
-            contents = contents.to(device)
-            styles = styles.to(device)
+        batch = next(train_loader)
+        audio, contents, styles = batch
+        audio = audio.reshape(
+            audio.shape[0] * audio.shape[1], audio.shape[-2], audio.shape[-1]
+        )
+        contents = contents.reshape(contents.shape[0] * contents.shape[1])
+        audio = audio.to(device)
+        contents = contents.to(device)
+        styles = styles.to(device)
 
-            # Forward pass
-            outputs = model(audio.squeeze())
-            loss = criterion(outputs, contents)
+        # Forward pass
+        outputs = model(audio.squeeze())
+        loss = criterion(outputs, contents)
 
-            # Backward pass and optimization
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+        # Backward pass and optimization
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
         if step % 10 == 0:
             print(f"Step {step}, Loss: {loss.item()}")
