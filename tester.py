@@ -454,8 +454,16 @@ class Tester:
         else:
             existing_data.append(new_data)
 
+        # sort things out
+        existing_data.sort(key=lambda row: row.get("model_id", ""))
+        sorted_fieldnames = ["model_id"] + sorted(
+            [f for f in fieldnames if f != "model_id"]
+        )
+
         # write back to CSV
         with open(save_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=list(fieldnames))
+            writer = csv.DictWriter(f, fieldnames=list(sorted_fieldnames))
             writer.writeheader()
             writer.writerows(existing_data)
+
+        # TODO: sort out the columns by fieldnames
