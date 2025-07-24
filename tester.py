@@ -240,29 +240,31 @@ class Tester:
         c_labels_future_gt = self.c_labels_future_gt
         x_future_pred = self.x_future_pred
 
-        config = self.config
-        if config["dataloader"] == "insnotes_dataloader":
-            sr = 16000
-            hop_length = 256
-            win_length = 1024
-            n_fft = 1024
+        model_module = import_module("utils.pitch_clf.model.MelCNNPitchClassifier")
+        ckpt_path = "logs/mel_cnn_pitch_classifier.pt"
+        clf = model_module(n_mels=128, n_frames=32, n_class=len(self.C_LIST))
+        clf.load_state_dict(torch.load(ckpt_path, map_location=self.device))
 
-        acc = []
-        n_saved_examples = 0
-        for i in range(x_future_pred.shape[1]):
-            waveforms = [
-                lr.feature.inverse.mel_to_audio(
-                    x_i,
-                    sr=sr,
-                    n_fft=n_fft,
-                    hop_length=hop_length,
-                    win_length=win_length,
-                )
-                for x_i in x_future_pred[:, i, :]
-            ]
+        # config = self.config
+        # if config["dataloader"] == "insnotes_dataloader":
+        #     sr = 16000
+        #     hop_length = 256
+        #     win_length = 1024
+        #     n_fft = 1024
 
-        pass
-        # TODO
+        # acc = []
+        # n_saved_examples = 0
+        # for i in range(x_future_pred.shape[1]):
+        #     waveforms = [
+        #         lr.feature.inverse.mel_to_audio(
+        #             x_i,
+        #             sr=sr,
+        #             n_fft=n_fft,
+        #             hop_length=hop_length,
+        #             win_length=win_length,
+        #         )
+        #         for x_i in x_future_pred[:, i, :]
+        #     ]
 
     def recon_waveform(self, n_samples=10):
         """
