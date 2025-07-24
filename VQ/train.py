@@ -101,16 +101,16 @@ def init_dataloaders(config):
         train_size = int(len(dataset_all) * train_ratio)
         eval_size = len(dataset_all) - train_size
         train_dataset, eval_dataset = torch.utils.data.random_split(dataset_all, [train_size, eval_size])
-        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
-        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
+        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
+        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
     else:
         print("Using predefined datasets")
         plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
         plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
-        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
-        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True)
+        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
+        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
     single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
-    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size, num_workers=n_workers, persistent_workers=True)
+    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size, num_workers=n_workers, persistent_workers=True, pin_memory=True)
     return plus_train_loader, plus_eval_loader, single_img_eval_loader
 
 
@@ -185,12 +185,11 @@ class PlusTrainer:
                 optimizer.zero_grad()
             else:
                 print("Optimizer is None")
-                print(batch_ndx)
-                print(len(sample[0][0]))
             data, labels = sample
-            data = [x.to(DEVICE) for x in data]
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
+            data_all = data_all.to(DEVICE, non_blocking=True)
+            data = split_into_three(data_all)
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
             e_content = e_all[..., 0:self.latent_code_1]
 
@@ -256,7 +255,8 @@ class PlusTrainer:
             if is_log:
                 self.model.eval()
                 print('Eval phase')
-                self.one_epoch(epoch_num, eval_loss_counter, self.plus_eval_loader, True, eval_vis_img, None)
+                with torch.no_grad():
+                    self.one_epoch(epoch_num, eval_loss_counter, self.plus_eval_loader, True, eval_vis_img, None)
                 self.model.train()
                 if self.is_save_img:
                     with torch.no_grad():

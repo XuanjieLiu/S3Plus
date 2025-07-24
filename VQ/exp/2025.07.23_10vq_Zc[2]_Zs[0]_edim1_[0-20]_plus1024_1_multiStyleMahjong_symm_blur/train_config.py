@@ -38,7 +38,6 @@ CONFIG = {
     'eval_record_path': "Eval_record.txt",
     'plus_accu_record_path': "plus_eval.txt",
     'log_interval': 50,
-    'eval_interval': 200,
     'is_save_img': True,
     'batch_size': 256,
     'is_commutative_train': False,
