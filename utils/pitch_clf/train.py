@@ -85,6 +85,14 @@ if __name__ == "__main__":
                 val_acc = 0.0
                 for val_batch in val_loader:
                     val_audio, val_contents, _ = val_batch
+                    val_audio = val_audio.reshape(
+                        val_audio.shape[0] * val_audio.shape[1],
+                        val_audio.shape[-2],
+                        val_audio.shape[-1],
+                    )
+                    val_contents = val_contents.reshape(
+                        val_contents.shape[0] * val_contents.shape[1]
+                    )
                     val_audio = val_audio.to(device)
                     val_contents = val_contents.to(device)
 
