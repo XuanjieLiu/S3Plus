@@ -16,9 +16,11 @@ C_LIST = dataloader_module.C_LIST
 
 val_data_dir = "../data/insnotes_major_val"
 
-train_loader = dataloader_module.get_dataloader(batch_size=128, num_workers=4)
+train_loader = dataloader_module.get_dataloader(
+    batch_size=128, n_segments=24, num_workers=4, data_type=12
+)
 val_loader = dataloader_module.get_dataloader(
-    batch_size=128, num_workers=4, test=True, data_dir=val_data_dir
+    batch_size=128, n_segments=24, num_workers=4, test=True, data_dir=val_data_dir
 )
 
 model = MelCNNPitchClassifier(n_mels=128, n_frames=32, n_class=len(C_LIST))
@@ -34,6 +36,12 @@ for step in tqdm(range(steps)):
     model.train()
     for batch in train_loader:
         audio, contents, styles = batch
+        audio = audio.reshape(
+            audio.shape[0] * audio.shape[1], audio.shape[-2], audio.shape[-1]
+        )
+        contents = contents.reshape(
+            contents.shape[0] * contents.shape[1], contents.shape[-1]
+        )
         audio = audio.to(device)
         contents = contents.to(device)
         styles = styles.to(device)
