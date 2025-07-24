@@ -249,6 +249,16 @@ class Tester:
         clf.to(self.device)
         clf.eval()
 
+        acc = 0
+        x_future_pred = torch.tensor(x_future_pred).to(self.device).squeeze()
+        for i in range(x_future_pred.shape[0]):
+            x_i = x_future_pred[i, :]
+            pred = torch.max(clf(x_i), 1)[1].item()
+            acc += (pred == c_labels_future_gt[i]).sum().item()
+        acc /= x_future_pred.shape[0] * x_future_pred.shape[1]
+
+        print(f"Future prediction accuracy on X: {acc}")
+
         # config = self.config
         # if config["dataloader"] == "insnotes_dataloader":
         #     sr = 16000
