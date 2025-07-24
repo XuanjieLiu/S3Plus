@@ -236,6 +236,7 @@ class Tester:
         """
         Compute the future prediction accuracy on the x level (behavioral level).
         if save_n_samples > 0, save these audio files of the predictions.
+        # TODO: write another func to test the pitch classifier on recons, to test if the
         """
         c_labels_future_gt = self.c_labels_future_gt
         x_future_pred = self.x_future_pred
