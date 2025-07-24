@@ -50,7 +50,7 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-    total_steps = 10000
+    total_steps = 1000
 
     step = 0
     while step < total_steps:
