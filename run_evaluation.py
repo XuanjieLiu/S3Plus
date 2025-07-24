@@ -112,8 +112,9 @@ if __name__ == "__main__":
     tester.build_model()
     tester.test(
         future_pred_acc=known_args.future_pred_acc,
-        recon_waveform=known_args.recon_waveform,
+        recon_acc=known_args.recon_acc,
         future_pred_waveform=known_args.future_pred_waveform,
+        recon_waveform=known_args.recon_waveform,
         vis_tsne=config.get("vis_tsne", False),
         confusion_mtx=config.get("confusion_mtx", False),
     )
