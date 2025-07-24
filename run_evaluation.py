@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_results_at",
         type=str,
-        required=True,
+        default="results.csv",
         help="csv file to save numerical results as a row with model name and result entries. Other kinds of results will be saved in the checkpoint directory",
     )
 
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     with open(known_args.config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     config["active_checkpoint"] = known_args.active_checkpoint
+    config["save_results_at"] = known_args.save_results_at
 
     # Update config with additional arguments
     for key, value in additional_args.items():
