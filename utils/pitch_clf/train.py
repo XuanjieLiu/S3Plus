@@ -14,13 +14,13 @@ from utils.pitch_clf.model import MelCNNPitchClassifier
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train MelCNN Pitch Classifier")
     parser.add_argument(
-        "batch_size",
+        "--batch_size",
         type=int,
         default=128,
         help="Batch size for training",
     )
     parser.add_argument(
-        "lr",
+        "--lr",
         type=float,
         default=1e-3,
         help="Learning rate for the optimizer",
