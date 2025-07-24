@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
                 print(f"Validation Loss at Step {step}: {val_loss / len(val_loader)}")
                 print(
-                    f"Validation Accuracy at Step {step}: {val_acc / len(val_loader.dataset)}"
+                    f"Validation Accuracy at Step {step}: {val_acc / (len(val_loader.dataset) * 24)}"
                 )
 
     # Save the model
