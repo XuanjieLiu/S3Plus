@@ -88,12 +88,12 @@ def switch_digital(a_con: torch.Tensor, b_con: torch.Tensor, emb_dim: int):
 
 
 def init_dataloaders(config):
-    aug_t = config['augment_times']
-    blur_cfg = config['blur_config']
-    is_blur = config['is_blur']
-    trans = make_dataset_trans(is_blur, blur_cfg)
+    aug_t = config.get('augment_times', 1)
+    blur_cfg = config.get('blur_config', None)
+    is_blur = config.get('is_blur', False)
+    trans = make_dataset_trans(is_blur, blur_cfg) if is_blur else None
     batch_size = config['batch_size']
-    n_workers = config['num_workers']
+    n_workers = config.get('num_workers', 0)
     if config['is_random_split_data']:
         print("Using random split data")
         train_ratio = config['train_data_ratio']
