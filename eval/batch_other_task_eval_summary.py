@@ -30,7 +30,7 @@ group_list = [
 
 EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp')
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 11)]
 
 COMPARE_KEYS = ['accu', 'loss_recon']
 COMPARE_KEYS_NAME = ['Accuracy', 'Repr_pred_loss']

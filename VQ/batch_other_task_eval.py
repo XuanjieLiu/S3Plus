@@ -12,7 +12,7 @@ if len(sys.argv) < 2:
 sys.path.append(EXP_ROOT)
 EXP_NAME_LIST = sys.argv[1:]
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+OTHER_TASK_EXP_NUM_LIST = [str(i) for i in range(1, 11)]
 
 # Batch eval minus
 
@@ -30,11 +30,12 @@ for exp_num in EXP_NUM_LIST:
         print(pretrained_config.CONFIG)
         print(other_task_config.CONFIG)
         sub_exp_path = os.path.join(exp_path, exp_num)
-        optimal_check_point = find_optimal_checkpoint_num_by_train_config(sub_exp_path, pretrained_config.CONFIG)
         for i in range(0, len(other_task_config.CONFIG)):
             print(f'Sub-Exp path: {sub_exp_path}')
             os.chdir(sub_exp_path)
             config = other_task_config.CONFIG[i]
+            optimal_checkpoint_finding_config = config.get('optimal_checkpoint_finding_config', None)
+            optimal_check_point = find_optimal_checkpoint_num_by_train_config(sub_exp_path, pretrained_config.CONFIG, optimal_checkpoint_finding_config)
             config['pretrained_path'] = f'checkpoint_{optimal_check_point}.pt'
             other_task = OtherTask(pretrained_config.CONFIG, config)
             for j in OTHER_TASK_EXP_NUM_LIST:

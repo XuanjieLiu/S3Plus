@@ -122,16 +122,28 @@ def render_new_dataset_from_old_dataset(
         )
 
 if __name__ == "__main__":
-
     render_new_dataset_from_old_dataset(
-        ['train', 'test_1', 'test_2'],
-        os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet'),
-        os.path.join(DATA_ROOT, 'multi_style_pairs(0,20)_tripleSet_mahjong'),
-        ['default'],
-        ['b'],
-        comp_plus,  # remember to change the comp_plus to comp_minus or reverse
-        render_EU_tally_mark_num_dataset
+        ['train', 'test'],
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(1,20)'),
+        os.path.join(DATA_ROOT, 'multi_style_pairs_minus(1,20)'),
+        TRAIN_MARKERS,
+        TRAIN_COLORS,
+        comp_minus,  # remember to change the comp_plus to comp_minus or reverse
+        render_dataset
     )
+
+    """
+        Make mahjong dataset from single style pairs dataset.
+    """
+    # render_new_dataset_from_old_dataset(
+    #     ['train', 'test_1', 'test_2'],
+    #     os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet'),
+    #     os.path.join(DATA_ROOT, 'multi_style_pairs(0,20)_tripleSet_mahjong'),
+    #     ['default'],
+    #     ['b'],
+    #     comp_plus,  # remember to change the comp_plus to comp_minus or reverse
+    #     render_EU_tally_mark_num_dataset
+    # )
 
     """
     Make EU tally mark dataset from single style pairs dataset.
@@ -164,23 +176,6 @@ if __name__ == "__main__":
     #     test_2_plus_tuple, test_2_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
     # )
 
-    print('aaa')
 
-
-    # target_set_name = f'{DATA_ROOT}/single_style_pairs_minus(0,20)_arabic'
-    # make_arabic_dataset_datapair_from_tuple_list(
-    #     train_tuples,
-    #     os.path.join(target_set_name, 'train'),
-    #     ['default'],
-    #     ['blue'],
-    #     comp_minus
-    # )
-    # make_arabic_dataset_datapair_from_tuple_list(
-    #     test_1_tuples,
-    #     os.path.join(target_set_name, 'test'),
-    #     ['default'],
-    #     ['blue'],
-    #     comp_minus
-    # )
 
 
