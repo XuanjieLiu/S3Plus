@@ -92,8 +92,14 @@ def init_dataloaders(config):
     blur_cfg = config.get('blur_config', None)
     is_blur = config.get('is_blur', False)
     trans = make_dataset_trans(is_blur, blur_cfg) if is_blur else None
-    batch_size = config['batch_size']
     n_workers = config.get('num_workers', 0)
+    loader_config = {
+        'batch_size': config['batch_size'],
+        'shuffle': True,
+        'num_workers': n_workers,
+        'persistent_workers': True if n_workers > 0 else False,
+        'pin_memory': True
+    }
     if config['is_random_split_data']:
         print("Using random split data")
         train_ratio = config['train_data_ratio']
@@ -101,16 +107,16 @@ def init_dataloaders(config):
         train_size = int(len(dataset_all) * train_ratio)
         eval_size = len(dataset_all) - train_size
         train_dataset, eval_dataset = torch.utils.data.random_split(dataset_all, [train_size, eval_size])
-        plus_train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
-        plus_eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
+        plus_train_loader = DataLoader(train_dataset, **loader_config)
+        plus_eval_loader = DataLoader(eval_dataset, **loader_config)
     else:
         print("Using predefined datasets")
         plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
         plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
-        plus_train_loader = DataLoader(plus_train_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
-        plus_eval_loader = DataLoader(plus_eval_set, batch_size=batch_size, shuffle=True, num_workers=n_workers, persistent_workers=True, pin_memory=True)
+        plus_train_loader = DataLoader(plus_train_set, **loader_config)
+        plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
     single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
-    single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=batch_size, num_workers=n_workers, persistent_workers=True, pin_memory=True)
+    single_img_eval_loader = DataLoader(single_img_eval_set, **loader_config)
     return plus_train_loader, plus_eval_loader, single_img_eval_loader
 
 
