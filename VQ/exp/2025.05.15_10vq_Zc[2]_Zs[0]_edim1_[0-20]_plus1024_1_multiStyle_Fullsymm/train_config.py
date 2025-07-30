@@ -6,6 +6,7 @@ CONFIG = {
     'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
     'plus_eval_set_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test",
     'plus_eval_set_path_2': None,
+    'is_random_split_data': False,
     'is_blur': False,
     'num_workers': 0,
     'latent_embedding_1': 2,
