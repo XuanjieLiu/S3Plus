@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
     gen_directories_val_ood_spectrum(
         save_dir="../data/sax_major_val_ood_spectrum",
-        save_name="insnotes_major_",
+        save_name="sax_major_",
         mode="major",
         styles="1",
     )
