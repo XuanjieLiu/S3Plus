@@ -178,7 +178,7 @@ class PseudoMelGen:
             return np.array(envelope)
 
 
-def gen_directory(save_dir, mode="major", ood=False):
+def gen_directory(save_dir, mode="major", ood=False, styles="all"):
     """
     generate a directory maybe for testing, mode scales
     if ood is True, generate out-of-distribution keys (for now they are A, A#, B)
@@ -197,6 +197,8 @@ def gen_directory(save_dir, mode="major", ood=False):
         "Harmonica",
         "Choir Aahs",
     ]
+    if not styles == "all":
+        S_LIST = [S_LIST[0]]
 
     generators = []
     for i in range(len(S_LIST)):
@@ -231,7 +233,7 @@ def gen_directory(save_dir, mode="major", ood=False):
     # )
 
 
-def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major"):
+def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="all"):
     """
     generate multiple directories of mode scales, including val and ood sets
     val: from 3 scales to 11 scales
@@ -252,6 +254,8 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major"):
         "Harmonica",
         "Choir Aahs",
     ]
+    if not styles == "all":
+        S_LIST = [S_LIST[0]]
 
     C_LIST = [
         "C",
@@ -373,13 +377,14 @@ if __name__ == "__main__":
     # gen_directory("../data/insnotes_major_ood", ood=True)
     # print("Generated insnotes_major_ood")
 
-    gen_directory("../data/insnotes_major_all", ood=False)
+    gen_directory("../data/sax_major_all", ood=False, styles="1")
 
-    # gen_directories_val_ood_spectrum(
-    #     save_dir="../data/insnotes_major_val_ood_spectrum",
-    #     save_name="insnotes_major_",
-    #     mode="major",
-    # )
+    gen_directories_val_ood_spectrum(
+        save_dir="../data/sax_major_val_ood_spectrum",
+        save_name="insnotes_major_",
+        mode="major",
+        styles="1",
+    )
 
     # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
     # gen_directory_with_dataset_input(
