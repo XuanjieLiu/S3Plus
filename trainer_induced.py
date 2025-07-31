@@ -26,62 +26,12 @@ import wandb
 from utils.training_utils import *
 from utils.eval_utils import *
 
+from trainer import Trainer
 
-class Trainer:
+
+class TrainerInduced(Trainer):
     def __init__(self, config):
-        # basic configs
-        self.config = config
-        if self.config["debug"]:
-            self.portion = 1
-            self.config["n_epochs"] = 1
-            self.config["n_steps"] = 100
-            self.config["log_every_n_steps"] = 1
-            self.config["save_top_k"] = 1
-        else:
-            self.portion = 1
-
-        if self.config["random_seed"] is not None:
-            setup_seed(self.config["random_seed"])
-
-        # device
-        if self.config["device"] == "cuda" and torch.cuda.is_available():
-            self.device = torch.device("cuda")
-            # self.local_rank = int(os.environ["LOCAL_RANK"])
-        else:
-            self.device = torch.device("cpu")
-            # self.local_rank = 0
-
-        # log dir
-        if "name" not in config:
-            config["name"] = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-        self.name = config["name"]
-        self.log_dir = os.path.join(config["log_dir"], self.name)
-        os.makedirs(self.log_dir, exist_ok=True)
-
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d_%H:%M:%S",
-            handlers=[
-                logging.StreamHandler(sys.stdout),
-                logging.FileHandler(os.path.join(self.log_dir, "log.txt")),
-            ],
-        )
-
-        # backup the config file
-        with open(os.path.join(self.log_dir, "config.yaml"), "w") as f:
-            yaml.dump(config, f)
-
-        # wandb
-        if not config["debug"]:
-            if "project" in config:
-                wandb.init(project=config["project"], name=self.name)
-            else:
-                wandb.init(project="SV3", name=self.name)
-            wandb.config.update(config)
-
-        # performance history: {step: val_loss}
-        self.performance_history = {}
+        super().__init__(config)
 
     def prepare_data(self):
         """
@@ -98,15 +48,29 @@ class Trainer:
             # data_dir=os.path.join(self.data_dir, "train"),
             batch_size=config["batch_size"],
             num_workers=config["num_workers"],
+            data_type=config["data_type"],
             # shuffle=True,  # when distributed, shuffle is omitted
             # distributed=False,
+            mode="major",
         )
-
         logging.info("Train dataloader ready.")
+        self.inducement_loader = dataloader_module.get_dataloader(
+            # data_dir=os.path.join(self.data_dir, "train"),
+            batch_size=config["batch_size"],
+            n_segments=6,
+            num_workers=config["num_workers"],
+            data_type=config["data_type"],
+            # shuffle=True,  # when distributed, shuffle is omitted
+            # distributed=False,
+            mode=config["inducement"],
+        )
+        logging.info("Inducement dataloader ready.")
+
         self.val_loader = dataloader_module.get_dataloader(
             data_dir=os.path.join(self.data_dir),
             batch_size=config["batch_size"],
             num_workers=config["num_workers"],
+            data_type=config["data_type"],
             # shuffle=False,  # when distributed, shuffle is omitted
             test=True,
             # distributed=False,
@@ -128,8 +92,14 @@ class Trainer:
 
         if "ISymm" in method_specs:
             if "insnotes" in config["dataloader"]:
-                Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
-                Loss = import_module("model.symm_loss").SymmLoss
+                if "Induced" in method_specs:
+                    Model = import_module(
+                        "model.simple_rnn_insnotes_induced"
+                    ).SymmCSAEwithSecondaryPrior
+                    Loss = import_module("model.symm_loss_induced").SymmLossInduced
+                else:
+                    Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
+                    Loss = import_module("model.symm_loss").SymmLoss
 
         model_config = self.config["model_config"]
         optimizer_config = self.config["optimizer_config"]
@@ -232,15 +202,22 @@ class Trainer:
         self.model.train()
         running_losses_train = {}
         train_loader = self.train_loader
+        inducement_loader = self.inducement_loader
         while step < n_steps:
             # training loop
 
             batch_data, c_labels, s_labels = next(train_loader)
+            batch_data_induced, c_labels_induced, s_labels_induced = next(
+                inducement_loader
+            )
             # Move data to device
             batch_data = batch_data.to(device=self.device)
+            batch_data_induced = batch_data_induced.to(device=self.device)
             # forward
             with torch.autocast(self.device.type):
-                losses = self.loss.compute_loss(step, self.model, batch_data)
+                losses = self.loss.compute_loss(
+                    step, self.model, batch_data, batch_data_induced
+                )
             # backward
             self.optimizer.zero_grad(set_to_none=True)
             if self.pcgrad is not None:

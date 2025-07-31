@@ -1,0 +1,63 @@
+log_dir: "./logs"
+project: "ISymm_Induced"
+name: "ISymm_melody"
+debug: False
+random_seed: 
+
+dataloader: "insnotes_dataloader"
+data_dir: "../data/insnotes_major_val"
+data_type: 3 # means 3 scales in distribition, only for this dataset
+method: "ISymm_Induced"
+inducement: "chromatic" # "chromatic", "corrupted_chromatic"
+
+device: "cuda"
+num_workers: 4
+batch_size: 8
+steps: 5000 # incremental if load_checkpoint is active
+val_every_n_steps: 100 # steps
+val_steps: 10 # steps, an integer or "whole" to use the whole dataset
+log_every_n_steps: 1 # steps
+save_top_k: 3 # based on validation loss
+save_every_n_steps: 100 # steps, multiple or equal to val_every_n_steps
+
+load_checkpoint: None
+active_checkpoint: None
+
+loss_config:
+  weights:
+    ae_loss: 1
+    prior_loss: 10
+    prior_loss_secondary: 10
+    isymm_loss: 10
+    commit_loss: 1
+  ntf_ratio: "0 if t < 100 else min(1.0, (t - 100) / 1000)"
+  start_isymm_at_n_steps: 100
+
+model_config:
+  d_zc: 512
+  d_zs: 512
+  n_layers_rnn: 1
+  n_atoms: 24
+  vq_ema_decay: 0.98
+  threshold_ema_dead_code: 2
+  GRU: True
+
+optimizer_config:
+  optimizer: "AdamW"
+  lr: 5.0e-4
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+  momentum: 0.9
+  weight_decay: 0.0
+
+  scheduler: "exponential_decay" # "cosine_annealing", "exponential_decay"
+  lr_anneal_steps: 100
+  lr_anneal_min_factor: 0.01
+  lr_decay_factor: 0.99
+  lr_decay_steps: 10
+  lr_decay_min_factor: 0.001
+  warmup_steps: 10
+  warmup_factor: 0.1
+
+  PCGrad: False

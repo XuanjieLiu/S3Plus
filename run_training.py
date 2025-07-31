@@ -52,8 +52,10 @@ if __name__ == "__main__":
     if known_args.debug > 0:
         config["debug"] = True
 
-    if "ISymm" in config["method"]:
+    if config["method"] == "ISymm":
         from trainer import Trainer
+    elif config["method"] == "ISymm_Induced":
+        from trainer_induced import TrainerInduced as Trainer
 
     trainer = Trainer(config)
     trainer.prepare_data()

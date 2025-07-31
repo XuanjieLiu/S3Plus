@@ -75,7 +75,7 @@ def worker_init_fn(worker_id):
 
 
 class InsNotesDataset(IterableDataset):
-    def __init__(self, n_segments=90, transform=None, data_type=None):
+    def __init__(self, n_segments=90, transform=None, data_type=None, mode="major"):
         """
         data_dir: directory directly containing .npy files
 
@@ -90,6 +90,7 @@ class InsNotesDataset(IterableDataset):
             Spectrogram(n_fft=1024, win_length=1024, hop_length=256),
             MelScale(n_mels=128, sample_rate=16000, f_min=0, f_max=8000, n_stft=513),
         )
+        self.mode = mode
 
     def __iter__(self):
         """
@@ -107,7 +108,9 @@ class InsNotesDataset(IterableDataset):
             elif isinstance(self.data_type, int):
                 j = random.randint(0, self.data_type - 1)
                 j = C_LIST.index(roots[j])
-            audio, contents = generators[i].gen_melody(mel_len=self.n_segments, root=j)
+            audio, contents = generators[i].gen_melody(
+                mel_len=self.n_segments, mode=self.mode, root=j
+            )
             audio = torch.tensor(audio)
             audio = self.transform(audio)  # spectrogram
             # audio = audio[
@@ -186,7 +189,7 @@ def get_dataloader(
 ):
     if not test:
         dataset = InsNotesDataset(
-            n_segments=n_segments, transform=transform, data_type=data_type
+            n_segments=n_segments, transform=transform, data_type=data_type, mode=mode
         )
         dataloader = DataLoader(
             dataset,
