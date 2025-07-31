@@ -22,17 +22,17 @@ from utils.training_utils import setup_seed
 
 S_LIST = [
     "Soprano Sax",
-    "Pipe Organ",
-    "Accordion",
-    "Viola",
-    "Trumpet",
-    "Muted Trumpet",
-    "Oboe",
-    "Clarinet",
-    "Piccolo",
-    "Pan Flute",
-    "Harmonica",
-    "Choir Aahs",
+    # "Pipe Organ",
+    # "Accordion",
+    # "Viola",
+    # "Trumpet",
+    # "Muted Trumpet",
+    # "Oboe",
+    # "Clarinet",
+    # "Piccolo",
+    # "Pan Flute",
+    # "Harmonica",
+    # "Choir Aahs",
 ]
 
 C_LIST = [
