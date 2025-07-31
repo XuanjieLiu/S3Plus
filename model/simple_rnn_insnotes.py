@@ -268,3 +268,6 @@ if __name__ == "__main__":
     print("Z_Predictions shape:", zc_predictions.shape)
     predictions = model.decode(zc_predictions, zs)
     print("Predictions shape:", predictions.shape)
+
+
+# TODO: stochasticity
