@@ -14,26 +14,6 @@ from vector_quantize_pytorch import VectorQuantize
 
 from model.modules.insnotes import Encoder, Decoder
 
-# todo: make these parameters configurable
-log_interval = 10
-IMG_CHANNEL = 1
-
-LAST_H = 15
-LAST_W = 2
-
-CHANNELS = [64, 64, 128, 128]
-
-
-def repeat_one_dim(z, repeat_times=None, sample_range=None):
-    length = z.size(1)
-    if sample_range is None:
-        sample_range = length
-    if repeat_times is None:
-        repeat_times = length
-    r_dim = random.sample(range(sample_range), 1)[0]
-    r_tensor = z[:, r_dim : r_dim + 1, :]
-    return r_tensor.repeat(1, repeat_times, 1)
-
 
 class SymmCSAEwithPrior(nn.Module):
     def __init__(self, config):
@@ -44,6 +24,9 @@ class SymmCSAEwithPrior(nn.Module):
         self.n_layers_rnn = config["n_layers_rnn"]
         self.n_atoms = config["n_atoms"]
         # self.base_len = config["base_len"]
+
+        if self.d_zs <= 0:
+            self.d_zs = 0
 
         # hard-coded parameters
         self.encoder = Encoder(n_channels=128, W=128, H=32, d_emb=self.d_zc + self.d_zs)
@@ -90,10 +73,14 @@ class SymmCSAEwithPrior(nn.Module):
         x = x.reshape(b * t, c, h, w)
         z = self.encoder(x)
         z = z.reshape(b, t, z.size(1))
-        zc = z[:, :, : self.d_zc]
-        zs = z[:, :, self.d_zc :]
-        # pool this zs so that the sequence length is 1
-        zs = zs.mean(dim=1, keepdim=True)
+        if self.d_zs > 0:
+            zc = z[:, :, : self.d_zc]
+            zs = z[:, :, self.d_zc :]
+            # pool this zs so that the sequence length is 1
+            zs = zs.mean(dim=1, keepdim=True)
+        else:
+            zc = z
+            zs = None
         if quantize:
             zc_vq, indices, commit_loss = self.quantize(zc)
             return zc_vq, indices, commit_loss, zs
@@ -106,9 +93,12 @@ class SymmCSAEwithPrior(nn.Module):
         return quantized, indices, commit_loss
 
     def decode(self, zc, zs):
-        # expand zs to match the sequence length of zc
-        zs = zs.expand(-1, zc.size(1), -1)
-        z = torch.cat((zc, zs), dim=-1)
+        if zs is not None:
+            # expand zs to match the sequence length of zc
+            zs = zs.expand(-1, zc.size(1), -1)
+            z = torch.cat((zc, zs), dim=-1)
+        else:
+            z = zc
         out = self.decoder(z)
         return out
 
@@ -262,9 +252,7 @@ if __name__ == "__main__":
     print(model.get_model_size())
 
     # Create a random input tensor
-    x = torch.randn(
-        3, 10, IMG_CHANNEL, 128, 64
-    )  # Batch size of 1, sequence length of 10
+    x = torch.randn(3, 10, 1, 128, 64)  # Batch size of 1, sequence length of 10
     # Test the forward pass
     x_hat, zc, zc_vq, indices, commit_loss, zs = model(x)
     print("Output shape:", x_hat.shape)

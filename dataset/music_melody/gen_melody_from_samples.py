@@ -49,6 +49,14 @@ class PseudoMelGen:
             p_list = [0, 2, 4, 6, 7, 9, 11]
         elif mode == "mixolydian":
             p_list = [0, 2, 4, 5, 7, 9, 10]
+        elif mode == "chromatic":
+            p_list = list(range(12))
+        elif (
+            mode == "corrupted_chromatic"
+        ):  # introduce a small random mistake in the chromatic scale
+            p_list = list(range(12))
+            # remove a random pitch
+            p_list.remove(np.random.choice(p_list))
 
         melody = []
         pitches = []
