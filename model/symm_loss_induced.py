@@ -16,7 +16,7 @@ class SymmLossInduced(SymmLoss):
         """
         super(SymmLossInduced, self).__init__(config, use_isymm)
 
-    def compute_loss(self, step, model, x_main, x_inducement):
+    def compute_loss(self, step, model, x_main, x_inducement=None):
         """
         Do the forward here
         """
@@ -26,11 +26,17 @@ class SymmLossInduced(SymmLoss):
         )  # vq loss and recon loss
         ae_loss = F.mse_loss(x_hat, x_main)
 
-        x_hat_induced, zc_inducement, zc_vq_inducement, _, commit_loss_induced, _ = (
-            model(x_inducement)
-        )
-        ae_loss += F.mse_loss(x_hat_induced, x_inducement)
-        commit_loss += commit_loss_induced
+        if x_inducement is not None:
+            (
+                x_hat_induced,
+                zc_inducement,
+                zc_vq_inducement,
+                _,
+                commit_loss_induced,
+                _,
+            ) = model(x_inducement)
+            ae_loss += F.mse_loss(x_hat_induced, x_inducement)
+            commit_loss += commit_loss_induced
 
         # get the prior output
         ntf_ratio = compute_loss_weight(self.config["ntf_ratio"], step)
@@ -38,12 +44,13 @@ class SymmLossInduced(SymmLoss):
         prior_loss = F.mse_loss(zc_vq_hat, zc[:, 1:, :], reduction="mean")
         # TODO: introduce stochasticity, not just MSE
 
-        zc_vq_inducement_hat = model.secondary_rnn_forward(
-            zc_vq_inducement, ntf_ratio=ntf_ratio
-        )
-        prior_loss_secondary = F.mse_loss(
-            zc_vq_inducement_hat, zc_inducement[:, 1:, :], reduction="mean"
-        )
+        if x_inducement is not None:
+            zc_vq_inducement_hat = model.secondary_rnn_forward(
+                zc_vq_inducement, ntf_ratio=ntf_ratio
+            )
+            prior_loss_secondary = F.mse_loss(
+                zc_vq_inducement_hat, zc_inducement[:, 1:, :], reduction="mean"
+            )
 
         if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
