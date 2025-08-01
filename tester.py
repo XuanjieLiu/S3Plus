@@ -74,8 +74,14 @@ class Tester:
 
         if "ISymm" in method_specs:
             if "insnotes" in config["dataloader"]:
-                Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
-                Loss = import_module("model.symm_loss").SymmLoss
+                if "Induced" in method_specs:
+                    Model = import_module(
+                        "model.simple_rnn_insnotes_induced"
+                    ).SymmCSAEwithSecondaryPrior
+                    Loss = import_module("model.symm_loss_induced").SymmLossInduced
+                else:
+                    Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
+                    Loss = import_module("model.symm_loss").SymmLoss
 
         model_config = self.config["model_config"]
         loss_config = self.config["loss_config"]
