@@ -37,6 +37,7 @@ for exp_num in EXP_NUM_LIST:
             optimal_checkpoint_finding_config = config.get('optimal_checkpoint_finding_config', None)
             optimal_check_point = find_optimal_checkpoint_num_by_train_config(sub_exp_path, pretrained_config.CONFIG, optimal_checkpoint_finding_config)
             config['pretrained_path'] = f'checkpoint_{optimal_check_point}.pt'
+            print(f'Optimal checkpoint: {optimal_check_point}')
             other_task = OtherTask(pretrained_config.CONFIG, config)
             for j in OTHER_TASK_EXP_NUM_LIST:
                 sub_sub_exp_path = os.path.join(sub_exp_path, j)

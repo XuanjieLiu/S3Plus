@@ -98,6 +98,7 @@ class OtherTask:
         tensor_y = data_name_2_labels(labels[2]).to(DEVICE)
         sizes = data[0].size()
         data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
+        data_all = data_all.to(DEVICE)
         e_all, e_q_loss, z_all = self.pretrained.batch_encode_to_z(data_all)
         e_content = e_all[..., 0:self.latent_code_1]
         ec_a, ec_b, ec_c = split_into_three(e_content)
@@ -135,7 +136,6 @@ class OtherTask:
     def one_epoch(self, epoch_num, loss_counter: LossCounter, data_loader,
                   is_log, optimizer: torch.optim.Optimizer = None):
         for batch_ndx, sample in enumerate(data_loader):
-            print(f'Epoch: {epoch_num}')
             if optimizer is not None:
                 optimizer.zero_grad()
             ec_ab, tensor_y, loss_classify, loss_recon, accu, recon_z_ab = self.fc_comp(sample)

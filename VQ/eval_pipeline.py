@@ -1,7 +1,7 @@
 import sys
 import os
 from typing import Dict, Callable, Any
-
+import torch
 import numpy as np
 import json
 from torchvision import transforms
@@ -19,11 +19,14 @@ from torch.utils.data import ConcatDataset
 from torch.utils.data import DataLoader
 from two_dim_num_vis import MumEval
 
+EVAL_ITEM_PLUS = 'plus_eval_configs'
+EVAL_ITEM_MATCHING_RATE = 'emb_matching_rate_configs'
+EVAL_ITEM_ORDERLINESS = 'orderliness_configs'
 
 # EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
-    "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
@@ -33,6 +36,12 @@ EXP_NAME_LIST = [
     # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
     # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
 ]
+EVAL_TERMS = [
+    EVAL_ITEM_PLUS,
+    EVAL_ITEM_MATCHING_RATE,
+    EVAL_ITEM_ORDERLINESS,
+]
+
 
 def make_data_loader(sub_cfg: Dict[str, Any],
                 dataset_cls: Callable[..., Any]) -> DataLoader:
@@ -95,109 +104,115 @@ def save_all_results(pipline_dir, all_results, all_ckpts):
         json.dump(all_results_details, f, indent=4)
 
 
-if __name__ == "__main__":
-    for exp_name in EXP_NAME_LIST:
-        exp_path = os.path.join(EXP_ROOT, exp_name)
-        config = load_config_from_exp_name(exp_name)
-        eval_config = config['eval_config']
-        pipeline_dir = os.path.join(exp_path, eval_config['pipeline_result_path'])
-        os.makedirs(pipeline_dir, exist_ok=True)
-        all_results = {}
-        all_ckpts = find_all_ckpts(config, exp_path)
-        # eval plus accu
-        if eval_config.get('plus_eval_configs') is not None:
-            plus_evaler = VQvaePlusEval(config)
-            plus_eval_configs = eval_config['plus_eval_configs']
-            for sub_config in plus_eval_configs:
-                name = sub_config['name']
-                data_loader = make_data_loader(sub_config, MultiImgDataset)
-                one2n_accu_result_name = f"{name}_one2n_accu"
-                one2one_accu_result_name = f"{name}_one2one_accu"
-                one2n_accu_result_name_cycle = f"{name}_one2n_accu_cycle"
-                one2one_accu_result_name_cycle = f"{name}_one2one_accu_cycle"
-                emb_self_consistency_result_name = f"{name}_emb_self_consistency"
-                emb_label_consistency_result_name = f"{name}_emb_label_consistency"
-                z_c_recognition_rate_result_name = f"{name}_z_c_recognition_rate"
-                z_c_cycle_recognition_rate_result_name = f"{name}_z_c_cycle_recognition_rate"
-                one2n_accu_list = []
-                one2n_accu_list_cycle = []
-                one2one_accu_list = []
-                one2one_accu_list_cycle = []
-                emb_self_consistency_list = []
-                emb_label_consistency_list = []
-                z_c_recognition_rate_list = []
-                z_c_cycle_recognition_rate_list = []
-                for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
-                    plus_evaler.reload_model(ckpt_path)
-                    all_enc_z, all_plus_z = plus_evaler.load_plusZ_eval_data(data_loader, is_find_index=True)
-                    # 计算 one2n accu
-                    one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
-                    one2n_accu_list.append(one2n_accu)
-                    one2n_accu_list_cycle.append(one2n_accu_cycle)
-                    # 计算 one2one accu
-                    one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
-                    one2one_accu_list.append(one2one_accu)
-                    one2one_accu_list_cycle.append(one2one_accu_cycle)
-                    # 计算 emb self consistency
-                    emb_self_consistency_list.append(calc_plus_z_self_cycle_consistency(all_plus_z))
-                    # 计算 emb label consistency 和 z_c recognition rate
-                    emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate = (
-                        calc_plus_z_mode_emb_label_cycle_consistency(all_enc_z, all_plus_z))
-                    emb_label_consistency_list.append(emb_label_consistency)
-                    z_c_recognition_rate_list.append(z_c_recognition_rate)
-                    z_c_cycle_recognition_rate_list.append(z_c_cycle_recognition_rate)
-                all_results[one2n_accu_result_name] = one2n_accu_list
-                all_results[one2one_accu_result_name] = one2one_accu_list
-                all_results[one2n_accu_result_name_cycle] = one2n_accu_list_cycle
-                all_results[one2one_accu_result_name_cycle] = one2one_accu_list_cycle
-                all_results[emb_self_consistency_result_name] = emb_self_consistency_list
-                all_results[emb_label_consistency_result_name] = emb_label_consistency_list
-                all_results[z_c_recognition_rate_result_name] = z_c_recognition_rate_list
-                all_results[z_c_cycle_recognition_rate_result_name] = z_c_cycle_recognition_rate_list
+def pipeline_eval(exp_name: str):
+    exp_path = os.path.join(EXP_ROOT, exp_name)
+    config = load_config_from_exp_name(exp_name)
+    eval_config = config['eval_config']
+    pipeline_dir = os.path.join(exp_path, eval_config['pipeline_result_path'])
+    os.makedirs(pipeline_dir, exist_ok=True)
+    all_results = {}
+    all_ckpts = find_all_ckpts(config, exp_path)
+    # eval plus accu
+    if eval_config.get(EVAL_ITEM_PLUS) is not None and EVAL_ITEM_PLUS in EVAL_TERMS:
+        plus_evaler = VQvaePlusEval(config)
+        plus_eval_configs = eval_config['plus_eval_configs']
+        for sub_config in plus_eval_configs:
+            name = sub_config['name']
+            data_loader = make_data_loader(sub_config, MultiImgDataset)
+            one2n_accu_result_name = f"{name}_one2n_accu"
+            one2one_accu_result_name = f"{name}_one2one_accu"
+            one2n_accu_result_name_cycle = f"{name}_one2n_accu_cycle"
+            one2one_accu_result_name_cycle = f"{name}_one2one_accu_cycle"
+            emb_self_consistency_result_name = f"{name}_emb_self_consistency"
+            emb_label_consistency_result_name = f"{name}_emb_label_consistency"
+            z_c_recognition_rate_result_name = f"{name}_z_c_recognition_rate"
+            z_c_cycle_recognition_rate_result_name = f"{name}_z_c_cycle_recognition_rate"
+            one2n_accu_list = []
+            one2n_accu_list_cycle = []
+            one2one_accu_list = []
+            one2one_accu_list_cycle = []
+            emb_self_consistency_list = []
+            emb_label_consistency_list = []
+            z_c_recognition_rate_list = []
+            z_c_cycle_recognition_rate_list = []
+            for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
+                plus_evaler.reload_model(ckpt_path)
+                all_enc_z, all_plus_z = plus_evaler.load_plusZ_eval_data(data_loader)
+                # 计算 one2n accu
+                one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
+                one2n_accu_list.append(one2n_accu)
+                one2n_accu_list_cycle.append(one2n_accu_cycle)
+                # 计算 one2one accu
+                one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
+                one2one_accu_list.append(one2one_accu)
+                one2one_accu_list_cycle.append(one2one_accu_cycle)
+                # 计算 emb self consistency
+                emb_self_consistency_list.append(calc_plus_z_self_cycle_consistency(all_plus_z))
+                # 计算 emb label consistency 和 z_c recognition rate
+                emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate = (
+                    calc_plus_z_mode_emb_label_cycle_consistency(all_enc_z, all_plus_z))
+                emb_label_consistency_list.append(emb_label_consistency)
+                z_c_recognition_rate_list.append(z_c_recognition_rate)
+                z_c_cycle_recognition_rate_list.append(z_c_cycle_recognition_rate)
+            all_results[one2n_accu_result_name] = one2n_accu_list
+            all_results[one2one_accu_result_name] = one2one_accu_list
+            all_results[one2n_accu_result_name_cycle] = one2n_accu_list_cycle
+            all_results[one2one_accu_result_name_cycle] = one2one_accu_list_cycle
+            all_results[emb_self_consistency_result_name] = emb_self_consistency_list
+            all_results[emb_label_consistency_result_name] = emb_label_consistency_list
+            all_results[z_c_recognition_rate_result_name] = z_c_recognition_rate_list
+            all_results[z_c_cycle_recognition_rate_result_name] = z_c_cycle_recognition_rate_list
 
-        # eval matching rate
-        if eval_config.get('emb_matching_rate_configs') is not None:
-            mr_evaler = MultiStyleZcEvaler(config)
-            emb_matching_rate_configs = eval_config['emb_matching_rate_configs']
-            for sub_config in emb_matching_rate_configs:
-                name = sub_config['name']
-                data_loader = make_data_loader(sub_config, SingleImgDataset)
-                one2n_matching_rate_list = []
-                one2one_matching_rate_list = []
-                for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
-                    mr_evaler.reload_model(ckpt_path)
-                    num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
-                        data_loader,
-                        lambda x: mr_evaler.model.find_indices(
-                            mr_evaler.model.batch_encode_to_z(x)[0],
-                            True, False
-                        )
+    # eval matching rate
+    if eval_config.get(EVAL_ITEM_MATCHING_RATE) is not None and EVAL_ITEM_MATCHING_RATE in EVAL_TERMS:
+        mr_evaler = MultiStyleZcEvaler(config)
+        emb_matching_rate_configs = eval_config['emb_matching_rate_configs']
+        for sub_config in emb_matching_rate_configs:
+            name = sub_config['name']
+            data_loader = make_data_loader(sub_config, SingleImgDataset)
+            one2n_matching_rate_list = []
+            one2one_matching_rate_list = []
+            for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
+                mr_evaler.reload_model(ckpt_path)
+                num_z, num_labels, colors, shapes = load_enc_eval_data_with_style(
+                    data_loader,
+                    lambda x: mr_evaler.model.find_indices(
+                        mr_evaler.model.batch_encode_to_z(x)[0],
+                        True, False
                     )
-                    num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
-                    one2n_match_rate = mr_evaler.calc_emb_matching_score(num_emb_idx, num_labels)
-                    one2n_matching_rate_list.append(one2n_match_rate)
-                    one2one_matching_rate = solve_label_emb_one2one_matching(num_emb_idx, num_labels)[1]
-                    one2one_matching_rate_list.append(one2one_matching_rate)
-                all_results[f'{name}_one2n'] = one2n_matching_rate_list
-                all_results[f'{name}_one2one'] = one2one_matching_rate_list
+                )
+                num_emb_idx = [x[0] for x in num_z.detach().cpu().numpy()]
+                one2n_match_rate = mr_evaler.calc_emb_matching_score(num_emb_idx, num_labels)
+                one2n_matching_rate_list.append(one2n_match_rate)
+                one2one_matching_rate = solve_label_emb_one2one_matching(num_emb_idx, num_labels)[1]
+                one2one_matching_rate_list.append(one2one_matching_rate)
+            all_results[f'{name}_one2n'] = one2n_matching_rate_list
+            all_results[f'{name}_one2one'] = one2one_matching_rate_list
 
-        # eval orderliness
-        if eval_config.get('orderliness_configs') is not None:
-            orderliness_evaler = MumEval(config, None)
-            orderliness_configs = eval_config['orderliness_configs']
-            for sub_config in orderliness_configs:
-                name = sub_config['name']
-                img_dir_path = os.path.join(pipeline_dir, sub_config['img_dir_name'])
-                os.makedirs(img_dir_path, exist_ok=True)
-                data_loader = make_data_loader(sub_config, SingleImgDataset)
-                orderliness_list = []
-                for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
-                    img_path = os.path.join(img_dir_path, f'{sub_exp}.png')
-                    orderliness_evaler.reload_model(ckpt_path)
-                    nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
-                    orderliness_list.append(nna_score)
-                all_results[f'{name}'] = orderliness_list
+    # eval orderliness
+    if eval_config.get(EVAL_ITEM_ORDERLINESS) is not None and EVAL_ITEM_ORDERLINESS in EVAL_TERMS:
+        orderliness_evaler = MumEval(config, None)
+        orderliness_configs = eval_config['orderliness_configs']
+        for sub_config in orderliness_configs:
+            name = sub_config['name']
+            img_dir_path = os.path.join(pipeline_dir, sub_config['img_dir_name'])
+            os.makedirs(img_dir_path, exist_ok=True)
+            data_loader = make_data_loader(sub_config, SingleImgDataset)
+            orderliness_list = []
+            for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
+                img_path = os.path.join(img_dir_path, f'{sub_exp}.png')
+                orderliness_evaler.reload_model(ckpt_path)
+                nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
+                orderliness_list.append(nna_score)
+            all_results[f'{name}'] = orderliness_list
 
-        # save all_results to json
-        save_all_results(pipeline_dir, all_results, all_ckpts)
+    # save all_results to json
+    save_all_results(pipeline_dir, all_results, all_ckpts)
+
+
+if __name__ == "__main__":
+    with torch.no_grad():
+        for exp_name in EXP_NAME_LIST:
+            pipeline_eval(exp_name)
+        print("Pipeline evaluation completed.")
 

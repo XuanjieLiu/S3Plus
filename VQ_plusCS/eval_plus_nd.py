@@ -65,7 +65,7 @@ def load_plusZ_eval_data(loader, encode_func, plus_func, zc_dim):
 
 
 def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: EvalHelper = None):
-    dim_z = all_enc_z[0].z.size(0)
+    dim_z = all_enc_z[0].emb_idx.size(0)
     if dim_z == 1:
         fig, ax = plt.subplots(1, dim_z, sharey='all', figsize=(dim_z * 5, 5))
         axs = [ax]
@@ -74,8 +74,8 @@ def plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, eval_helper: Eval
     enc_x = [ob.label for ob in all_enc_z]
     plus_x = [ob.label_c for ob in all_plus_z]
     for i in range(0, dim_z):
-        enc_y = [ob.z.cpu()[i].item() for ob in all_enc_z]
-        plus_y = [ob.plus_c_z.cpu()[i].item() for ob in all_plus_z]
+        enc_y = [ob.emb_idx.cpu()[i].item() for ob in all_enc_z]
+        plus_y = [ob.emb_idx.cpu()[i].item() for ob in all_plus_z]
         axs[i].scatter(enc_x, enc_y, edgecolors='blue', label='z by encoder', facecolors='none')
         axs[i].scatter(plus_x, plus_y, edgecolors='red', label='z by plus', facecolors='none')
         # for ax in axs.flat:

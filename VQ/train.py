@@ -309,13 +309,13 @@ class PlusTrainer:
 
     def calc_plus_accu(self, data_loader):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, True)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader)
         ks, accu = calc_ks_enc_plus_z(all_enc_z, all_plus_z)
         return ks, accu
 
     def overall_plus_eval(self, epoch_num, data_loader, result_path):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, True)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader)
         one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
         one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
         emb_self_consistency = calc_plus_z_self_cycle_consistency(all_plus_z)
@@ -347,7 +347,7 @@ class PlusTrainer:
 
     def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
-        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader, False)
+        all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader)
         n_row, n_col = self.eval_help.calc_subfigures_row_col()
         eval_path = os.path.join(result_path, f'{epoch_num}_{result_name}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path, n_row, n_col,
