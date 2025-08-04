@@ -1,11 +1,18 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
+EVAL_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test"
+SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
+IS_BLUR = False
+AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)_trainAll/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test",
+    'single_img_eval_set_path': SINGLE_IMG_SET,
+    'plus_eval_set_path': EVAL_SET,
     'plus_eval_set_path_2': None,
+    'is_random_split_data': False,
+    'is_blur': IS_BLUR,
+    'num_workers': 0,
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -77,14 +84,53 @@ CONFIG = {
             'optimal_checkpoint_num': 'find_by_keys',
             'record_name': 'Train_record.txt',
             'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'],
-            'iter_after': 0.0,
+            'iter_after': 0.1,
         },
-        'plus_eval_config': {
-            'eval_set_path_list': [
-                f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test",
-            ],
-            'one2n_accu_result_name': 'one2n_accu',
-            'one2one_accu_result_name': 'one2one_accu',
-        }
+        'plus_eval_configs': [
+            {
+                'name': 'eval_set',
+                'eval_set_path_list': [
+                    EVAL_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+            },
+        ],
+        'emb_matching_rate_configs': [
+            {
+                'name': 'emb_matching_rate',
+                'eval_set_path_list': [
+                    SINGLE_IMG_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+            },
+        ],
+        'orderliness_configs': [
+            {
+                'name': 'orderliness',
+                'img_dir_name': 'orderliness',
+                'eval_set_path_list': [
+                    SINGLE_IMG_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+            },
+        ],
     },
 }
