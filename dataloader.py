@@ -59,8 +59,7 @@ class SingleImgDataset(torch.utils.data.Dataset):
         self.cache_all = cache_all
         self.augment_times = augment_times
 
-        # 使用默认 transform，如果没有传入
-        self.transform = transform if transform is not None else transforms.Compose([transforms.ToTensor()])
+        self.transform = transform
         self.data_list = []
 
         if cache_all:
@@ -80,20 +79,22 @@ class SingleImgDataset(torch.utils.data.Dataset):
         if self.cache_all:
             # 从缓存读取 tensor，再施加 transform
             raw_tensor, name = self.data_list[base_index]
-            img = transforms.ToPILImage()(raw_tensor)
-            transformed_tensor = self.transform(img)
+            if self.transform is None:
+                # 如果没有 transform，则直接返回原始 tensor
+                return raw_tensor, name
+            # 应用 transform
+            transformed_tensor = self.transform(raw_tensor)
             return transformed_tensor, name
         else:
             return self.read_a_data_from_disk(self.f_list[base_index], apply_transform=True)
 
-    def read_a_data_from_disk(self, data_name, apply_transform=True):
+    def read_a_data_from_disk(self, data_name, apply_transform=False):
         data_path = os.path.join(self.dataset_path, data_name)
         img = Image.open(data_path).convert('RGB')
+        img_tensor = transforms.ToTensor()(img).to(DEVICE)
 
         if apply_transform:
-            img_tensor = self.transform(img)
-        else:
-            img_tensor = transforms.ToTensor()(img)
+            img_tensor = self.transform(img_tensor)
 
         return img_tensor, data_name
 

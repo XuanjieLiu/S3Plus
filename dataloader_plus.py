@@ -54,8 +54,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
         self.cache_all = cache_all
         self.augment_times = augment_times
 
-        # 用户自定义 transform
-        self.transform = transform if transform is not None else transforms.Compose([transforms.ToTensor()])
+        self.transform = transform
 
         # 缓存原始图像数据
         self.data_list = []
@@ -64,7 +63,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
 
     def cacheAll(self):
         for name in self.f_list:
-            data = self.read_a_data_from_disk(name, apply_transform=False)
+            data = self.read_a_data_from_disk(name)
             self.data_list.append(data)
 
     def __len__(self):
@@ -76,29 +75,29 @@ class MultiImgDataset(torch.utils.data.Dataset):
         if self.cache_all:
             # 从缓存中读取原始图像 tensor，再应用 transform
             raw_imgs, img_names = self.data_list[base_index]
+            if self.transform is None:
+                # 如果没有 transform，则直接返回原始图像 tensor
+                return raw_imgs, img_names
             transformed_imgs = [
-                self.transform(transforms.ToPILImage()(img_tensor)) for img_tensor in raw_imgs
+                self.transform(img_tensor) for img_tensor in raw_imgs
             ]
             return transformed_imgs, img_names
         else:
             return self.read_a_data_from_disk(self.f_list[base_index], apply_transform=True)
 
-    def read_a_data_from_disk(self, data_name, apply_transform=True):
+    def read_a_data_from_disk(self, data_name, apply_transform=False):
         data_path = os.path.join(self.dataset_path, data_name)
         img_list = sorted(os.listdir(data_path))
 
         img_tensors = []
         for name in img_list:
             img = Image.open(os.path.join(data_path, name)).convert('RGB')
-            if apply_transform:
-                img_tensor = self.transform(img)
-            else:
-                img_tensor = transforms.ToTensor()(img)
+            img_tensor = transforms.ToTensor()(img).to(DEVICE)
+            if apply_transform and self.transform is not None:
+                img_tensor = self.transform(img_tensor)
             img_tensors.append(img_tensor)
 
         return img_tensors, img_list
-
-
 
 
 if __name__ == "__main__":

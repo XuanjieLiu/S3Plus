@@ -5,6 +5,7 @@ from typing import List, Dict, Callable, Any
 
 from torch.utils.data import DataLoader, ConcatDataset
 from torchvision import transforms
+from torchvision.transforms import v2
 import torch
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -114,7 +115,7 @@ class RandomGaussianBlur:
         kernel_size = random.choice(self.kernel_size_choices)
         sigma = random.uniform(*self.sigma_range)
 
-        blur = transforms.GaussianBlur(kernel_size=kernel_size, sigma=sigma)
+        blur = v2.GaussianBlur(kernel_size=kernel_size, sigma=sigma)
         return blur(img)
 
 
@@ -232,7 +233,7 @@ def make_dataset_trans(
     transform_steps = []
     if is_blur:
         transform_steps.append(RandomGaussianBlur(**blur_cfg))
-    transform_steps.append(transforms.ToTensor())
+    # transform_steps.append(transforms.ToTensor())
     transform = transforms.Compose(transform_steps)
     return transform
 

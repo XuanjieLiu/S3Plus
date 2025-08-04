@@ -5,7 +5,7 @@ TRAIN_SET = f"{data_root}/multi_style_pairs(0,20)_mahjong/train"
 EVAL_SET = f"{data_root}/multi_style_pairs(0,20)_mahjong/test"
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-mahjong"
 AUGMENT_TIMES = 16
-IS_BLUR = True
+IS_BLUR = False
 BLUR_CONFIG = {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
     'kernel_size_choices': (5, 7, 9),
     'sigma_range': (0.5, 3.0),
@@ -16,7 +16,7 @@ CONFIG = {
     'single_img_eval_set_path': SINGLE_IMG_SET,
     'plus_eval_set_path': EVAL_SET,
     'num_sub_exp': 10,  # 子实验数量
-    'num_workers': 8,  # 数据加载的线程数
+    'num_workers': 1,  # 数据加载的线程数
     'is_random_split_data': False, # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
     'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
     'latent_embedding_1': 2,

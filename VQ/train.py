@@ -98,7 +98,6 @@ def init_dataloaders(config):
         'shuffle': True,
         'num_workers': n_workers,
         'persistent_workers': True if n_workers > 0 else False,
-        'pin_memory': True
     }
     if config['is_random_split_data']:
         print("Using random split data")
@@ -189,12 +188,10 @@ class PlusTrainer:
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
                 optimizer.zero_grad()
-            else:
-                print("Optimizer is None")
             data, labels = sample
             sizes = data[0].size()
             data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
-            data_all = data_all.to(DEVICE, non_blocking=True)
+            # data_all = data_all.to(DEVICE, non_blocking=True)
             data = split_into_three(data_all)
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
             e_content = e_all[..., 0:self.latent_code_1]
@@ -267,9 +264,9 @@ class PlusTrainer:
                 if self.is_save_img:
                     with torch.no_grad():
                         # self.plot_enc_z(epoch_num, self.single_img_eval_loader)
+                        single_img_results = self.single_img_eval(epoch_num)
                         train_plus_results = self.overall_plus_eval(epoch_num, self.train_loader, self.train_result_path)
                         eval_plus_results = self.overall_plus_eval(epoch_num, self.plus_eval_loader, self.eval_result_path)
-                        single_img_results = self.single_img_eval(epoch_num)
                         loss_values = train_plus_results + eval_plus_results + single_img_results
                         special_loss_counter.add_values(loss_values)
                         special_loss_counter.record_and_clear(RECORD_PATH_DEFAULT, epoch_num)
