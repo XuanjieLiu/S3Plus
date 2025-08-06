@@ -1,7 +1,7 @@
 import os
 
 from torch import optim
-
+import time
 from VQVAE import VQVAE
 from shared import *
 from simple_FC import SimpleFC
@@ -9,9 +9,30 @@ from dataloader_plus import MultiImgDataset
 from torch.utils.data import DataLoader
 from loss_counter import LossCounter, RECORD_PATH_DEFAULT
 from train import split_into_three
+from common_func import make_dataset_trans
 from dataMaker_fixedPosition_plusPair import data_name_2_labels
 from common_func import parse_label
 from evaler_common import OperResult
+
+
+def init_dataloaders(config):
+    aug_t = config.get('augment_times', 1)
+    blur_cfg = config.get('blur_config', None)
+    is_blur = config.get('is_blur', False)
+    trans = make_dataset_trans(is_blur, blur_cfg) if is_blur else None
+    n_workers = config.get('num_workers', 0)
+    loader_config = {
+        'batch_size': config['batch_size'],
+        'shuffle': True,
+        'num_workers': n_workers,
+        'persistent_workers': True if n_workers > 0 else False,
+    }
+    plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
+    plus_eval_set = MultiImgDataset(config['eval_data_path'], transform=trans, augment_times=aug_t)
+    plus_train_loader = DataLoader(plus_train_set, **loader_config)
+    plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
+
+    return plus_train_loader, plus_eval_loader
 
 
 def name_appd(name: str, path:str):
@@ -32,6 +53,7 @@ def is_need_train(train_config):
 class OtherTask:
     def __init__(self, train_config, other_task_config):
         self.other_task_config = other_task_config
+        self.train_loader, self.eval_loader = init_dataloaders(other_task_config)
         self.train_config = train_config
         self.pretrained = self.load_pretrained()
         self.latent_code_1 = self.pretrained.latent_code_1
@@ -40,11 +62,6 @@ class OtherTask:
         # self.simple_fc = SimpleFC(other_task_config['fc_network_config'], self.latent_code_1*2, self.num_class).to(DEVICE)
         task_name = other_task_config['task_name']
         self.fc_model_path = name_appd(task_name, other_task_config['fc_model_path'])
-        train_set = MultiImgDataset(other_task_config['train_data_path'])
-        eval_set = MultiImgDataset(other_task_config['eval_data_path'])
-        self.batch_size = other_task_config['batch_size']
-        self.train_loader = DataLoader(train_set, batch_size=self.batch_size)
-        self.eval_loader = DataLoader(eval_set, batch_size=self.batch_size)
         self.train_result_path = name_appd(task_name, other_task_config['train_record_path'])
         self.eval_result_path = name_appd(task_name, other_task_config['eval_record_path'])
         self.learning_rate = other_task_config['learning_rate']

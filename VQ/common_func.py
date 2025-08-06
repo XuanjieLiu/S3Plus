@@ -98,6 +98,7 @@ class RandomGaussianBlur:
         self.kernel_size_choices = kernel_size_choices
         self.sigma_range = sigma_range
         self.p_no_blur = p_no_blur
+        self.blur_trans = [v2.GaussianBlur(kernel_size=item, sigma=sigma_range) for item in kernel_size_choices]
 
     def __call__(self, img):
         """
@@ -112,10 +113,7 @@ class RandomGaussianBlur:
         if random.random() < self.p_no_blur:
             return img  # return original image without blur
 
-        kernel_size = random.choice(self.kernel_size_choices)
-        sigma = random.uniform(*self.sigma_range)
-
-        blur = v2.GaussianBlur(kernel_size=kernel_size, sigma=sigma)
+        blur = random.choice(self.blur_trans)
         return blur(img)
 
 

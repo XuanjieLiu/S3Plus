@@ -21,7 +21,7 @@ from shared import *
 from two_dim_num_vis import plot_z_against_label, MumEval
 from visual_imgs import VisImgs
 from eval_common import EvalHelper
-from common_func import make_dataset_trans, random_gaussian_blur_batch, solve_label_emb_one2one_matching
+from common_func import make_dataset_trans, solve_label_emb_one2one_matching
 from eval.dec_vis_eval_2digit import plot_dec_img
 
 
@@ -99,7 +99,7 @@ def init_dataloaders(config):
         'num_workers': n_workers,
         'persistent_workers': True if n_workers > 0 else False,
     }
-    if config['is_random_split_data']:
+    if config.get('is_random_split_data', False):
         print("Using random split data")
         train_ratio = config['train_data_ratio']
         dataset_all = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
@@ -114,8 +114,11 @@ def init_dataloaders(config):
         plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
         plus_train_loader = DataLoader(plus_train_set, **loader_config)
         plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
-    single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
-    single_img_eval_loader = DataLoader(single_img_eval_set, **loader_config)
+    if config.get('single_img_eval_set_path', None) is not None:
+        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
+        single_img_eval_loader = DataLoader(single_img_eval_set, **loader_config)
+    else:
+        single_img_eval_loader = None
     return plus_train_loader, plus_eval_loader, single_img_eval_loader
 
 
