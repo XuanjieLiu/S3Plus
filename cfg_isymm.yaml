@@ -39,7 +39,7 @@ model_config:
   n_atoms: 24
   vq_ema_decay: 0.98
   threshold_ema_dead_code: 2
-  GRU: True
+  GRU: False
 
 optimizer_config:
   optimizer: "AdamW"

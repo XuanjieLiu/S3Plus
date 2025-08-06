@@ -46,7 +46,7 @@ class SymmCSAEwithPrior(nn.Module):
         )
 
         if "GRU" in config.keys() and config["GRU"]:
-            self.prior = nn.GRU(
+            self.prior = nn.RNN(
                 input_size=self.d_zc,
                 hidden_size=self.d_zc,
                 num_layers=self.n_layers_rnn,

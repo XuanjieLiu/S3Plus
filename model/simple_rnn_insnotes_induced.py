@@ -21,7 +21,7 @@ class SymmCSAEwithSecondaryPrior(SymmCSAEwithPrior):
     def __init__(self, config):
         super().__init__(config)
         self.n_layers_secondary_rnn = 1  # secondary RNN has only 1 layer
-        self.secondary_prior = nn.GRU(
+        self.secondary_prior = nn.RNN(
             input_size=self.d_zc,
             hidden_size=self.d_zc,
             num_layers=1,
