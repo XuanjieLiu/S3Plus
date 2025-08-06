@@ -4,13 +4,14 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 from importlib import reload
 from other_task_eval import OtherTask, is_need_train
 from common_func import find_optimal_checkpoint_num_by_train_config, EXP_ROOT
-
+import torch.multiprocessing as mp
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python myscript.py arg1 arg2 ...")
         sys.exit()
 
+    mp.set_start_method('spawn', force=True)
     sys.path.append(EXP_ROOT)
     EXP_NAME_LIST = sys.argv[1:]
     EXP_NUM_LIST = [str(i) for i in range(1, 21)]
