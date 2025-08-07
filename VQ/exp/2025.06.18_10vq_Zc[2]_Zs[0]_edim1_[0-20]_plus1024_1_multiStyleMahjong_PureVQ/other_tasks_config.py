@@ -4,8 +4,8 @@ data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../..
 CONFIG = [
     {
         'task_name': "minus_16_1.1",
-        'train_data_path': f"{data_root}/single_style_pairs_minus(0,20)_mahjong/train",
-        'eval_data_path': f"{data_root}/single_style_pairs_minus(0,20)_mahjong/test",
+        'train_data_path': f"{data_root}/multi_style_pairs_minus(0,20)_mahjong/train",
+        'eval_data_path': f"{data_root}/multi_style_pairs_minus(0,20)_mahjong/test",
         'batch_size': 128,
         'train_record_path': "train_record.txt",
         'eval_record_path': "eval_record.txt",
