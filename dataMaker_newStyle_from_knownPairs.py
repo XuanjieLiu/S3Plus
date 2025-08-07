@@ -122,15 +122,15 @@ def render_new_dataset_from_old_dataset(
         )
 
 if __name__ == "__main__":
-    render_new_dataset_from_old_dataset(
-        ['train', 'test'],
-        os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
-        os.path.join(DATA_ROOT, 'multi_style_pairs_minus(0,20)'),
-        TRAIN_MARKERS,
-        TRAIN_COLORS,
-        comp_minus,  # remember to change the comp_plus to comp_minus or reverse
-        render_dataset
-    )
+    # render_new_dataset_from_old_dataset(
+    #     ['train', 'test'],
+    #     os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
+    #     os.path.join(DATA_ROOT, 'multi_style_pairs_minus(0,20)'),
+    #     TRAIN_MARKERS,
+    #     TRAIN_COLORS,
+    #     comp_minus,  # remember to change the comp_plus to comp_minus or reverse
+    #     render_dataset
+    # )
 
     """
         Make mahjong dataset from single style pairs dataset.
@@ -144,19 +144,17 @@ if __name__ == "__main__":
     #     comp_plus,  # remember to change the comp_plus to comp_minus or reverse
     #     render_EU_tally_mark_num_dataset
     # )
+    render_new_dataset_from_old_dataset(
+        ['train', 'test'],
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(1,20)'),
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(1,20)_mahjong'),
+        ['default'],
+        ['b'],
+        comp_minus,  # remember to change the comp_plus to comp_minus or reverse
+        render_ZHENG_num_dataset
+    )
 
-    """
-    Make EU tally mark dataset from single style pairs dataset.
-    """
-    # render_new_dataset_from_old_dataset(
-    #     ['train', 'test_1', 'test_2'],
-    #     os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_ZHENG'),
-    #     os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet_EU_tally'),
-    #     ['default'],
-    #     ['b'],
-    #     comp_plus,  # remember to change the comp_plus to comp_minus or reverse
-    #     render_EU_tally_mark_num_dataset
-    # )
+
 
     # source_dataset = os.path.join(DATA_ROOT, 'single_style_pairs(0,20)_tripleSet')
     # train_plus_tuple = load_data_pairs_from_dataset(os.path.join(source_dataset, 'train'))
