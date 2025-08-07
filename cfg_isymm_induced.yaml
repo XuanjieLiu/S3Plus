@@ -44,7 +44,7 @@ model_config:
 
 optimizer_config:
   optimizer: "AdamW"
-  lr: 2.0e-4
+  lr: 1.0e-4
   beta1: 0.9
   beta2: 0.999
   eps: 1.0e-8
