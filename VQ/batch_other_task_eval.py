@@ -11,7 +11,7 @@ if __name__ == '__main__':
         print("Usage: python myscript.py arg1 arg2 ...")
         sys.exit()
 
-    mp.set_start_method('spawn', force=True)
+    # mp.set_start_method('spawn', force=True)
     sys.path.append(EXP_ROOT)
     EXP_NAME_LIST = sys.argv[1:]
     EXP_NUM_LIST = [str(i) for i in range(1, 21)]
