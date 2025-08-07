@@ -21,6 +21,7 @@ class Encoder(nn.Module):
 
         self.linear_1 = nn.Linear(output_size, d_emb)
         self.act = nn.GELU()
+        self.norm = nn.LayerNorm(d_emb)
 
     def _make_cnn(
         self,
@@ -124,6 +125,9 @@ class Encoder(nn.Module):
         emb = x.reshape(x.shape[0], -1)  # [batch_size * n_segments, cnn_output_size]
         emb = self.linear_1(emb)
         emb = self.act(emb)
+        emb = self.norm(
+            emb
+        )  # this is so fxcking important because it stabilizes training
         emb = emb.reshape(batch_size, emb.shape[-1])
 
         return emb
