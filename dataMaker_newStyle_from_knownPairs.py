@@ -146,12 +146,12 @@ if __name__ == "__main__":
     # )
     render_new_dataset_from_old_dataset(
         ['train', 'test'],
-        os.path.join(DATA_ROOT, 'single_style_pairs_minus(1,20)'),
-        os.path.join(DATA_ROOT, 'single_style_pairs_minus(1,20)_mahjong'),
+        os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
+        os.path.join(DATA_ROOT, 'multi_style_pairs_minus(0,20)_mahjong'),
         ['default'],
         ['b'],
         comp_minus,  # remember to change the comp_plus to comp_minus or reverse
-        render_ZHENG_num_dataset
+        render_EU_tally_mark_num_dataset
     )
 
 
