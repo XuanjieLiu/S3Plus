@@ -96,7 +96,7 @@ class OtherTask:
             print(f"No pretrained parameters found in {pretrained_path}")
             exit()
 
-    def delete_dataloader(self):
+    def delete_loader_iter(self):
         del_dataloader(self.train_loader)
         del_dataloader(self.eval_loader)
 

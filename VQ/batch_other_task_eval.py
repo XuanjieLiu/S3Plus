@@ -49,5 +49,5 @@ if __name__ == '__main__':
                     os.chdir(sub_sub_exp_path)
                     if is_need_train(other_task_config.CONFIG[i]):
                         other_task.train()
-                other_task.delete_dataloader()
+                other_task.delete_loader_iter()
 
