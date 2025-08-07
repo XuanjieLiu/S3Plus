@@ -96,6 +96,10 @@ class OtherTask:
             print(f"No pretrained parameters found in {pretrained_path}")
             exit()
 
+    def delete_dataloader(self):
+        del_dataloader(self.train_loader)
+        del_dataloader(self.eval_loader)
+
     def train(self):
         self.resume()
         self.simple_fc.train()
@@ -115,9 +119,6 @@ class OtherTask:
                 self.simple_fc.eval()
                 self.one_epoch(epoch_num, eval_loss_counter, self.eval_loader, True, None)
                 self.simple_fc.train()
-        # 删除所有 dataloader
-        del_dataloader(self.train_loader)
-        del_dataloader(self.eval_loader)
 
     def fc_comp(self, sample):
         data, labels = sample
