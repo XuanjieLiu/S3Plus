@@ -39,7 +39,7 @@ class SymmCSAEwithPrior(nn.Module):
             decay=config["vq_ema_decay"] if "vq_ema_decay" in config else 0.98,
             kmeans_init=True,
             ema_update=True,
-            rotation_trick=False,
+            rotation_trick=True,
             threshold_ema_dead_code=config["threshold_ema_dead_code"]
             if "threshold_ema_dead_code" in config
             else 0,
