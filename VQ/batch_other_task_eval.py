@@ -11,7 +11,7 @@ if __name__ == '__main__':
         print("Usage: python myscript.py arg1 arg2 ...")
         sys.exit()
 
-    # mp.set_start_method('spawn', force=True)
+    mp.set_start_method('spawn', force=True)
     sys.path.append(EXP_ROOT)
     EXP_NAME_LIST = sys.argv[1:]
     EXP_NUM_LIST = [str(i) for i in range(1, 21)]
@@ -40,7 +40,6 @@ if __name__ == '__main__':
                 optimal_check_point = find_optimal_checkpoint_num_by_train_config(sub_exp_path, pretrained_config.CONFIG, optimal_checkpoint_finding_config)
                 config['pretrained_path'] = f'checkpoint_{optimal_check_point}.pt'
                 print(f'Optimal checkpoint: {optimal_check_point}')
-                other_task = OtherTask(pretrained_config.CONFIG, config)
                 num_sub_exp = config.get('num_sub_exp', 20)
                 other_task_exp_num_list = [str(i) for i in range(1, num_sub_exp + 1)]
                 for j in other_task_exp_num_list:
@@ -48,5 +47,6 @@ if __name__ == '__main__':
                     os.makedirs(sub_sub_exp_path, exist_ok=True)
                     os.chdir(sub_sub_exp_path)
                     if is_need_train(other_task_config.CONFIG[i]):
+                        other_task = OtherTask(pretrained_config.CONFIG, config)
                         other_task.train()
 

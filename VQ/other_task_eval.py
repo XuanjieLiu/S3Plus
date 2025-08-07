@@ -50,6 +50,11 @@ def is_need_train(train_config):
         print("No more training is needed")
         return False
 
+def del_dataloader(dataloader):
+    it = getattr(dataloader, "_iterator", None)
+    if it is not None:
+        it._shutdown_workers()  # 关闭 worker
+        dataloader._iterator = None
 
 class OtherTask:
     def __init__(self, train_config, other_task_config):
@@ -110,7 +115,9 @@ class OtherTask:
                 self.simple_fc.eval()
                 self.one_epoch(epoch_num, eval_loss_counter, self.eval_loader, True, None)
                 self.simple_fc.train()
-
+        # 删除所有 dataloader
+        del_dataloader(self.train_loader)
+        del_dataloader(self.eval_loader)
 
     def fc_comp(self, sample):
         data, labels = sample
