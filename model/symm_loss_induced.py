@@ -119,6 +119,8 @@ class SymmLossInduced(SymmLoss):
         losses = {}
         total_loss = 0
         for k, v in self.config["weights"].items():
+            if isinstance(v, str):
+                v = compute_loss_weight(v, step)
             if locals().get(k) is None:
                 continue
             total_loss = total_loss + v * locals()[k]
