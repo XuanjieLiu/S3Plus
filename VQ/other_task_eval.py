@@ -109,6 +109,11 @@ class OtherTask:
                 self.simple_fc.eval()
                 self.one_epoch(epoch_num, eval_loss_counter, self.eval_loader, True, None)
                 self.simple_fc.train()
+        # 删除所有 dataloader
+        self.train_loader._iterator._shutdown_workers()
+        self.eval_loader._iterator._shutdown_workers()
+        del self.train_loader._iterator
+        del self.eval_loader._iterator
 
     def fc_comp(self, sample):
         data, labels = sample
