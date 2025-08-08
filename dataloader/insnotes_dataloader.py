@@ -159,7 +159,12 @@ class InsNotesTestDataset(Dataset):
         # audio = audio[
         #     :, :-1, :64
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
-        audio = audio[: self.n_segments, :, :32]  # cut the length to 32 for now
+        audio = audio[:, :, :32]  # cut the length to 32 for now
+        # randomly select n_segments segments
+        assert audio.shape[0] >= self.n_segments:
+        start = random.randint(0, audio.shape[0] - self.n_segments)
+        audio = audio[start : start + self.n_segments, :, :]
+
         audio = torch.log(audio + 1e-6)  # log spectrogram
         audio = audio.unsqueeze(1)  # add channel dimension
         style = int(data_name.split("_")[0][3:])
