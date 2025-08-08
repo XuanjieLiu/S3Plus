@@ -145,7 +145,7 @@ class TrainerInduced(Trainer):
             cp_path = self.config["load_checkpoint"]
             if os.path.exists(cp_path):
                 save_info = torch.load(cp_path)
-                self.start_step = save_info["steps"]
+                self.start_step = save_info["step"]
                 self.model.load_state_dict(save_info["model"])
                 self.optimizer.load_state_dict(save_info["optimizer"])
                 logging.info(
