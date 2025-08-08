@@ -161,7 +161,7 @@ class InsNotesTestDataset(Dataset):
         # ]  # remove the last column because it's always zero. Only for vanilla STFT. also, cut the length to 64 for now
         audio = audio[:, :, :32]  # cut the length to 32 for now
         # randomly select n_segments segments
-        assert audio.shape[0] >= self.n_segments:
+        assert audio.shape[0] >= self.n_segments
         start = random.randint(0, audio.shape[0] - self.n_segments)
         audio = audio[start : start + self.n_segments, :, :]
 
