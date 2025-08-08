@@ -124,35 +124,38 @@ class Tester:
         self.x_prompt_gt = []
         self.x_prompt_recon = []
 
-        for i, batch in tqdm(enumerate(self.test_loader)):
-            batch_data, c_labels, s_labels = batch
-            # Move data to device
-            batch_data = batch_data.to(device=self.device)
-            # forward
-            with torch.no_grad():
-                losses = self.loss.compute_loss(
-                    self.current_step, self.model, batch_data
-                )
-                zc_vq, indices, commit_loss, zs = self.model.encode(
-                    batch_data, quantize=True
-                )
-                zc_prompt = zc_vq[
-                    :, :7, :
-                ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
-                zc_future_pred = self.model.unroll(zc_prompt, 7)
-                zc_future_pred_vq, zc_idx_future_pred, _ = self.model.quantize(
-                    zc_future_pred
-                )
-                x_future_pred = self.model.decode(zc_future_pred_vq, zs)
-                x_prompt_recon = self.model.decode(zc_prompt, zs)
-            self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
-            self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
-            self.zc_idx_future_gt.append(indices[:, 7:14].cpu().numpy())
-            self.zc_idx_future_pred.append(zc_idx_future_pred.cpu().numpy())
-            self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
-            self.x_future_pred.append(x_future_pred.cpu().numpy())
-            self.x_prompt_gt.append(batch_data[:, :7, :].cpu().numpy())
-            self.x_prompt_recon.append(x_prompt_recon.cpu().numpy())
+        for i in tqdm(
+            range(10), desc="Testing", ncols=100
+        ):  # since there is stochasticity in test_loader, we sample 10 times
+            for j, batch in enumerate(self.test_loader):
+                batch_data, c_labels, s_labels = batch
+                # Move data to device
+                batch_data = batch_data.to(device=self.device)
+                # forward
+                with torch.no_grad():
+                    losses = self.loss.compute_loss(
+                        self.current_step, self.model, batch_data
+                    )
+                    zc_vq, indices, commit_loss, zs = self.model.encode(
+                        batch_data, quantize=True
+                    )
+                    zc_prompt = zc_vq[
+                        :, :7, :
+                    ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
+                    zc_future_pred = self.model.unroll(zc_prompt, 7)
+                    zc_future_pred_vq, zc_idx_future_pred, _ = self.model.quantize(
+                        zc_future_pred
+                    )
+                    x_future_pred = self.model.decode(zc_future_pred_vq, zs)
+                    x_prompt_recon = self.model.decode(zc_prompt, zs)
+                self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
+                self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
+                self.zc_idx_future_gt.append(indices[:, 7:14].cpu().numpy())
+                self.zc_idx_future_pred.append(zc_idx_future_pred.cpu().numpy())
+                self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
+                self.x_future_pred.append(x_future_pred.cpu().numpy())
+                self.x_prompt_gt.append(batch_data[:, :7, :].cpu().numpy())
+                self.x_prompt_recon.append(x_prompt_recon.cpu().numpy())
 
         self.zc_future_gt = np.concatenate(self.zc_future_gt, axis=0)
         self.zc_future_pred = np.concatenate(self.zc_future_pred, axis=0)
