@@ -365,7 +365,7 @@ def interpolate_plus_eval(
     loaded_model: VQVAE,
     enc_z: List[EncInfo],
     plus_z: List[PlusInfo],
-    n_trials: int = 50,
+    n_trials: int = 10,
 ):
     """
     执行 enc_z 的插值加法评估。

@@ -8,11 +8,10 @@ from torchvision import transforms
 from plot_multistyle_zc import MultiStyleZcEvaler
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
-from interpolate_plus_accu_eval import InterpolatePlusAccuEval
 from common_func import (load_config_from_exp_name, record_num_list, EXP_ROOT, RandomGaussianBlur, make_dataset_trans,
                          find_optimal_checkpoint_num_by_train_config, solve_label_emb_one2one_matching)
 from eval_plus_nd import VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, \
-    calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency
+    calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency, interpolate_plus_eval
 from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset, load_enc_eval_data_with_style
 from torch.utils.data import ConcatDataset
@@ -22,6 +21,7 @@ from two_dim_num_vis import MumEval
 EVAL_ITEM_PLUS = 'plus_eval_configs'
 EVAL_ITEM_MATCHING_RATE = 'emb_matching_rate_configs'
 EVAL_ITEM_ORDERLINESS = 'orderliness_configs'
+EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 
 # EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NUM_LIST = ['1']
@@ -40,6 +40,7 @@ EVAL_TERMS = [
     EVAL_ITEM_PLUS,
     EVAL_ITEM_MATCHING_RATE,
     EVAL_ITEM_ORDERLINESS,
+    EVAL_ITEM_INTERPOLATE,
 ]
 
 
@@ -205,6 +206,29 @@ def pipeline_eval(exp_name: str):
                 nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
                 orderliness_list.append(nna_score)
             all_results[f'{name}'] = orderliness_list
+
+    # eval interpolate
+    if eval_config.get(EVAL_ITEM_INTERPOLATE) is not None and EVAL_ITEM_INTERPOLATE in EVAL_TERMS:
+        interpolate_configs = eval_config['interpolate_configs']
+        interpolate_evaler = VQvaePlusEval(config)
+        for sub_config in interpolate_configs:
+            name = sub_config['name']
+            data_loader = make_data_loader(sub_config, MultiImgDataset)
+            itp_result_name = f"{name}"
+            itp_cycle_result_name = f"{name}_cycle"
+            itp_result_list = []
+            itp_cycle_result_list = []
+            for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
+                interpolate_evaler.reload_model(ckpt_path)
+                all_enc_z, all_plus_z = interpolate_evaler.load_plusZ_eval_data(data_loader)
+                # 计算 interpolate
+                itp_score, itp_cycle_score = interpolate_plus_eval(interpolate_evaler.model,
+                                                                  all_enc_z, all_plus_z,
+                                                                  sub_config.get('interpolate_num', 10))
+                itp_result_list.append(itp_score)
+                itp_cycle_result_list.append(itp_cycle_score)
+            all_results[itp_result_name] = itp_result_list
+            all_results[itp_cycle_result_name] = itp_cycle_result_list
 
     # save all_results to json
     save_all_results(pipeline_dir, all_results, all_ckpts)

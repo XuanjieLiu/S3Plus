@@ -2,11 +2,12 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 EVAL_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test"
+TRAIN_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/train"
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
 IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
-    'train_data_path': f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/train",
+    'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
     'plus_eval_set_path': EVAL_SET,
     'plus_eval_set_path_2': None,
@@ -130,6 +131,22 @@ CONFIG = {
                     'p_no_blur': 0.00,
                 },
                 'augment_times': AUGMENT_TIMES,
+            },
+        ],
+        'interpolate_configs': [
+            {
+                'name': 'train_interpolate',
+                'eval_set_path_list': [
+                    TRAIN_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+                'interpolate_num': 10,
             },
         ],
     },
