@@ -136,7 +136,7 @@ CONFIG = {
             {
                 'name': 'train_interpolate',
                 'eval_set_path_list': [
-                    f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/train",
+                    TRAIN_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
                 'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
@@ -145,7 +145,7 @@ CONFIG = {
                     'p_no_blur': 0.00,
                 },
                 'augment_times': AUGMENT_TIMES,
-                'interpolate_num': 10,
+                'interpolate_num': 1,
             },
         ],
     },
