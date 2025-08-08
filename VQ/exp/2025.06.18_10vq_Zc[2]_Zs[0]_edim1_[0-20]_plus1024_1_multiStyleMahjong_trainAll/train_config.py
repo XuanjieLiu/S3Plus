@@ -1,10 +1,15 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
+EVAL_SET = f"{data_root}/multi_style_pairs(0,20)_mahjong/test"
+TRAIN_SET = f"{data_root}/multi_style_pairs(0,20)_mahjong/train"
+SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-mahjong"
+IS_BLUR = False
+AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': f"{data_root}/multi_style_pairs(0,20)_mahjong_trainAll/train",
-    'single_img_eval_set_path': f"{data_root}/(0,20)-FixedPos-mahjong",
-    'plus_eval_set_path': f"{data_root}/multi_style_pairs(0,20)_mahjong/test",
+    'single_img_eval_set_path': SINGLE_IMG_SET,
+    'plus_eval_set_path': EVAL_SET,
     'plus_eval_set_path_2': None,
     'is_random_split_data': False, # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
     'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
@@ -86,22 +91,30 @@ CONFIG = {
             {
                 'name': 'eval_set',
                 'eval_set_path_list': [
-                    f"{data_root}/multi_style_pairs(0,20)_mahjong/test",
+                    EVAL_SET,
                 ],
-            },
-            {
-                'name': 'train_set',
-                'eval_set_path_list': [
-                    f"{data_root}/multi_style_pairs(0,20)_mahjong_trainAll/train",
-                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'emb_matching_rate_configs': [
             {
                 'name': 'emb_matching_rate',
                 'eval_set_path_list': [
-                    f"{data_root}/(0,20)-FixedPos-mahjong",
+                    SINGLE_IMG_SET,
                 ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'orderliness_configs': [
@@ -109,9 +122,31 @@ CONFIG = {
                 'name': 'orderliness',
                 'img_dir_name': 'orderliness',
                 'eval_set_path_list': [
-                    f"{data_root}/(0,20)-FixedPos-mahjong",
+                    SINGLE_IMG_SET,
                 ],
-                'is_add_noise': False,
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+            },
+        ],
+        'interpolate_configs': [
+            {
+                'name': 'train_interpolate',
+                'eval_set_path_list': [
+                    TRAIN_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                    'kernel_size_choices': (5, 7, 9),
+                    'sigma_range': (0.5, 3.0),
+                    'p_no_blur': 0.00,
+                },
+                'augment_times': AUGMENT_TIMES,
+                'interpolate_num': 10,
             },
         ],
     },
