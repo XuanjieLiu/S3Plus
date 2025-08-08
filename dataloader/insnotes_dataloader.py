@@ -163,22 +163,27 @@ class InsNotesTestDataset(Dataset):
         # randomly select n_segments segments
         assert audio.shape[0] >= self.n_segments
         start = random.randint(0, audio.shape[0] - self.n_segments)
-        audio = audio[start : start + self.n_segments, :, :]
+        audio_seg = audio[start : start + self.n_segments, :, :]
 
-        audio = torch.log(audio + 1e-6)  # log spectrogram
-        audio = audio.unsqueeze(1)  # add channel dimension
+        audio_seg = torch.log(audio_seg + 1e-6)  # log spectrogram
+        audio_seg = audio_seg.unsqueeze(1)  # add channel dimension
         style = int(data_name.split("_")[0][3:])
         root = int(data_name.split("_")[1][4:])
 
+        # manually generate content labels
         if self.mode == "major":
             p_list = [0, 2, 4, 5, 7, 9, 11]
+            while len(p_list) < audio.shape[0]:
+                p_list += p_list
+            p_list = p_list[start : start + self.n_segments]
         pitches = [
             (p_list[i % len(p_list)] + root) % 12 for i in range(self.n_segments)
-        ]  # this only works if we take the first self.n_segments pitches
+        ]
+
         contents = torch.tensor(pitches)
         styles = torch.tensor([style for _ in range(self.n_segments)])
 
-        return audio, contents, styles
+        return audio_seg, contents, styles
 
 
 def get_dataloader(
