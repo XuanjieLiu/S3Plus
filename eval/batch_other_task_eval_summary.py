@@ -106,7 +106,7 @@ def summary_an_exp(eg: ExpGroup):
         values = all_result[j]
         mean = float(np.mean(values))
         std = float(np.std(values))
-        result = f'{COMPARE_KEYS_NAME[j]}: {mean:.4f} ± {std:.4f}'
+        result = f'{COMPARE_KEYS_NAME[j]}: {mean:.2f} \\pm {std:.2f}'
         results_str.append(result)
         print(result)
     log_result(exp_dir, results_str)
