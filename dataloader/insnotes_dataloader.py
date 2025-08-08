@@ -176,9 +176,7 @@ class InsNotesTestDataset(Dataset):
             while len(p_list) < audio.shape[0]:
                 p_list += p_list
             p_list = p_list[start : start + self.n_segments]
-        pitches = [
-            (p_list[i % len(p_list)] + root) % 12 for i in range(self.n_segments)
-        ]
+        pitches = [(item + root) % 12 for item in p_list]
 
         contents = torch.tensor(pitches)
         styles = torch.tensor([style for _ in range(self.n_segments)])
