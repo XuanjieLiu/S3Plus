@@ -425,6 +425,9 @@ class Tester:
         print(f"Saved {n_samples} x-level future predictions to {self.output_dir}")
 
     def _save_results(self, column_names, results_data):
+        if self.config["save_results_at"] == "":
+            return
+
         model_id = self.config["name"] + "/"
         model_id += os.path.basename(self.config["active_checkpoint"])
         save_path = Path(self.config["save_results_at"])

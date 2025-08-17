@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_results_at",
         type=str,
-        default="results.csv",
+        default="",
         help="csv file to save numerical results as a row with model name and result entries. Other kinds of results will be saved in the checkpoint directory",
     )
 
