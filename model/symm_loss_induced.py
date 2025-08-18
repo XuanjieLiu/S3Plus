@@ -55,7 +55,7 @@ class SymmLossInduced(SymmLoss):
         if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
-            g_t = torch.randint(1, 7, size=())
+            g_t = torch.randint(1, 2, size=())
 
             # Old and probably wrong way to do it
             # global_prompt = zc[:, : max(p_t, p_r), :].clone()
@@ -84,14 +84,14 @@ class SymmLossInduced(SymmLoss):
             start_cursor = torch.randint(
                 p_t, zc.shape[1] - p_r + 1, size=()
             ).item()  # TODO: use different cursor for each batch item
-            zc_observed_with_p_t = zc[:, start_cursor - p_t : start_cursor + p_r, :]
+            zc_observed_with_p = zc[:, start_cursor - p_t : start_cursor + p_r, :]
             # T then R
             # T
             zc_observed_t = []
             for i in range(p_r):
                 zc_observed_t.append(
                     model.secondary_unroll(
-                        zc_observed_with_p_t[:, i : p_t + i, :], g_t
+                        zc_observed_with_p[:, i : p_t + i, :], g_t
                     )[:, -1, :]
                 )
             zc_observed_t = torch.stack(zc_observed_t, dim=1)  # (B, p_r, d_zc)
@@ -100,10 +100,10 @@ class SymmLossInduced(SymmLoss):
 
             # R then T
             # R
-            zc_observed = zc_observed_with_p_t[:, -p_r:, :]
+            zc_observed = zc_observed_with_p[:, -p_r:, :]
             zc_observed_r = model.unroll(zc_observed, g_r)  # (B, g_r, d_zc)
             zc_observed_r_with_p = torch.cat(
-                [zc_observed_with_p_t, zc_observed_r], dim=1
+                [zc_observed_with_p, zc_observed_r], dim=1
             )
             zc_observed_rt = []
             for i in range(g_r):

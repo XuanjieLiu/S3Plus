@@ -136,12 +136,12 @@ class Tester:
                     losses = self.loss.compute_loss(
                         self.current_step, self.model, batch_data
                     )
-                    zc_vq, indices, commit_loss, zs = self.model.encode(
+                    zc_vq, zc_idx, commit_loss, zs = self.model.encode(
                         batch_data, quantize=True
                     )
-                    zc_prompt = zc_vq[
+                    zc_prompt, zc_idx_prompt = zc_vq[
                         :, :7, :
-                    ].clone()  # use the first 12 tokens as prompt, 12 is hard coded
+                    ].clone(), zc_idx[:, :7].clone()
                     zc_future_pred = self.model.unroll(zc_prompt, 7)
                     zc_future_pred_vq, zc_idx_future_pred, _ = self.model.quantize(
                         zc_future_pred
@@ -150,7 +150,7 @@ class Tester:
                     x_prompt_recon = self.model.decode(zc_prompt, zs)
                 self.zc_future_gt.append(zc_vq[:, 7:14, :].cpu().numpy())
                 self.zc_future_pred.append(zc_future_pred_vq.cpu().numpy())
-                self.zc_idx_future_gt.append(indices[:, 7:14].cpu().numpy())
+                self.zc_idx_future_gt.append(zc_idx[:, 7:14].cpu().numpy())
                 self.zc_idx_future_pred.append(zc_idx_future_pred.cpu().numpy())
                 self.c_labels_future_gt.append(c_labels[:, 7:14].cpu().numpy())
                 self.x_future_pred.append(x_future_pred.cpu().numpy())

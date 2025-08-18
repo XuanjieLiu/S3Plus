@@ -44,6 +44,7 @@ class SymmCSAEwithPrior(nn.Module):
             if "threshold_ema_dead_code" in config
             else 0,
         )
+        self.codebook_norm = nn.BatchNorm1d(self.d_zc, affine=False, track_running_stats=False) # purely for normalization
 
         if "GRU" in config.keys() and config["GRU"]:
             self.prior = nn.RNN(
@@ -88,6 +89,8 @@ class SymmCSAEwithPrior(nn.Module):
             return zc, zs
 
     def quantize(self, x, freeze_codebook=False):
+        if not freeze_codebook and self.training:
+            self.vq.codebook = self.codebook_norm(self.vq.codebook)
         quantized, indices, commit_loss = self.vq(x, freeze_codebook=freeze_codebook)
 
         return quantized, indices, commit_loss
