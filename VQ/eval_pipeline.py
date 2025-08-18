@@ -10,7 +10,7 @@ from plot_multistyle_zc import MultiStyleZcEvaler
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from common_func import (load_config_from_exp_name, record_num_list, EXP_ROOT, RandomGaussianBlur, make_dataset_trans,
                          find_optimal_checkpoint_num_by_train_config, solve_label_emb_one2one_matching)
-from eval_plus_nd import VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, \
+from eval_plus_nd import VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, calc_emb_select_plus_accu,\
     calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency, interpolate_plus_eval
 from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset, load_enc_eval_data_with_style
@@ -26,10 +26,11 @@ EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 # EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
-    # "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
-    # "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
-    # "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
-    # "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
+    # "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
+    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
+    "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
     # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
     # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
     # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
@@ -131,6 +132,8 @@ def pipeline_eval(exp_name: str):
             one2one_accu_result_name = f"{name}_one2one_accu"
             one2n_accu_result_name_cycle = f"{name}_one2n_accu_cycle"
             one2one_accu_result_name_cycle = f"{name}_one2one_accu_cycle"
+            emb_select_accu_result_name = f"{name}_emb_select_accu"
+            emb_select_accu_cycle_result_name = f"{name}_emb_select_accu_cycle"
             emb_self_consistency_result_name = f"{name}_emb_self_consistency"
             emb_label_consistency_result_name = f"{name}_emb_label_consistency"
             z_c_recognition_rate_result_name = f"{name}_z_c_recognition_rate"
@@ -139,6 +142,8 @@ def pipeline_eval(exp_name: str):
             one2n_accu_list_cycle = []
             one2one_accu_list = []
             one2one_accu_list_cycle = []
+            emb_select_accu_list = []
+            emb_select_accu_cycle_list = []
             emb_self_consistency_list = []
             emb_label_consistency_list = []
             z_c_recognition_rate_list = []
@@ -154,6 +159,10 @@ def pipeline_eval(exp_name: str):
                 one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
                 one2one_accu_list.append(one2one_accu)
                 one2one_accu_list_cycle.append(one2one_accu_cycle)
+                # 计算 emb select accu
+                emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
+                emb_select_accu_list.append(emb_select_accu)
+                emb_select_accu_cycle_list.append(emb_select_accu_cycle)
                 # 计算 emb self consistency
                 emb_self_consistency_list.append(calc_plus_z_self_cycle_consistency(all_plus_z))
                 # 计算 emb label consistency 和 z_c recognition rate
@@ -166,6 +175,8 @@ def pipeline_eval(exp_name: str):
             all_results[one2one_accu_result_name] = one2one_accu_list
             all_results[one2n_accu_result_name_cycle] = one2n_accu_list_cycle
             all_results[one2one_accu_result_name_cycle] = one2one_accu_list_cycle
+            all_results[emb_select_accu_result_name] = emb_select_accu_list
+            all_results[emb_select_accu_cycle_result_name] = emb_select_accu_cycle_list
             all_results[emb_self_consistency_result_name] = emb_self_consistency_list
             all_results[emb_label_consistency_result_name] = emb_label_consistency_list
             all_results[z_c_recognition_rate_result_name] = z_c_recognition_rate_list

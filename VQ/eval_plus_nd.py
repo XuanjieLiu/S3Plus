@@ -463,5 +463,49 @@ def _get_interpolate_plus_pairs(a1: int, a2: int, b1: int, b2: int, enc_z: List[
     return a_itp, b_itp, style_enc
 
 
+def calc_emb_select_plus_accu(enc_z: List[EncInfo], plus_z: List[PlusInfo]):
+    """
+    通过 emb 选择题的方式计算 plus 的准确率。
+    先从 enc_z 中对每个 label 选择一个 emb 作为选项。
+    然后对 plus_z 中的每个 plus_c_z 选择最接近的 emb 作为答案。
+    计算答案与真实 label 的匹配程度作为准确率。
+    :param enc_z:
+    :param plus_z:
+    :return:
+    """
+    all_labels = set(item.label for item in enc_z)
+
+    def _get_random_options(enc_z: List[EncInfo], all_labels) -> List[EncInfo]:
+        options = []
+        for label in all_labels:
+            options.append(_sample_EncInfo_by_label(enc_z, label))
+        return options
+
+    accu = 0
+    accu_cycle = 0
+    n_total = len(plus_z)
+
+    for item in plus_z:
+        label_c = item.label_c
+        options = _get_random_options(enc_z, all_labels)
+
+        # 计算与选项的距离
+        distances = [torch.dist(opt.emb_value, item.emb_value).item() for opt in options]
+        cycle_distances = [torch.dist(opt.emb_value, item.cycle_emb_value).item() for opt in options]
+
+        # 找到最小距离的选项
+        min_distance_idx = distances.index(min(distances))
+        min_cycle_distance_idx = cycle_distances.index(min(cycle_distances))
+
+        # 检查是否匹配
+        if options[min_distance_idx].label == label_c:
+            accu += 1
+        if options[min_cycle_distance_idx].label == label_c:
+            accu_cycle += 1
+
+    accu_mean = accu / n_total if n_total > 0 else 0
+    accu_cycle_mean = accu_cycle / n_total if n_total > 0 else 0
+    print(f"Emb Select Plus Accu: {accu_mean:.4f}, Cycle Accu: {accu_cycle_mean:.4f}")
+    return accu_mean, accu_cycle_mean
 
 
