@@ -24,10 +24,10 @@ EVAL_ITEM_MATCHING_RATE = 'emb_matching_rate_configs'
 EVAL_ITEM_ORDERLINESS = 'orderliness_configs'
 EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 
-# EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-EXP_NUM_LIST = ['1']
+EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+# EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
-    ## Main experiments, single style blue points with blur
+    # # Main experiments, single style blue points with blur
     # "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
     # "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_OnlineBlur",
     # "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
@@ -53,7 +53,7 @@ EXP_NAME_LIST = [
     "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
     "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
 
-    ## single style mahjong, pending
+    # # single style mahjong, pending
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
