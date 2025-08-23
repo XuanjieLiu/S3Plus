@@ -5,13 +5,14 @@ from typing import List, Tuple, Dict
 
 import torch
 from torch.utils.data import DataLoader
-from VQVAE import VQVAE
+from VQVAE import VQVAE, get_all_code_embs
 from shared import *
 from eval_common import draw_scatter_point_line
 import matplotlib.markers
 import matplotlib.pyplot as plt
 from scipy import stats
 from common_func import parse_label, solve_label_emb_one2one_matching
+from two_dim_num_vis import num_position_in_two_dim_repr
 
 matplotlib.use('AGG')
 MODEL_PATH = 'curr_model.pt'
@@ -333,7 +334,7 @@ class VQvaePlusEval:
                 enc_z_list.append(EncInfo(label_c[i], idx_z_c[i], zc[i], zc_s[i]))
                 plus_z_list.append(PlusInfo(
                     label_a[i], label_b[i], idx_plus_c[i], idx_plus_c_cycle[i],
-                    zc[i], plus_c_cycle[i], za_s[i], plus_c_cycle_style[i]
+                    plus_c[i], plus_c_cycle[i], za_s[i], plus_c_cycle_style[i]
                 ))
             all_enc_z.extend(enc_z_list)
             all_plus_z.extend(plus_z_list)
@@ -509,3 +510,115 @@ def calc_emb_select_plus_accu(enc_z: List[EncInfo], plus_z: List[PlusInfo]):
     return accu_mean, accu_cycle_mean
 
 
+def find_min_idx_and_value(lst: List[float]) -> Tuple[int, float]:
+    """
+    找到列表中最小值的索引和对应的值。
+    :param lst: List of float values.
+    :return: Tuple of (index, value).
+    """
+    min_idx = 0
+    min_value = lst[0]
+    for i in range(1, len(lst)):
+        if lst[i] < min_value:
+            min_value = lst[i]
+            min_idx = i
+    if min_value == float('inf'):
+        raise ValueError("List contains only infinite values.")
+    return min_idx, min_value
+
+
+def calc_emb_select_plus_accu_debug(enc_z: List[EncInfo], plus_z: List[PlusInfo], loaded_model: VQVAE, save_dir: str):
+    """
+    通过 emb 选择题的方式计算 plus 的准确率。
+    先从 enc_z 中对每个 label 选择一个 emb 作为选项。
+    然后对 plus_z 中的每个 plus_c_z 选择最接近的 emb 作为答案。
+    计算答案与真实 label 的匹配程度作为准确率。
+    :param enc_z:
+    :param plus_z:
+    :return:
+    """
+    all_labels = set(item.label for item in enc_z)
+
+    def _get_random_options(enc_z: List[EncInfo], all_labels) -> List[EncInfo]:
+        options = []
+        for label in all_labels:
+            options.append(_sample_EncInfo_by_label(enc_z, label))
+        return options
+
+    accu = 0
+    accu_cycle = 0
+    n_total = len(plus_z)
+    accu_incons_idx = 0
+    accu_cycle_incons_idx = 0
+
+    incons_pairs_list = []
+    cycle_incons_pairs_list = []
+    cycle_cons_pairs_list = []
+
+    for item in plus_z:
+        label_c = item.label_c
+        options = _get_random_options(enc_z, all_labels)
+
+        # 计算与选项的距离
+        distances = [torch.dist(opt.emb_value, item.emb_value).item() for opt in options]
+        cycle_distances = [torch.dist(opt.emb_value, item.cycle_emb_value).item() for opt in options]
+
+        # 找到最小距离的选项
+        min_distance_idx, min_value = find_min_idx_and_value(distances)
+        min_cycle_distance_idx, _ = find_min_idx_and_value(cycle_distances)
+
+        # 检查是否匹配
+        if options[min_distance_idx].label == label_c:
+            accu += 1
+            label_emb_idx = int(item.emb_idx.item())
+            option_emb_idx = int(options[min_distance_idx].emb_idx.item())
+            if option_emb_idx != label_emb_idx:
+                print(f"Min distance is {min_value}. plus_z_idx is {label_emb_idx}, plus_z_value is {item.emb_value.cpu().detach().numpy()}")
+                print(f"The min distance option is {option_emb_idx}, emb_value is {options[min_distance_idx].emb_value.cpu().detach().numpy()}")
+                accu_incons_idx += 1
+                incons_pairs_list.append((item.emb_value.cpu().detach(), options[min_distance_idx].emb_value.cpu().detach()))
+        if options[min_cycle_distance_idx].label == label_c:
+            accu_cycle += 1
+            if options[min_cycle_distance_idx].emb_idx != item.emb_idx:
+                accu_cycle_incons_idx += 1
+                cycle_incons_pairs_list.append((item.cycle_emb_value.cpu().detach(), options[min_cycle_distance_idx].emb_value.cpu().detach()))
+        else:
+            if options[min_cycle_distance_idx].emb_idx != item.emb_idx:
+                cycle_cons_pairs_list.append((item.cycle_emb_value.cpu().detach(), options[min_cycle_distance_idx].emb_value.cpu().detach()))
+
+
+    accu_mean = accu / n_total if n_total > 0 else 0
+    accu_cycle_mean = accu_cycle / n_total if n_total > 0 else 0
+    accu_incons_mean = accu_incons_idx / n_total if n_total > 0 else 0
+    accu_cycle_incons_mean = accu_cycle_incons_idx / n_total if n_total > 0 else 0
+    print(f"Emb Select Plus Accu: {accu_mean:.4f}, Cycle Accu: {accu_cycle_mean:.4f}")
+    print(f"Emb Select Plus Inconsistency: {accu_incons_mean:.4f}, Cycle Inconsistency: {accu_cycle_incons_mean:.4f}")
+
+    os.makedirs(save_dir, exist_ok=True)
+    plot_incons_label_pairs(loaded_model, enc_z, incons_pairs_list, os.path.join(save_dir, 'incons_label_pairs.png'))
+    plot_incons_label_pairs(loaded_model, enc_z, cycle_incons_pairs_list, os.path.join(save_dir, 'cycle_incons_label_pairs.png'))
+    plot_incons_label_pairs(loaded_model, enc_z, cycle_cons_pairs_list, os.path.join(save_dir, 'cycle_cons_label_pairs.png'))
+    return accu_mean, accu_cycle_mean
+
+
+def plot_incons_label_pairs(model: VQVAE, enc_z: List[EncInfo], pairs_list, save_path):
+    all_embs = get_all_code_embs(model)
+    num_z = [item.emb_value.cpu().detach().numpy() for item in enc_z]
+    num_labels = [int(item.label) for item in enc_z]
+    plt.figure(figsize=(5, 5))
+    num_position_in_two_dim_repr(plt, num_z, num_labels, all_embs)
+    plt.axis('equal')
+    plus_z_x = [item[0][0] for item in pairs_list]
+    plus_z_y = [item[0][1] for item in pairs_list]
+    option_z_x = [item[1][0] for item in pairs_list]
+    option_z_y = [item[1][1] for item in pairs_list]
+    plt.scatter(plus_z_x, plus_z_y, color='red', marker='o', s=10, label='plus_z')
+    plt.scatter(option_z_x, option_z_y, marker='s', s=30, label='option_z', c=None, facecolors='none', edgecolors='red')
+    for (plus_z, option_z) in pairs_list:
+        plt.plot([plus_z[0], option_z[0]],
+                 [plus_z[1], option_z[1]],
+                 color='red', linestyle='--', linewidth=0.5)
+    plt.savefig(f'{save_path}')
+    plt.cla()
+    plt.clf()
+    plt.close()

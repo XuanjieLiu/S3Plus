@@ -10,8 +10,9 @@ from plot_multistyle_zc import MultiStyleZcEvaler
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from common_func import (load_config_from_exp_name, record_num_list, EXP_ROOT, RandomGaussianBlur, make_dataset_trans,
                          find_optimal_checkpoint_num_by_train_config, solve_label_emb_one2one_matching)
-from eval_plus_nd import VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, calc_emb_select_plus_accu,\
-    calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency, interpolate_plus_eval
+from eval_plus_nd import (VQvaePlusEval, calc_one2one_plus_accu, calc_multi_emb_plus_accu, calc_emb_select_plus_accu,
+                          calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency,
+                          interpolate_plus_eval, calc_emb_select_plus_accu_debug)
 from dataloader_plus import MultiImgDataset
 from dataloader import SingleImgDataset, load_enc_eval_data_with_style
 from torch.utils.data import ConcatDataset
@@ -23,26 +24,40 @@ EVAL_ITEM_MATCHING_RATE = 'emb_matching_rate_configs'
 EVAL_ITEM_ORDERLINESS = 'orderliness_configs'
 EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 
-EXP_NUM_LIST = [str(i) for i in range(1, 21)]
-# EXP_NUM_LIST = ['1']
+# EXP_NUM_LIST = [str(i) for i in range(1, 21)]
+EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
+    ## Main experiments, single style blue points with blur
+    # "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    # "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_OnlineBlur",
+    # "2025.06.13_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
+    # "2025.06.16_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ_OnlineBlur",
     # "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Fullsymm_OnlineBlur",
+    # "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
+
+    # Main experiments, multi style colourful points
     "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
     "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
     "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
     "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
-    # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
-    # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
-    # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
-    # # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+
+    # Main experiments, multi style mahjong
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+
+    # Main experiments, single style blue points
     "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
     "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing",
     "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll",
     "2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ",
+
+    ## single style mahjong, pending
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_nothing",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_PureVQ",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
 ]
 EVAL_TERMS = [
     EVAL_ITEM_PLUS,
@@ -53,7 +68,7 @@ EVAL_TERMS = [
 
 
 def make_data_loader(sub_cfg: Dict[str, Any],
-                dataset_cls: Callable[..., Any]) -> DataLoader:
+                     dataset_cls: Callable[..., Any]) -> DataLoader:
     aug_t = sub_cfg.get('augment_times', 1)
     path_list = sub_cfg['eval_set_path_list']
     is_blur = sub_cfg.get('is_blur', False)
@@ -105,7 +120,8 @@ def save_all_results(pipline_dir, all_results, all_ckpts):
     with open(summary_path, 'w') as f:
         json.dump(all_results_summary, f, indent=4)
 
-    all_results_details = {'ckpts': [f'exp_{sub_exp}: {os.path.basename(ckpt)}' for sub_exp, ckpt in zip(EXP_NUM_LIST, all_ckpts)]}
+    all_results_details = {
+        'ckpts': [f'exp_{sub_exp}: {os.path.basename(ckpt)}' for sub_exp, ckpt in zip(EXP_NUM_LIST, all_ckpts)]}
     for key, value in all_results.items():
         all_results_details[key] = [f'exp_{sub_exp}: {round(v, 3)}' for sub_exp, v in zip(EXP_NUM_LIST, value)]
     details_path = os.path.join(pipline_dir, 'all_results_details.json')
@@ -151,6 +167,18 @@ def pipeline_eval(exp_name: str):
             for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
                 plus_evaler.reload_model(ckpt_path)
                 all_enc_z, all_plus_z = plus_evaler.load_plusZ_eval_data(data_loader)
+
+                # # debug emb select accu
+                # debug_save_dir = os.path.join(pipeline_dir, f'debug_emb_select_accu_{sub_exp}')
+                # os.makedirs(debug_save_dir, exist_ok=True)
+                # emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu_debug(all_enc_z, all_plus_z, plus_evaler.model, debug_save_dir)
+                # emb_select_accu_list.append(emb_select_accu)
+                # emb_select_accu_cycle_list.append(emb_select_accu_cycle)
+
+                # 计算 emb select accu
+                emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
+                emb_select_accu_list.append(emb_select_accu)
+                emb_select_accu_cycle_list.append(emb_select_accu_cycle)
                 # 计算 one2n accu
                 one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
                 one2n_accu_list.append(one2n_accu)
@@ -159,10 +187,6 @@ def pipeline_eval(exp_name: str):
                 one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
                 one2one_accu_list.append(one2one_accu)
                 one2one_accu_list_cycle.append(one2one_accu_cycle)
-                # 计算 emb select accu
-                emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
-                emb_select_accu_list.append(emb_select_accu)
-                emb_select_accu_cycle_list.append(emb_select_accu_cycle)
                 # 计算 emb self consistency
                 emb_self_consistency_list.append(calc_plus_z_self_cycle_consistency(all_plus_z))
                 # 计算 emb label consistency 和 z_c recognition rate
@@ -241,8 +265,8 @@ def pipeline_eval(exp_name: str):
                 all_enc_z, all_plus_z = interpolate_evaler.load_plusZ_eval_data(data_loader)
                 # 计算 interpolate
                 itp_score, itp_cycle_score = interpolate_plus_eval(interpolate_evaler.model,
-                                                                  all_enc_z, all_plus_z,
-                                                                  sub_config.get('interpolate_num', 10))
+                                                                   all_enc_z, all_plus_z,
+                                                                   sub_config.get('interpolate_num', 10))
                 itp_result_list.append(itp_score)
                 itp_cycle_result_list.append(itp_cycle_score)
             all_results[itp_result_name] = itp_result_list
@@ -257,4 +281,3 @@ if __name__ == "__main__":
         for exp_name in EXP_NAME_LIST:
             pipeline_eval(exp_name)
         print("Pipeline evaluation completed.")
-

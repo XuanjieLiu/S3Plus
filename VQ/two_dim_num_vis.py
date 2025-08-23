@@ -5,7 +5,7 @@ from collections import defaultdict
 from importlib import reload
 from torch.utils.data import DataLoader
 from dataloader import SingleImgDataset, load_enc_eval_data
-from VQ.VQVAE import VQVAE
+from VQ.VQVAE import VQVAE, get_all_code_embs
 from shared import *
 import matplotlib.markers
 import matplotlib.pyplot as plt
@@ -15,6 +15,7 @@ from common_func import add_gaussian_noise
 
 matplotlib.use('AGG')
 COLOR_LIST = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'hotpink', 'gray', 'steelblue', 'olive']
+
 
 def plot_z_against_label(num_z, num_labels, eval_path=None, eval_helper: EvalHelper = None):
     fig, axs = plt.subplots(1, num_z.size(1), figsize=(num_z.size(1) * 7, 5))
@@ -43,9 +44,9 @@ def plot_z_against_label(num_z, num_labels, eval_path=None, eval_helper: EvalHel
         plt.close()
 
 
-def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
-    plt.figure(figsize=(5, 5))
-    assert len(num_z[0]) == 2, f"The representation dimension of a number should be two, but got {len(num_z[0])} instead."
+def num_position_in_two_dim_repr(plt_func: matplotlib.pyplot, num_z, num_labels, all_embs=None):
+    assert len(
+        num_z[0]) == 2, f"The representation dimension of a number should be two, but got {len(num_z[0])} instead."
     sorted_label = sorted(num_labels)
     sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
     sorted_num_z = [num_z[i] for i in sorted_indices]
@@ -53,20 +54,25 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
     Y = [item[1] for item in sorted_num_z]
     max_repeating_num = find_most_frequent_elements_repeating_num(num_labels)
     for i in range(0, len(num_z)):
-        plt.scatter(X[i], Y[i],
-                    marker=f'${sorted_label[i]}$',
-                    s=200,
-                    alpha=min(1, 1/max_repeating_num*1.3),
-                    c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
+        plt_func.scatter(X[i], Y[i],
+                         marker=f'${sorted_label[i]}$',
+                         s=200,
+                         alpha=min(1, 1 / max_repeating_num * 1.3),
+                         c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
         if all_embs is None:
-            draw_scatter_gird(plt.gca(), X[i], Y[i])
-    plt.plot(X, Y, linestyle='dashed', linewidth=0.5)
+            draw_scatter_gird(plt_func.gca(), X[i], Y[i])
+    plt_func.plot(X, Y, linestyle='dashed', linewidth=0.5)
     if all_embs is not None:
         embs_x = [item[0] for item in all_embs]
         embs_y = [item[1] for item in all_embs]
-        plt.scatter(embs_x, embs_y, marker='o', s=1, c='navy')
-    plt.xlabel('z1')
-    plt.ylabel('z2')
+        plt_func.scatter(embs_x, embs_y, marker='o', s=1, c='navy')
+    plt_func.xlabel('z1')
+    plt_func.ylabel('z2')
+
+
+def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
+    plt.figure(figsize=(5, 5))
+    num_position_in_two_dim_repr(plt, num_z, num_labels, all_embs)
     if x_limit is not None:
         plt.xlim(x_limit[0], x_limit[1])
     if y_limit is not None:
@@ -85,7 +91,8 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
 def plot_num_position_in_three_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111, projection='3d')
-    assert len(num_z[0]) == 3, f"The representation dimension of a number should be three, but got {len(num_z[0])} instead."
+    assert len(
+        num_z[0]) == 3, f"The representation dimension of a number should be three, but got {len(num_z[0])} instead."
     sorted_label = sorted(num_labels)
     sorted_indices = [i[0] for i in sorted(enumerate(num_labels), key=lambda x: x[1])]
     sorted_num_z = [num_z[i] for i in sorted_indices]
@@ -95,10 +102,10 @@ def plot_num_position_in_three_dim_repr(num_z, num_labels, result_path=None, x_l
     max_repeating_num = find_most_frequent_elements_repeating_num(num_labels)
     for i in range(0, len(num_z)):
         ax.scatter(X[i], Y[i], Z[i],
-                    marker=f'${sorted_label[i]}$',
-                    s=200,
-                    alpha=min(1, 1/max_repeating_num*1.3),
-                    c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
+                   marker=f'${sorted_label[i]}$',
+                   s=200,
+                   alpha=min(1, 1 / max_repeating_num * 1.3),
+                   c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
     plt.plot(X, Y, Z, linestyle='dashed', linewidth=0.5)
     if all_embs is not None:
         embs_x = [item[0] for item in all_embs]
@@ -177,6 +184,10 @@ def multiple_nearest_neighbor_analysis(num_z_c, num_labels, n_times=10):
     mean_score = np.mean(score_list)
     return mean_score
 
+
+
+
+
 class MumEval:
     def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.config = config
@@ -218,23 +229,16 @@ class MumEval:
         num_z, num_labels = load_enc_eval_data(
             data_loader,
             lambda x:
-                self.model.batch_encode_to_z(x)[0]
+            self.model.batch_encode_to_z(x)[0]
         )
         num_z = num_z.cpu().detach().numpy()
         num_z_c = num_z[:, :self.latent_code_1]
         return num_z_c, num_labels
 
+
     def plot_num_position_graph(self, num_z_c, num_labels, is_show_all_emb=True, result_name=None):
         if self.latent_code_1 == 2 or self.latent_code_1 == 3:
-            all_embs = None
-            code_book = self.model.vq_layer.embeddings.weight.cpu().detach().numpy()
-            code_book = np.around(code_book, decimals=3)
-            if is_show_all_emb and self.latent_embedding_1 == 2:
-                all_embs = combine_two_codebooks(code_book, code_book)
-            if self.latent_embedding_1 == 3:
-                all_embs = combine_three_codebooks(code_book, code_book, code_book)
-            if is_show_all_emb and self.latent_embedding_1 == 1:
-                all_embs = code_book
+            all_embs = get_all_code_embs(self.model) if is_show_all_emb else None
             if self.latent_code_1 == 2:
                 plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
             elif self.latent_code_1 == 3:
@@ -278,15 +282,15 @@ def nearest_neighbor_analysis(num_z_c, num_labels, verbose=False):
 
     def is_the_next_num_the_closest(sorted_num_z, sorted_label):
         valid_nearest_neighbor = 0
-        for i in range(len(sorted_label)-1):
+        for i in range(len(sorted_label) - 1):
             z = sorted_num_z[i]
-            next_label_z = sorted_num_z[i+1:]
+            next_label_z = sorted_num_z[i + 1:]
             distances = np.linalg.norm(next_label_z - z, axis=1)
             if is_the_unique_min_num(distances[0], distances):
                 valid_nearest_neighbor += 1
             else:
                 if verbose:
-                    print(f'Nearest neighbor analysis failed at number {sorted_label[i]} and {sorted_label[i+1]}.')
+                    print(f'Nearest neighbor analysis failed at number {sorted_label[i]} and {sorted_label[i + 1]}.')
         return valid_nearest_neighbor
 
     ascend_valid_nearest_neighbor = is_the_next_num_the_closest(ascend_sorted_num_z, ascend_sorted_label)
@@ -300,19 +304,6 @@ def nearest_neighbor_analysis(num_z_c, num_labels, verbose=False):
 
 def is_the_unique_min_num(num, num_list):
     return num == min(num_list) and list(num_list).count(num) == 1
-
-
-def combine_two_codebooks(arr_1, arr_2):
-    return [[x, y] for x in arr_1 for y in arr_2]
-
-
-def combine_three_codebooks(arr_1, arr_2, arr_3):
-    combined = []
-    for i in range(0, len(arr_1)):
-        for j in range(0, len(arr_2)):
-            for k in range(0, len(arr_3)):
-                combined.append([arr_1[i], arr_2[j], arr_3[k]])
-    return combined
 
 
 def test_two_dim_vis():

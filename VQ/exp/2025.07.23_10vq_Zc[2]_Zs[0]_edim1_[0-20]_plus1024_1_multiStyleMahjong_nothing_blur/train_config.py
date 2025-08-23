@@ -101,12 +101,8 @@ CONFIG = {
                     EVAL_SET,
                 ],
                 'is_blur': True,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
-                'augment_times': 16,
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'emb_matching_rate_configs': [
@@ -116,12 +112,8 @@ CONFIG = {
                     SINGLE_IMG_SET,
                 ],
                 'is_blur': True,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
-                'augment_times': 16,
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'orderliness_configs': [
@@ -132,12 +124,8 @@ CONFIG = {
                     SINGLE_IMG_SET,
                 ],
                 'is_blur': True,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
-                'augment_times': 16,
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
             },
         ],
     },

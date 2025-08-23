@@ -375,3 +375,35 @@ def split_into_three(tensor):
     new_tensor = tensor.reshape(*sizes)
     return new_tensor[0], new_tensor[1], new_tensor[2]
 
+
+def get_all_code_embs(model: VQVAE):
+    """
+    Get all codebook embeddings from the model.
+    This function retrieves the codebook embeddings based on the latent code and embedding configurations of the model
+    :param model: VQVAE model instance
+    :return: all_embs: List of codebook embeddings
+    """
+    all_embs = None
+    if model.latent_code_1 == 2 or model.latent_code_1 == 3:
+        code_book = model.vq_layer.embeddings.weight.cpu().detach().numpy()
+        code_book = np.around(code_book, decimals=3)
+        if model.latent_embedding_1 == 2:
+            all_embs = combine_two_codebooks(code_book, code_book)
+        if model.latent_embedding_1 == 3:
+            all_embs = combine_three_codebooks(code_book, code_book, code_book)
+        if model.latent_embedding_1 == 1:
+            all_embs = code_book
+    return all_embs
+
+
+def combine_two_codebooks(arr_1, arr_2):
+    return [[x, y] for x in arr_1 for y in arr_2]
+
+
+def combine_three_codebooks(arr_1, arr_2, arr_3):
+    combined = []
+    for i in range(0, len(arr_1)):
+        for j in range(0, len(arr_2)):
+            for k in range(0, len(arr_3)):
+                combined.append([arr_1[i], arr_2[j], arr_3[k]])
+    return combined
