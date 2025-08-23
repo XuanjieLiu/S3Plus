@@ -39,7 +39,10 @@ class SymmLossInduced(SymmLoss):
             commit_loss += commit_loss_induced
 
         # get the prior output
-        ntf_ratio = compute_loss_weight(self.config["ntf_ratio"], step)
+        if isinstance(self.config["ntf_ratio"], str):
+            ntf_ratio = compute_loss_weight(self.config["ntf_ratio"], step)
+        else:
+            ntf_ratio = self.config["ntf_ratio"]
         zc_vq_hat = model.rnn_forward(zc_vq, ntf_ratio=ntf_ratio)
         prior_loss = F.mse_loss(zc_vq_hat, zc[:, 1:, :], reduction="mean")
         # TODO: introduce stochasticity, not just MSE
@@ -52,7 +55,10 @@ class SymmLossInduced(SymmLoss):
                 zc_vq_inducement_hat, zc_inducement[:, 1:, :], reduction="mean"
             )
 
-        if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
+        # symmetry loss
+        # important: freeze the inducement model
+        model.freeze_secondary_prior()
+        if step > self.config["start_isymm_at_n_steps"] and self.use_isymm and self.config["weights"]["isymm_loss"] > 0:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
             g_t = torch.randint(1, 2, size=())
@@ -102,19 +108,17 @@ class SymmLossInduced(SymmLoss):
             # R
             zc_observed = zc_observed_with_p[:, -p_r:, :]
             zc_observed_r = model.unroll(zc_observed, g_r)  # (B, g_r, d_zc)
-            zc_observed_r_with_p = torch.cat(
-                [zc_observed_with_p, zc_observed_r], dim=1
-            )
             zc_observed_rt = []
             for i in range(g_r):
                 zc_observed_rt.append(
                     model.secondary_unroll(
-                        zc_observed_r_with_p[:, -i - 1 - p_t : -i - 1, :], g_t
+                        zc_observed_r[:, i : p_t + i, :], g_t
                     )[:, -1, :]
                 )
             zc_observed_rt = torch.stack(zc_observed_rt, dim=1)
 
             isymm_loss = F.mse_loss(zc_observed_rt, zc_observed_tr, reduction="mean")
+        model.unfreeze_secondary_prior()
 
         losses = {}
         total_loss = 0

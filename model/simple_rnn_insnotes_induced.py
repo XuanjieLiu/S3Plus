@@ -81,6 +81,14 @@ class SymmCSAEwithSecondaryPrior(SymmCSAEwithPrior):
 
         return predictions
 
+    def freeze_secondary_prior(self):
+        for param in self.secondary_prior.parameters():
+            param.requires_grad = False
+
+    def unfreeze_secondary_prior(self):
+        for param in self.secondary_prior.parameters():
+            param.requires_grad = True
+
 
 if __name__ == "__main__":
     # Test the SymmAE class

@@ -55,7 +55,10 @@ class SymmLoss:
         ae_loss = F.mse_loss(x_hat, x)
 
         # get the prior output
-        ntf_ratio = compute_loss_weight(self.config["ntf_ratio"], step)
+        if isinstance(self.config["ntf_ratio"], str):
+            ntf_ratio = compute_loss_weight(self.config["ntf_ratio"], step)
+        else:
+            ntf_ratio = self.config["ntf_ratio"]
         zc_vq_hat = model.rnn_forward(zc_vq, ntf_ratio=ntf_ratio)
         prior_loss = F.mse_loss(zc_vq_hat, zc[:, 1:, :], reduction="mean")
 
