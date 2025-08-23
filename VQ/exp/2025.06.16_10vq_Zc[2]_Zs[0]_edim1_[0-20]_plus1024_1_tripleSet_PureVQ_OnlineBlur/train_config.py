@@ -1,11 +1,22 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
+TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet/train"
+EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1"
+EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2"
+SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
+AUGMENT_TIMES = 16
+IS_BLUR = True
+BLUR_CONFIG = {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+    'kernel_size_choices': (5, 7, 9),
+    'sigma_range': (0.5, 3.0),
+    'p_no_blur': 0.00,
+}
 CONFIG = {
-    'train_data_path': f"{data_root}/single_style_pairs(0,20)_tripleSet/train",
-    'single_img_eval_set_path': f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
-    'plus_eval_set_path': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
-    'plus_eval_set_path_2': f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2",
+    'train_data_path': TRAIN_SET,
+    'single_img_eval_set_path': SINGLE_IMG_SET,
+    'plus_eval_set_path': EVAL_SET_1,
+    'plus_eval_set_path_2': EVAL_SET_2,
     'is_random_split_data': False,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
     'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
     'is_online_blur': True,  # 是否在训练时模糊处理图像
@@ -76,6 +87,9 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
+    'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+    'blur_config': BLUR_CONFIG,
+    'augment_times': AUGMENT_TIMES,
     'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
@@ -88,17 +102,23 @@ CONFIG = {
             {
                 'name': 'eval_set',
                 'eval_set_path_list': [
-                    f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_1",
-                    f"{data_root}/blur-single_style_pairs(0,20)_tripleSet/test_2",
+                    EVAL_SET_1,
+                    EVAL_SET_2,
                 ],
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'emb_matching_rate_configs': [
             {
                 'name': 'emb_matching_rate',
                 'eval_set_path_list': [
-                    f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
+                    SINGLE_IMG_SET,
                 ],
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
             },
         ],
         'orderliness_configs': [
@@ -106,9 +126,23 @@ CONFIG = {
                 'name': 'orderliness',
                 'img_dir_name': 'orderliness',
                 'eval_set_path_list': [
-                    f"{data_root}/blur-(0,20)-FixedPos-oneStyle",
+                    SINGLE_IMG_SET,
                 ],
-                'is_add_noise': False,
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
+            },
+        ],
+        'interpolate_configs': [
+            {
+                'name': 'train_interpolate',
+                'eval_set_path_list': [
+                    TRAIN_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+                'augment_times': AUGMENT_TIMES,
+                'interpolate_num': 10,
             },
         ],
     },
