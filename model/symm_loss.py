@@ -42,7 +42,8 @@ class SymmLoss:
         p_t = torch.randint(2, 3, size=())
         g_t = torch.randint(1, 2, size=())
         p_r = torch.randint(7, 8, size=())
-        g_r = torch.randint(4, 8, size=())
+        g_r = torch.randint(1, 2, size=())
+
 
         return p_t, g_t, p_r, g_r
 

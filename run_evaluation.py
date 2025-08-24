@@ -104,7 +104,9 @@ if __name__ == "__main__":
         config["debug"] = True
 
     # ready for testing
-    if "ISymm" in config["method"]:
+    if "Induced" in config["method"]:
+        from tester_inducement import TesterInduced as Tester
+    elif "ISymm" in config["method"]:
         from tester import Tester
 
     tester = Tester(config)

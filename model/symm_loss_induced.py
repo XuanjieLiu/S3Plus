@@ -58,7 +58,7 @@ class SymmLossInduced(SymmLoss):
         # symmetry loss
         # important: freeze the inducement model
         model.freeze_secondary_prior()
-        if step > self.config["start_isymm_at_n_steps"] and self.use_isymm and self.config["weights"]["isymm_loss"] > 0:
+        if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
             g_t = torch.randint(1, 2, size=())
@@ -88,16 +88,16 @@ class SymmLossInduced(SymmLoss):
                 f"p_t ({p_t}) must be less than or equal to zc.shape[1] - p_r + 1 ({zc.shape[1] - p_r + 1})"
             )
             start_cursor = torch.randint(
-                p_t, zc.shape[1] - p_r + 1, size=()
+                0, zc.shape[1] - p_r + 1, size=()
             ).item()  # TODO: use different cursor for each batch item
-            zc_observed_with_p = zc[:, start_cursor - p_t : start_cursor + p_r, :]
+            zc_observed = zc[:, start_cursor: start_cursor + p_r, :]
             # T then R
             # T
             zc_observed_t = []
             for i in range(p_r):
                 zc_observed_t.append(
                     model.secondary_unroll(
-                        zc_observed_with_p[:, i : p_t + i, :], g_t
+                        zc_observed[:, i : p_t + i, :], g_t
                     )[:, -1, :]
                 )
             zc_observed_t = torch.stack(zc_observed_t, dim=1)  # (B, p_r, d_zc)
@@ -106,7 +106,6 @@ class SymmLossInduced(SymmLoss):
 
             # R then T
             # R
-            zc_observed = zc_observed_with_p[:, -p_r:, :]
             zc_observed_r = model.unroll(zc_observed, g_r)  # (B, g_r, d_zc)
             zc_observed_rt = []
             for i in range(g_r):
