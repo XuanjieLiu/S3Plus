@@ -94,11 +94,14 @@ CONFIG = {
                     EVAL_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
+                'augment_times': AUGMENT_TIMES,
+            },
+            {
+                'name': 'train_set',
+                'eval_set_path_list': [
+                    TRAIN_SET,
+                ],
+                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -109,11 +112,6 @@ CONFIG = {
                     SINGLE_IMG_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -125,11 +123,6 @@ CONFIG = {
                     SINGLE_IMG_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -140,11 +133,6 @@ CONFIG = {
                     TRAIN_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
                 'augment_times': AUGMENT_TIMES,
                 'interpolate_num': 10,
             },
