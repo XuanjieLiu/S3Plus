@@ -61,7 +61,7 @@ class SymmLossInduced(SymmLoss):
         if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
-            g_t = torch.randint(1, 2, size=())
+            g_t = torch.randint(1, self.config["isymm_k"] + 1, size=())
 
             # Old and probably wrong way to do it
             # global_prompt = zc[:, : max(p_t, p_r), :].clone()

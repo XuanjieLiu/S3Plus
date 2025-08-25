@@ -33,6 +33,7 @@ loss_config:
   # ntf_ratio: "0 if t < 100 else min(1.0, (t - 100) / 10000)"
   ntf_ratio: 0.1
   start_isymm_at_n_steps: 0
+  isymm_k: 1
 
 model_config:
   d_zc: 128
