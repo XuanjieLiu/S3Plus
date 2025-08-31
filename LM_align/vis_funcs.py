@@ -85,32 +85,34 @@ def visualize_alignment(z, labels, imgs, embs, zs, e_ab, z_ab, save_path=None):
     plt.close(fig)  # 关闭画布，释放内存
 
 
-def plot_confusion_matrix(ax, pred_label, label_all, objs_all, obj_type):
+def plot_confusion_matrix(ax, pred_label, label_all, objs_all, obj_type,
+                          normalize_rows=True, show_counts=False):
     """
     在给定的坐标轴 ax 上绘制混淆矩阵热力图，并添加对角辅助线，
     同时在标题中显示该类别名称及准确率（保留三位小数）。
-    
+
     当 obj_type=="Overall" 时，不做类别过滤，使用所有数据。
+
+    参数：
+    - normalize_rows: True 时逐行归一化（每行和为 1）；False 时显示计数。
+    - show_counts:    仅在 normalize_rows=True 时生效；为 True 则在单元格中显示 `计数(比例)`。
     """
     # 转换为 numpy 数组
     pred_label = np.array(pred_label)
-    label_all = np.array(label_all)
-    objs_all = np.array(objs_all)
-    
+    label_all  = np.array(label_all)
+    objs_all   = np.array(objs_all)
+
     # 如果是整体统计，则直接使用所有数据；否则过滤指定类别
     if obj_type == "Overall":
         pred_sub = pred_label
         label_sub = label_all
     else:
-        mask = objs_all == obj_type
+        mask = (objs_all == obj_type)
         pred_sub = pred_label[mask]
         label_sub = label_all[mask]
-    
+
     # 计算准确率（防止除0错误）
-    if len(label_sub) > 0:
-        accuracy = np.mean(pred_sub == label_sub)
-    else:
-        accuracy = 0.0
+    accuracy = np.mean(pred_sub == label_sub) if len(label_sub) > 0 else 0.0
 
     # 动态识别实际与预测计数的最小值和最大值
     if len(label_sub) > 0:
@@ -124,45 +126,73 @@ def plot_confusion_matrix(ax, pred_label, label_all, objs_all, obj_type):
     else:
         min_pred, max_pred = 0, 0
 
-    # 构建混淆矩阵，行对应实际计数（min_actual 到 max_actual），列对应预测计数（min_pred 到 max_pred）
+    # 构建混淆矩阵（计数）
     n_actual = max_actual - min_actual + 1
-    n_pred   = max_pred - min_pred + 1
+    n_pred   = max_pred   - min_pred   + 1
     confusion = np.zeros((n_actual, n_pred), dtype=int)
-    
-    # 填充混淆矩阵（下标通过减去最小值进行偏移）
+
     for pred, actual in zip(pred_sub, label_sub):
         if min_actual <= actual <= max_actual and min_pred <= pred <= max_pred:
-            confusion[actual - min_actual, pred - min_pred] += 1
+            confusion[int(actual) - min_actual, int(pred) - min_pred] += 1
 
-    # 自定义颜色映射：从 green 到 yellow
+    # === 逐行归一化 ===
+    if normalize_rows:
+        row_sums = confusion.sum(axis=1, keepdims=True)
+        # 安全除法：行和为 0 的行保持为 0
+        confusion_norm = np.divide(
+            confusion.astype(float),
+            row_sums,
+            out=np.zeros_like(confusion, dtype=float),
+            where=(row_sums != 0)
+        )
+        data_to_show = confusion_norm
+        vmin, vmax = 0.0, 1.0  # 固定颜色范围，便于不同子图可比
+    else:
+        data_to_show = confusion
+        vmin, vmax = None, None  # 计数模式使用自适应范围
+
+    # 自定义颜色映射：从 green 到 yellow（保留你的风格）
     custom_cmap = LinearSegmentedColormap.from_list('custom_cmap', ['green', 'yellow'])
-    
-    im = ax.imshow(confusion, interpolation='nearest', cmap=custom_cmap, origin='lower')
-    
+
+    im = ax.imshow(data_to_show, interpolation='nearest', cmap=custom_cmap,
+                   origin='lower', vmin=vmin, vmax=vmax)
+
     # 在每个格子内添加数字注释
     for i in range(n_actual):
         for j in range(n_pred):
-            ax.text(j, i, str(confusion[i, j]), ha='center', va='center', color='black')
-    
-    # 设置坐标轴刻度与标签
+            if normalize_rows:
+                if show_counts:
+                    ax.text(j, i, f'{confusion[i, j]} ({data_to_show[i, j]:.2f})',
+                            ha='center', va='center', color='black', fontsize=9)
+                else:
+                    ax.text(j, i, f'{data_to_show[i, j]:.2f}',
+                            ha='center', va='center', color='black', fontsize=9)
+            else:
+                ax.text(j, i, str(confusion[i, j]),
+                        ha='center', va='center', color='black', fontsize=9)
+
+    # 坐标轴刻度与标签
     ax.set_xticks(np.arange(n_pred))
     ax.set_xticklabels(np.arange(min_pred, max_pred + 1))
     ax.set_yticks(np.arange(n_actual))
     ax.set_yticklabels(np.arange(min_actual, max_actual + 1))
     ax.set_xlabel('Predicted Count')
     ax.set_ylabel('Actual Count')
-    
-    # 添加对角辅助线：找出实际与预测的重叠区间
+
+    # 对角辅助线（实际=预测）
     lower_bound = max(min_actual, min_pred)
     upper_bound = min(max_actual, max_pred)
     if lower_bound <= upper_bound:
-        a_values = np.arange(lower_bound, upper_bound + 1)
+        a_values   = np.arange(lower_bound, upper_bound + 1)
         row_coords = a_values - min_actual
         col_coords = a_values - min_pred
         ax.plot(col_coords, row_coords, color='red', linestyle='--', linewidth=2)
-    
-    # 设置标题，包含类别及准确率（保留三位小数）
+
+    # 标题
     ax.set_title(f'{obj_type} (Acc: {accuracy:.3f})')
+
+    # 颜色条
+    ax.figure.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
 def plot_accuracy_bar(ax, categories, accuracies):
     """

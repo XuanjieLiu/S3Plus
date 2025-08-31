@@ -1,6 +1,9 @@
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import collections as matcoll
+import os
+import sys
+sys.path.append('{}'.format(os.path.dirname(os.path.abspath(__file__))))
 from VQVAE import VQVAE
 from shared import *
 

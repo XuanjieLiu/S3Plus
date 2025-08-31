@@ -17,14 +17,74 @@ from torchvision import transforms
 import torch.nn.functional as F
 import numpy as np
 from LM_align.VisionModels import LightweightViT, SimpleCNN
-from common_config import (CONFIG, DATA_TYPE_FRUIT, DATA_TYPE_SYNTH, DATA_TYPE_SYNTH_ONLINE,
-                           STAGE_TRAIN, STAGE_VAL, STAGE_VAL_OOD,
-                           VISION_MODEL_DINO, VISION_MODEL_LIGHTViT, VISION_MODEL_CNN)
-from loss_counter import LossCounter
+
 
 WANDB_API_KEY="532007cd7a07c1aa0d1194049c3231dadd1d418e"
 wandb.login(key=WANDB_API_KEY)
+PROJECT_DIR = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../')
+RESULTS_DIR = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/results/')
+print(f'Results path: {RESULTS_DIR}')
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
+DATA_TYPE_FRUIT = 'fruit'
+DATA_TYPE_SYNTH = 'synth'
+DATA_TYPE_SYNTH_ONLINE = 'synth_online'
+STAGE_TRAIN = 'train'
+STAGE_VAL = 'val'
+STAGE_VAL_OOD = 'val_ood'
+VISION_MODEL_DINO = 'dino'
+VISION_MODEL_LIGHTViT = 'lightViT'
+VISION_MODEL_CNN = 'cnn'
+
+CONFIG = {
+    'name': '25.04.04.align_Synth_online_cnn_noZero_1',
+    'dataset_anchor': os.path.join(PROJECT_DIR, 'fruit_recognition_dataset_oneFruit'),
+    'subset_list': ['Apple/Apple A', 'Apple/Apple D'],
+    'VQSPS': {
+        'EXP_NAME': '2024.02.03_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_AssocSymmCommuAll',
+        'CHECK_POINT_NAME': '2/checkpoint_50000.pt',
+    },
+    # Dino Projector
+    'PROJECTOR': {
+        'HIDDEN_PARAM': [1024, 1024, 1024],
+        'IS_BATCH_NORM': False,
+        'IS_LAYER_NORM': False,
+        'NG_SLOPE': 0.01,
+    },
+    'project_name': 'LM_align_2.20',
+    'vision_model': VISION_MODEL_DINO,
+    'vision_out_dim': 256,
+    'ALIGN': {
+        'LR': 0.0001,
+        'BATCH_SIZE': 32,
+        'EPOCHS': 100,
+        'commitment_scalar': 1,
+        'embedding_scalar': 0.0,
+        'collapse_scalar': 1,
+        'collapse_multiplier': 1, # before was 2.0
+        'is_use_anchor': False,
+        'plus_scalar': 1, # before was 100
+        # 'CODES': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        'CODES': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        # 'CODES': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20],
+    },
+    'data_type': DATA_TYPE_SYNTH_ONLINE,
+    'data_fruit': {
+        'dataset_anchor': os.path.join(PROJECT_DIR, 'fruit_recognition_dataset_oneFruit'),
+        'subset_list': ['Apple/Apple A', 'Apple/Apple D'],
+    },
+    'data_synth': {
+        'train_dir': os.path.join(PROJECT_DIR, 'LM_align/synthData/pre_generated_data'),
+        'val_dir': os.path.join(PROJECT_DIR, 'LM_align/synthData/pre_generated_data_sharedBoxes_val'),
+        'dataset_anchor': os.path.join(PROJECT_DIR, 'LM_align/synthData/pre_generated_data_anchor_1'),
+    },
+    'data_synth_online': {
+        'train_num_samples': 1024, # 1024 for dino
+        'train_reuse_times': 4, # 4 for dino
+        # 'train_reuse_times': 16, # 16 for vit and cnn
+    },
+    
+}
 
 def calc_accuracy(pred_label, true_label):
     return np.sum(pred_label == true_label) / len(true_label)
@@ -117,12 +177,6 @@ def load_vision_model(config=CONFIG):
         return SimpleCNN(output_dim=vision_out_dim).to(DEVICE), vision_out_dim
         
 
-EVAL_TERMS = [
-    'accuracy', 'e_q_loss_a', 'e_q_loss_b', 'e_q_loss_c', 'e_q_loss_ab',
-    'plus_loss', 'anchor_loss', 'collapse_loss', 'collapse_loss_mean', 'all_loss'
-]
-
-
 class AlignTrain:
     def __init__(self, config):
         self.config = config
@@ -136,6 +190,7 @@ class AlignTrain:
         self.model_sps = self.sps_loader.model.to(DEVICE)
         proj_out_dim = self.sps_loader.latent_code_1
         self.model_proj = load_fc_projector(proj_in_dim, proj_out_dim, config).to(DEVICE)
+        self.results_dir = os.path.join(RESULTS_DIR, config['name'])
         self.batch_size = config['ALIGN']['BATCH_SIZE']
         self.anchor_1_z = self.sps_loader.num_z_c[self.sps_loader.num_labels.index(1)]
         self.anchor_1_z_batch = torch.tensor(self.anchor_1_z).unsqueeze(0).repeat(self.batch_size, 1).to(DEVICE)
@@ -143,15 +198,8 @@ class AlignTrain:
         self.vq_layer, self.min_margin = self.init_codebook()
         self.criterion = nn.MSELoss()
         self.train_step = 0
-        self.epoch = 0
         self.collapse_loss = collapse_loss_func(self.min_margin, config['ALIGN']['collapse_multiplier'])
         self.collapse_scalar = config['ALIGN']['collapse_scalar']
-        self.log_interval = config['ALIGN']['log_interval']
-        self.ckpt_interval = config['ALIGN']['ckpt_interval']
-        self.ckpt_name = config['ALIGN']['ckpt_name']
-        self.results_dir = config['ALIGN']['result_dir']
-        self.wandb_run = None
-        os.makedirs(self.results_dir, exist_ok=True)
         
 
     def init_codebook(self):
@@ -199,13 +247,10 @@ class AlignTrain:
             return img_c
 
     def init_wandb(self):
-        sub_exp_id = self.config.get('sub_exp_id', None)
-        name = f"{self.config['name']}_{sub_exp_id}" if sub_exp_id is not None else self.config['name']
-        self.wandb_run = wandb.init(
-            project=self.config['project_name'],
-            name=name,
+        wandb.init(
+            project=self.config['project_name'], 
+            name=self.config['name'],
             config=self.config,
-            group=self.config['group']
         )
         
     def img2emb(self, img):
@@ -222,10 +267,7 @@ class AlignTrain:
         e_plus, e_q_loss = self.vq_layer(z_plus)
         return e_plus, e_q_loss, z_plus
     
-    def one_epoch(self, epoch, data_loader, optimizer=None, stage=STAGE_TRAIN, loss_counter: LossCounter=None):
-        pred_label_list = np.array([])
-        label_list = np.array([])
-        objs_list = np.array([])
+    def one_epoch(self, epoch, data_loader, optimizer=None, stage=STAGE_TRAIN):
         for i, data_batch in enumerate(data_loader):
             print(f'Stage: {stage}, Epoch: {epoch}, Batch: {i}, Train step: {self.train_step}')
             if optimizer is not None:
@@ -275,23 +317,18 @@ class AlignTrain:
                 f'{stage}_all_loss': all_loss,
                 f'{stage}_train_step': self.train_step,
                 f'{stage}_accuracy': accuracy,
-                f'{stage}_epoch': epoch,
             }
 
             if stage == STAGE_TRAIN:
                 self.train_step += 1
 
-            self.wandb_run.log(loss_dict)
-            loss_counter.add_values([
-                accuracy, e_q_loss_a.item(), e_q_loss_b.item(), e_q_loss_c.item(), e_q_loss_ab.item(),
-                plus_loss.item(), anchor_loss.item(), collapse_loss.item(), collapse_loss_all.item(), all_loss.item(),
-            ])
-
-            pred_label_list = np.concatenate((pred_label_list, pred_label))
-            label_list = np.concatenate((label_list, label_all))
-            objs_list = np.concatenate((objs_list, np.array(np.concatenate((objs, objs, objs)))))
-            # visualization
-            if (epoch % self.log_interval == 0 or stage == STAGE_VAL or stage == STAGE_VAL_OOD) and i == 0:
+            wandb.log(loss_dict)
+            if CONFIG['vision_model'] == VISION_MODEL_DINO:
+                train_log_interval = 50
+            else:
+                train_log_interval = 200
+            if self.train_step % train_log_interval == 0 or stage == STAGE_VAL or stage == STAGE_VAL_OOD: # This command for dino
+            # if stage == STAGE_VAL or stage == STAGE_VAL_OOD:
                 visualize_alignment(
                     self.sps_loader.num_z_c, self.sps_loader.num_labels,
                     [img_a[0].cpu().detach().numpy(), img_b[0].cpu().detach().numpy(), img_c[0].cpu().detach().numpy()],
@@ -299,76 +336,29 @@ class AlignTrain:
                     [z_a[0].cpu().detach().numpy(), z_b[0].cpu().detach().numpy(), z_c[0].cpu().detach().numpy()],
                     e_ab[0].cpu().detach().numpy(),
                     z_ab[0].cpu().detach().numpy(),
-                    save_path=os.path.join(self.results_dir, f'{stage}_epoch_{epoch}_step_{self.train_step}.png')
+                    save_path=os.path.join(self.results_dir, f'{stage}_step_{self.train_step}.png')
                 )
-        # Visualize accuracy
-        if epoch % self.log_interval == 0:
-            vis_all_confusion_and_accuracy(
-                pred_label_list, label_list, objs_list,
-                save_path=os.path.join(self.results_dir, f'{stage}_epoch_{epoch}_step_{self.train_step}_confusion.png')
-            )
-
-    def on_train_end(self):
-        self.train_step = 0
-        self.epoch = 0
-        self.wandb_run.finish()
-
+                # Visualize accuracy
+                vis_all_confusion_and_accuracy(
+                    np.array(pred_label), np.array(label_all), np.array(np.concatenate((objs, objs, objs))),
+                    save_path=os.path.join(self.results_dir, f'{stage}_step_{self.train_step}_confusion.png')
+                )
+            if stage == STAGE_VAL or stage == STAGE_VAL_OOD:
+                break
 
     def train(self):
         self.init_wandb()
-        self.resume()
-        train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['train_record_path'])
-        val_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['val_record_path'])
-        val_ood_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['val_ood_record_path'])
         os.makedirs(self.results_dir, exist_ok=True)
         if self.config['vision_model'] == VISION_MODEL_DINO:
             optimizer = optim.Adam(self.model_proj.parameters(), lr=self.config['ALIGN']['LR'])
         elif self.config['vision_model'] == VISION_MODEL_LIGHTViT or self.config['vision_model'] == VISION_MODEL_CNN:
             optimizer = optim.Adam(list(self.model_proj.parameters()) + list(self.model_vision.parameters()), lr=self.config['ALIGN']['LR'])
-        for epoch in range(self.epoch, self.config['ALIGN']['EPOCHS']):
-            self.one_epoch(epoch, self.data_loader_train, optimizer, stage=STAGE_TRAIN, loss_counter=train_loss_counter)
+        for epoch in range(self.config['ALIGN']['EPOCHS']):
+            self.one_epoch(epoch, self.data_loader_train, optimizer, stage=STAGE_TRAIN)
             with torch.no_grad():
-                self.one_epoch(epoch, self.data_loader_val, stage=STAGE_VAL, loss_counter=val_loss_counter)
-                self.one_epoch(epoch, self.data_loader_val_ood, stage=STAGE_VAL_OOD, loss_counter=val_ood_loss_counter)
-            # Record and clear loss counters
-            train_loss_counter.record_and_clear(num=epoch)
-            val_loss_counter.record_and_clear(num=epoch)
-            val_ood_loss_counter.record_and_clear(num=epoch)
-            if epoch % self.config['ALIGN']['ckpt_interval'] == 0 and epoch > 0:
-                ckpt_name = f'checkpoint_{epoch}.pt'
-                self.save_model(ckpt_name)
-            self.epoch += 1
-
-
-    def resume(self, ckpt_path=None):
-        if ckpt_path is not None:
-            self.load_model(ckpt_path)
-        elif os.path.exists(self.ckpt_name):
-            self.load_model(self.ckpt_name)
-            print(f"Resumed from default checkpoint {self.ckpt_name}")
-        else:
-            print(f"No checkpoint found, training from scratch")
-
-    def load_model(self, ckpt_path):
-        checkpoint = torch.load(ckpt_path)
-        self.model_proj.load_state_dict(checkpoint['model_proj_state_dict'])
-        if 'model_vision_state_dict' in checkpoint:
-            self.model_vision.load_state_dict(checkpoint['model_vision_state_dict'])
-        self.train_step = checkpoint['train_step']
-        self.epoch = checkpoint['epoch'] + 1
-        print(f"Resumed from {ckpt_path} at epoch {self.epoch}, train step {self.train_step}")
-
-    def save_model(self, ckpt_name):
-        ckpt = {
-            'model_proj_state_dict': self.model_proj.state_dict(),
-            'train_step': self.train_step,
-            'epoch': self.epoch,
-        }
-        if self.config['vision_model'] == VISION_MODEL_LIGHTViT or self.config['vision_model'] == VISION_MODEL_CNN:
-            ckpt['model_vision_state_dict'] = self.model_vision.state_dict()
-        torch.save(ckpt, ckpt_name)
-        torch.save(ckpt, self.ckpt_name)
-        print(f"Checkpoint saved")
+                self.one_epoch(epoch, self.data_loader_val, stage=STAGE_VAL)
+                self.one_epoch(epoch, self.data_loader_val_ood, stage=STAGE_VAL_OOD)
+        self.train_step = 0
 
 
 if __name__ == "__main__":
