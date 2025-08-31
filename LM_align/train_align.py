@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.optim as optim
 import torch.nn as nn
 from vis_funcs import visualize_alignment, vis_all_confusion_and_accuracy
