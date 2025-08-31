@@ -14,6 +14,8 @@ from loss_counter import read_record, find_optimal_checkpoint
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from importlib import reload
 import cv2
+from pathlib import Path
+import importlib.util
 
 
 DATASET_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../dataset/')
@@ -167,15 +169,23 @@ def find_optimal_checkpoint_num_by_train_config(
     return find_optimal_checkpoint_num(sub_exp_path, record_name, keys, check_points)
 
 
+# def load_config_from_exp_name(exp_name, exp_root=EXP_ROOT, config_name='train_config'):
+#     exp_path = os.path.join(exp_root, exp_name)
+#     sys.path.append(exp_path)
+#     os.chdir(exp_path)
+#     print(f'Exp path: {exp_path}')
+#     t_config = __import__(config_name)
+#     reload(t_config)
+#     sys.path.pop()
+#     return t_config.CONFIG
+
 def load_config_from_exp_name(exp_name, exp_root=EXP_ROOT, config_name='train_config'):
-    exp_path = os.path.join(exp_root, exp_name)
-    sys.path.append(exp_path)
-    os.chdir(exp_path)
-    print(f'Exp path: {exp_path}')
-    t_config = __import__(config_name)
-    reload(t_config)
-    sys.path.pop()
-    return t_config.CONFIG
+    exp_path = Path(exp_root) / exp_name / f"{config_name}.py"
+    print(f"Loading config from: {exp_path}")
+    spec = importlib.util.spec_from_file_location(config_name, exp_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.CONFIG
 
 
 def record_num_list(record_path, accu_list, exp_num_list=None):
