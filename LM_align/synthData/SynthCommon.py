@@ -7,146 +7,75 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 # ----------------------------
-# 全局配置与 Emoji / 符号映射（UPDATED）
+# 全局配置与 Emoji 映射
 # ----------------------------
-OBJ_LIST = ['apple', 'car', 'house', 'tree', 'dog',
-            'cat', 'bicycle', 'flower', 'boat', 'star']
+OBJ_LIST = ['white_king', 'white_rook', 'white_knight', 'sun', 'cloud',
+            'telephone', 'crossed_swords', 'radioactive', 'heart', 'skull']
 
-OBJ_LIST_2 = ['ghost', 'alien', 'robot', 'unicorn']
+OBJ_LIST_2 = ['white_queen', 'white_bishop', 'white_pawn', 'horse']
 
-# 原始 emoji（若系统装了 emoji 字体会直接用彩色）
 EMOJI_MAP = {
-    "apple": "🍎",
-    "car": "🚗",
-    "house": "🏠",
-    "tree": "🌳",
-    "dog": "🐶",
-    "cat": "🐱",
-    "bicycle": "🚲",
-    "flower": "🌸",
-    "boat": "⛵",   # 若该字符显示有问题，可尝试 "🚢"
-    "star": "⭐",
-    "ghost": "👻",
-    "alien": "👽",
-    "robot": "🤖",
-    "unicorn": "🦄",
+    # ♔–♟ Chess symbols
+    "white_king": "♔",
+    "white_queen": "♕",
+    "white_rook": "♖",
+    "white_bishop": "♗",
+    "white_knight": "♘",
+    "white_pawn": "♙",
+    "black_king": "♚",
+    "black_queen": "♛",
+    "black_rook": "♜",
+    "black_bishop": "♝",
+    "black_knight": "♞",
+    "black_pawn": "♟",
+
+    # ♠ ♥ ♦ ♣ Playing card suits
+    "spade": "♠",
+    "heart": "♥",
+    "diamond": "♦",
+    "club": "♣",
+
+    # Misc symbols (U+2600–U+26FF)
+    "sun": "☀",
+    "cloud": "☁",
+    "umbrella": "☂",
+    "snowman": "☃",
+    "comet": "☄",
+    "telephone": "☎",
+    "skull": "☠",
+    "radioactive": "☢",
+    "biohazard": "☣",
+    "flag": "⚑",
+    "crossed_swords": "⚔",
+    "gear": "⚙",
+    "scales": "⚖",
+    "church": "⛪",
+    "fountain": "⛲",
+    "tent": "⛺",
+    "sailboat": "⛵",
+
+    # Dingbats (U+2700–U+27BF)
+    "scissors": "✂",
+    "envelope": "✉",
+    "pencil": "✏",
+    "heavy_check_mark": "✔",
+    "cross_mark": "✘",
+    "star": "✦",
+    "sparkle": "✧",
+    "flower1": "✿",
+    "flower2": "❀",
 }
 
-# 当没有 emoji 字体可用时，尽量用 DejaVu Sans 覆盖到的“符号/叮咚字符”（NEW）
-# 这些都是非文字符号，基本在 Linux 自带/常见字体中可见（即便非彩色）
-SAFE_SYMBOL_MAP = {
-    "apple": "●",      # 几何圆点占位
-    "car": "🚗",       # 若无 emoji 字体，会退化成单色/方块，下面再做二次回退
-    "house": "⌂",     # U+2302 HOUSE
-    "tree": "♣",       # 用梅花近似树
-    "dog": "♘",       # 国际象棋马近似动物
-    "cat": "♞",       # 另一种马形象
-    "bicycle": "⚙",   # 齿轮近似；或 "⊚"
-    "flower": "✿",    # U+273F/✿ 或用 ❀ (U+2740)
-    "boat": "⛵",      # U+26F5 船（DejaVu Sans 常见）
-    "star": "★",      # U+2605 实心星
-    "ghost": "☁",     # 云作占位
-    "alien": "✦",     # 星型占位
-    "robot": "⌬",     # 近似科技符号（苯环）
-    "unicorn": "✧",   # 闪光占位
-}
-
-# 如果上面符号仍不被当前字体支持，再做“最后兜底”的几何字符（NEW）
-FALLBACK_GEOMETRIC = "■"
 
 # ----------------------------
-# 字体发现与加载（NEW）
-# ----------------------------
-def _candidate_font_paths():
-    """按优先级给出字体候选路径/族名。"""
-    home = str(Path.home())
-    candidates = [
-        # 用户级常见安装位置（Linux）
-        f"{home}/.local/share/fonts/NotoColorEmoji.ttf",
-        f"{home}/.fonts/NotoColorEmoji.ttf",
-        # 系统级（若计算节点允许读取）
-        "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
-        "/usr/share/fonts/NotoColorEmoji/NotoColorEmoji.ttf",
-        # Windows / macOS（以防你在本地也跑）
-        "C:/Windows/Fonts/seguiemj.ttf",                     # Segoe UI Emoji
-        "/System/Library/Fonts/Apple Color Emoji.ttc",       # macOS
-        # 单色大覆盖字体（Linux 常见）
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-    ]
-    # 允许通过环境变量自定义路径
-    env_font = os.getenv("EMOJI_FONT_PATH")
-    if env_font:
-        candidates.insert(0, env_font)
-    return candidates
-
-def load_symbol_font(size: int):
-    """
-    按优先级加载字体：
-    1) Noto Color Emoji / Segoe UI Emoji / Apple Color Emoji（彩色表情）
-    2) DejaVu Sans（单色覆盖面广）
-    找不到就用 PIL 默认字体。
-    """
-    for path in _candidate_font_paths():
-        try:
-            if os.path.exists(path):
-                return ImageFont.truetype(path, size=size)
-        except Exception:
-            continue
-    # 某些系统可直接用族名（若 fontconfig 可解析）
-    for family in ["Noto Color Emoji", "Segoe UI Emoji", "Apple Color Emoji", "DejaVu Sans"]:
-        try:
-            return ImageFont.truetype(family, size=size)
-        except Exception:
-            continue
-    # 最后兜底
-    return ImageFont.load_default()
-
-def pick_symbol(label: str, font: ImageFont.FreeTypeFont):
-    """
-    根据当前字体的可用性选一个可显示的符号：
-    - 先用 EMOJI_MAP[label]
-    - 显示不了再用 SAFE_SYMBOL_MAP[label]
-    - 还不行用几何兜底
-    """
-    # 试 emoji
-    s = EMOJI_MAP.get(label, label)
-    if _can_render_text(s, font):
-        return s
-    # 试安全符号
-    s2 = SAFE_SYMBOL_MAP.get(label, label)
-    if _can_render_text(s2, font):
-        return s2
-    # 兜底
-    return FALLBACK_GEOMETRIC
-
-def _can_render_text(text: str, font: ImageFont.ImageFont) -> bool:
-    """
-    简单检测：用 getbbox/getlength 等测量，如果抛错或宽高为 0 视为不可渲染。
-    （注意：并不能 100% 判断“方块/豆腐”，但能过滤绝大多数不可绘制情况）
-    """
-    try:
-        # Pillow 10 起推荐 textbbox；若旧版 Pillow 可退回 getsize
-        dummy_img = Image.new("RGB", (10, 10))
-        d = ImageDraw.Draw(dummy_img)
-        bbox = d.textbbox((0, 0), text, font=font)
-        w = max(0, bbox[2] - bbox[0])
-        h = max(0, bbox[3] - bbox[1])
-        return (w > 0 and h > 0)
-    except Exception:
-        try:
-            w, h = font.getsize(text)
-            return (w > 0 and h > 0)
-        except Exception:
-            return False
-
-# ----------------------------
-# 工具函数：判断两个矩形是否重叠（原样）
+# 工具函数：判断两个矩形是否重叠
 # ----------------------------
 def boxes_overlap(box1, box2):
+    """
+    判断两个矩形是否有重叠。box 格式：(x, y, w, h)
+    """
     x1, y1, w1, h1 = box1
     x2, y2, w2, h2 = box2
     if x1 + w1 <= x2 or x2 + w2 <= x1:
@@ -155,11 +84,18 @@ def boxes_overlap(box1, box2):
         return False
     return True
 
+
 # ----------------------------
-# 生成不重叠框（原样）
+# 功能函数：生成不重叠的随机矩形框列表
 # ----------------------------
 def generate_non_overlapping_boxes(num_boxes, canvas_size, min_size, max_size,
                                    max_attempts=1000, max_retry=5):
+    """
+    在给定画布上生成 num_boxes 个不重叠的随机矩形框。
+    如果在 max_attempts 内未生成，则重试 max_retry 次；
+    如果仍然不成功，则返回 None，表示跳过本次数据点生成。
+    每个 box 格式为 (x, y, w, h)
+    """
     canvas_w, canvas_h = canvas_size
     for retry in range(max_retry):
         boxes = []
@@ -177,57 +113,79 @@ def generate_non_overlapping_boxes(num_boxes, canvas_size, min_size, max_size,
         if len(boxes) == num_boxes:
             return boxes
         else:
-            print(f"Retry {retry+1}/{max_retry}: only generated {len(boxes)} boxes out of {num_boxes}. Retrying.")
+            print(f"Retry {retry + 1}/{max_retry}: only generated {len(boxes)} boxes out of {num_boxes}. Retrying.")
+    # 重试结束后仍未成功
     print(f"Skipping data point: failed to generate {num_boxes} non-overlapping boxes after {max_retry} retries.")
     return None
 
+
 # ----------------------------
-# 在图像上绘制对象（UPDATED：跨平台字体&回退）
+# 功能函数：在图像上绘制 emoji 表示的对象
 # ----------------------------
 def draw_object(draw, obj_label, box):
     """
-    在给定的 ImageDraw 上绘制一个“非文字符号”（emoji/符号）。
-    - 自动选择合适字体并回退
+    在给定的 ImageDraw 对象上绘制一个 emoji 表示的对象。
+    参数：
+      - obj_label: 对象名称（例如 'dog'）
+      - box: (x, y, w, h) 指定放置位置和尺寸
     """
+    # 获取对应的 emoji 字符，若没有则直接使用对象名称
+    emoji_char = EMOJI_MAP.get(obj_label, obj_label)
     x, y, w, h = box
-    font_size = int(max(10, min(w, h)))  # 至少 10，避免过小（某些彩色 emoji 字体对尺寸有挑剔） # NEW
-    font = load_symbol_font(font_size)   # NEW
-
-    # 选一个当前字体能稳定绘制的符号（emoji -> 安全符号 -> 几何兜底）
-    symbol = pick_symbol(obj_label, font)  # NEW
-
-    # 计算文本尺寸以居中
+    # 根据 box 尺寸设置字体大小，这里取最小边长作为字体大小
+    font_size = int(min(w, h))
     try:
-        bbox = draw.textbbox((0, 0), symbol, font=font)
-        text_w = bbox[2] - bbox[0]
-        text_h = bbox[3] - bbox[1]
-    except Exception:
-        text_w, text_h = font.getsize(symbol)
+        emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", size=font_size)
+    except Exception as e:
+        print("Warning: load seguiemj.ttf failed, use default font. Error:", e)
+        emoji_font = ImageFont.load_default()
+
+    # 使用 textbbox 计算 emoji 文本的尺寸，便于居中
+    bbox = draw.textbbox((0, 0), emoji_char, font=emoji_font)
+    text_w = bbox[2] - bbox[0]
+    text_h = bbox[3] - bbox[1]
     text_x = x + (w - text_w) / 2
     text_y = y + (h - text_h) / 2
+    draw.text((text_x, text_y), emoji_char, font=emoji_font, fill="black")
 
-    # 彩色 emoji 字体通常忽略 fill；单色字体用黑色即可
-    draw.text((text_x, text_y), symbol, font=font, fill="black")
 
 # ----------------------------
-# 其余函数保持不变（仅依赖 draw_object 渲染）
+# 功能函数：根据给定框列表生成一张图像
 # ----------------------------
 def draw_objects_on_image(obj_label, boxes, canvas_size, bg_color="white"):
+    """
+    在指定画布上绘制多个对象（使用 emoji），返回一张 PIL Image。
+    """
     image = Image.new("RGB", canvas_size, color=bg_color)
     draw = ImageDraw.Draw(image)
     for box in boxes:
         draw_object(draw, obj_label, box)
     return image
 
+
+# ----------------------------
+# 功能函数：生成一个数据点（三张图像：图a, 图b, 图c）
+# ----------------------------
 def generate_datapoint(obj_label, canvas_size=(256, 256), min_size=20, max_size=40,
                        max_attempts=1000, max_retry=5):
+    """
+    生成一个数据点，包含 3 张图像：
+      - 图c：包含 c 个 obj 的图像（c 在 1~20 随机选择）
+      - 随机将 c 拆分为 a + b（0 <= a <= c, b = c - a）
+      - 图a：从图c中删除 b 个对象，仅保留 a 个
+      - 图b：从图c中删除 a 个对象，仅保留 b 个
+    Label 中返回 {"obj": obj, "a": a, "b": b, "c": c}。
+    如果生成 boxes 失败，则返回 None 表示跳过本次数据点。
+    """
     c = random.randint(1, 20)
+    # c = 1
     a = random.randint(0, c)
     b = c - a
 
     boxes_c = generate_non_overlapping_boxes(c, canvas_size, min_size, max_size,
                                              max_attempts=max_attempts, max_retry=max_retry)
     if boxes_c is None:
+        # 返回 None，表示本次数据点跳过
         return None
 
     image_c = draw_objects_on_image(obj_label, boxes_c, canvas_size)
@@ -245,11 +203,20 @@ def generate_datapoint(obj_label, canvas_size=(256, 256), min_size=20, max_size=
     label = {"obj": obj_label, "a": a, "b": b, "c": c}
     return image_a, image_b, image_c, label
 
+
+# ----------------------------
+# 数据预生成函数：保存数据到本地
+# ----------------------------
 def pre_generate_dataset(num_samples, output_dir,
                          canvas_size=(256, 256), min_size=20, max_size=40,
                          max_attempts=1000, max_retry=5):
+    """
+    预生成 num_samples 个数据点并保存到 output_dir 目录下。
+    每个数据点保存在单独的文件夹中，包含 image_a.png, image_b.png, image_c.png 以及 label.json。
+    如果某个数据点生成失败（如无法生成足够的 boxes），则跳过，并记录下来。
+    """
     os.makedirs(output_dir, exist_ok=True)
-    skipped = []
+    skipped = []  # 用于记录跳过的数据点（记录样本索引及 c 值）
     generated = 0
     sample_index = 0
 
@@ -258,16 +225,20 @@ def pre_generate_dataset(num_samples, output_dir,
         datapoint = generate_datapoint(obj_label, canvas_size, min_size, max_size,
                                        max_attempts=max_attempts, max_retry=max_retry)
         if datapoint is None:
+            # 记录跳过情况，记录下本次尝试的 c 值
+            # 这里我们用 -1 表示该数据点因 boxes 生成失败而跳过
             skipped.append({"sample_index": sample_index, "reason": "box generation failed"})
             sample_index += 1
             continue
 
         image_a, image_b, image_c, label = datapoint
+        # 保存到 sample_{index:04d} 文件夹下
         sample_dir = os.path.join(output_dir, f"sample_{sample_index:04d}")
         os.makedirs(sample_dir, exist_ok=True)
         image_a.save(os.path.join(sample_dir, "image_a.png"))
         image_b.save(os.path.join(sample_dir, "image_b.png"))
         image_c.save(os.path.join(sample_dir, "image_c.png"))
+        # 保存 label 为 JSON 格式
         with open(os.path.join(sample_dir, "label.json"), "w", encoding="utf-8") as f:
             json.dump(label, f, ensure_ascii=False, indent=2)
         print(f"Saved sample {sample_index}: {label}")
@@ -281,37 +252,53 @@ def pre_generate_dataset(num_samples, output_dir,
             print(info)
     return skipped
 
+
 def plot_hist(X, Y):
     Z = [x + y for x, y in zip(X, Y)]
     All = np.concatenate([X, Y, Z])
+    # 重新绘制直方图，确保 x 轴刻度为所有整数
     plt.figure(figsize=(10, 10))
 
     plt.subplot(2, 2, 1)
     ele_X = sorted(list(set(X)))
-    plt.hist(X, bins=np.arange(ele_X[0]-0.5, ele_X[-1]+0.6, 1), alpha=0.7, edgecolor='black', density=True)
-    plt.xticks(ele_X)
-    plt.xlabel("A"); plt.ylabel("Density"); plt.title("Distribution of A")
+    plt.hist(X, bins=np.arange(ele_X[0] - 0.5, ele_X[-1] + 0.6, 1), alpha=0.7, edgecolor='black', density=True)
+    plt.xticks(ele_X)  # 设置 x 轴刻度为所有整数
+    plt.xlabel("A")
+    plt.ylabel("Density")
+    plt.title("Distribution of A")
 
     plt.subplot(2, 2, 2)
     ele_Y = sorted(list(set(Y)))
-    plt.hist(Y, bins=np.arange(ele_Y[0]-0.5, ele_Y[-1]+0.6, 1), alpha=0.7, edgecolor='black', density=True)
-    plt.xticks(ele_Y)
-    plt.xlabel("B"); plt.ylabel("Density"); plt.title("Distribution of B")
+    plt.hist(Y, bins=np.arange(ele_Y[0] - 0.5, ele_Y[-1] + 0.6, 1), alpha=0.7, edgecolor='black', density=True)
+    plt.xticks(ele_Y)  # 设置 x 轴刻度为所有整数
+    plt.xlabel("B")
+    plt.ylabel("Density")
+    plt.title("Distribution of B")
 
     plt.subplot(2, 2, 3)
     ele_Z = sorted(list(set(Z)))
-    plt.hist(Z, bins=np.arange(ele_Z[0]-0.5, ele_Z[-1]+0.6, 1), alpha=0.7, edgecolor='black', density=True)
-    plt.xticks(ele_Z)
-    plt.xlabel("C"); plt.ylabel("Density"); plt.title("Distribution of C")
+    plt.hist(Z, bins=np.arange(ele_Z[0] - 0.5, ele_Z[-1] + 0.6, 1), alpha=0.7, edgecolor='black', density=True)
+    plt.xticks(ele_Z)  # 设置 x 轴刻度为所有整数
+    plt.xlabel("C")
+    plt.ylabel("Density")
+    plt.title("Distribution of C")
 
     plt.subplot(2, 2, 4)
     ele_All = sorted(list(set(All)))
-    plt.hist(All, bins=np.arange(ele_All[0]-0.5, ele_All[-1]+0.6, 1), alpha=0.7, edgecolor='black', density=True)
-    plt.xticks(ele_All)
-    plt.xlabel("All"); plt.ylabel("Density"); plt.title("Distribution of All")
+    plt.hist(All, bins=np.arange(ele_All[0] - 0.5, ele_All[-1] + 0.6, 1), alpha=0.7, edgecolor='black', density=True)
+    plt.xticks(ele_All)  # 设置 x 轴刻度为所有整数
+    plt.xlabel("All")
+    plt.ylabel("Density")
+    plt.title("Distribution of All")
 
     plt.tight_layout()
     plt.show()
+
+
+"""
+Recurrent Dataset Generation
+"""
+
 
 def recurrent_generate_data(boxes, c, obj_label, canvas_size, max_iter=1000):
     data = []
@@ -319,7 +306,7 @@ def recurrent_generate_data(boxes, c, obj_label, canvas_size, max_iter=1000):
     rest_iter = max_iter
     box_idx = list(range(len(boxes)))
     while rest_iter > 0 and max_num >= 2:
-        a = random.randint(1, max_num-1)
+        a = random.randint(1, max_num - 1)
         b = max_num - a
         if b < 0:
             print(f"Error: a = {a}, b = {b}, max_num = {max_num}")
@@ -344,6 +331,7 @@ def recurrent_generate_data(boxes, c, obj_label, canvas_size, max_iter=1000):
             box_idx = b_idx
     return data
 
+
 def gen_recurrent_data(num_samples, canvas_size=(224, 224), obj_list=OBJ_LIST):
     data = []
     while len(data) < num_samples:
@@ -356,3 +344,5 @@ def gen_recurrent_data(num_samples, canvas_size=(224, 224), obj_list=OBJ_LIST):
     data = data[:num_samples]
     print(f"Generated {len(data)} samples.")
     return data
+
+
