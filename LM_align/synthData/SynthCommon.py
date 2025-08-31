@@ -118,6 +118,36 @@ def generate_non_overlapping_boxes(num_boxes, canvas_size, min_size, max_size,
     print(f"Skipping data point: failed to generate {num_boxes} non-overlapping boxes after {max_retry} retries.")
     return None
 
+def _load_font(font_size: int):
+    """
+    1) 优先用用户级 Noto Color Emoji（~/.local/share/fonts）
+    2) 退回系统常见路径
+    3) 再退回 DejaVu Sans（Linux 常见的单色大覆盖字体）
+    4) 最后退回 PIL 默认字体（一定不报错）
+    """
+    candidates = [
+        os.getenv("EMOJI_FONT_PATH"),  # 允许你通过环境变量指定：export EMOJI_FONT_PATH=~/.local/share/fonts/NotoColorEmoji.ttf
+        os.path.expanduser("~/.local/share/fonts/NotoColorEmoji.ttf"),
+        "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
+        "/usr/share/fonts/NotoColorEmoji/NotoColorEmoji.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+    for p in candidates:
+        if not p:
+            continue
+        try:
+            if os.path.exists(p):
+                return ImageFont.truetype(p, size=font_size)
+        except Exception:
+            pass
+    # 某些机器可直接用族名（fontconfig 能解析时）
+    for family in ["Noto Color Emoji", "DejaVu Sans"]:
+        try:
+            return ImageFont.truetype(family, size=font_size)
+        except Exception:
+            pass
+    # 兜底：永不报错
+    return ImageFont.load_default()
 
 # ----------------------------
 # 功能函数：在图像上绘制 emoji 表示的对象
@@ -135,7 +165,8 @@ def draw_object(draw, obj_label, box):
     # 根据 box 尺寸设置字体大小，这里取最小边长作为字体大小
     font_size = int(min(w, h))
     try:
-        emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", size=font_size)
+        font_size = int(max(10, min(w, h)))
+        emoji_font = _load_font(font_size)
     except Exception as e:
         print("Warning: load seguiemj.ttf failed, use default font. Error:", e)
         emoji_font = ImageFont.load_default()
