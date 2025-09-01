@@ -62,7 +62,7 @@ def batch_statistic():
             sub_exp_path = os.path.join(exp_path, sub_exp)
             train_record_path = os.path.join(sub_exp_path, config['ALIGN']['train_record_path'])
             optimal_checkpoint_num = find_best_epoch(train_record_path, TARGET_KEY, True)
-            all_ckpts.append(optimal_checkpoint_num)
+            all_ckpts.append(f"{optimal_checkpoint_num}")
             for eval_record_name in EVAL_RECORD_NAMES:
                 eval_txt_path = os.path.join(sub_exp_path, eval_record_name)
                 eval_record = get_metrics_by_epoch(eval_txt_path, optimal_checkpoint_num, EVAL_KEYS)
