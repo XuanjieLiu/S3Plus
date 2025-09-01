@@ -57,7 +57,7 @@ def batch_statistic():
         all_results = {}
         all_ckpts = []
         exp_path = os.path.join(EXP_ROOT, exp_name)
-        config = load_config_from_exp_name(exp_name, config_name='config')
+        config = load_config_from_exp_name(exp_name, exp_root=EXP_ROOT, config_name='config')
         for sub_exp in EXP_NUM_LIST:
             sub_exp_path = os.path.join(exp_path, sub_exp)
             train_record_path = os.path.join(sub_exp_path, config['ALIGN']['train_record_path'])
