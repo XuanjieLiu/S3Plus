@@ -15,6 +15,7 @@ EXP_NAME_LIST = [
     "2025.8.30",
 ]
 EVAL_RECORD_NAMES = [
+    'Train_record.txt',
     'Val_record.txt',
     'Val_ood_record.txt',
 ]
