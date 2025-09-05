@@ -1,5 +1,6 @@
 import os
 import sys
+import wandb
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.optim as optim
 import torch.nn as nn
@@ -14,7 +15,6 @@ from projector import FCProjector
 from FruitRecognitionDataset import FruitRecognitionDataset, random_mask_batch
 from synthData.SynthImgsDataset import PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2
 from shared import *
-import wandb
 from torchvision import transforms
 import torch.nn.functional as F
 import numpy as np
@@ -204,6 +204,7 @@ class AlignTrain:
         sub_exp_id = self.config.get('sub_exp_id', None)
         name = f"{self.config['name']}_{sub_exp_id}" if sub_exp_id is not None else self.config['name']
         self.wandb_run = wandb.init(
+            entity="xuanjieliu-mbzuai",
             project=self.config['project_name'],
             name=name,
             config=self.config,
