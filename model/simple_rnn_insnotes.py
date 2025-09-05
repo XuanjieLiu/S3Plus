@@ -44,7 +44,9 @@ class SymmCSAEwithPrior(nn.Module):
             if "threshold_ema_dead_code" in config
             else 0,
         )
-        self.codebook_norm = nn.BatchNorm1d(self.d_zc, affine=False, track_running_stats=False) # purely for normalization
+        self.codebook_norm = nn.BatchNorm1d(
+            self.d_zc, affine=False, track_running_stats=False
+        )  # purely for normalization
 
         if "GRU" in config.keys() and config["GRU"]:
             self.prior = nn.RNN(

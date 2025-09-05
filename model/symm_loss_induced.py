@@ -8,6 +8,8 @@ from utils.training_utils import compute_loss_weight, compute_loss_weights
 
 from model.symm_loss import SymmLoss
 
+# TODO: merge with model
+
 
 class SymmLossInduced(SymmLoss):
     def __init__(self, config, use_isymm=True):
@@ -90,15 +92,15 @@ class SymmLossInduced(SymmLoss):
             start_cursor = torch.randint(
                 0, zc.shape[1] - p_r + 1, size=()
             ).item()  # TODO: use different cursor for each batch item
-            zc_observed = zc[:, start_cursor: start_cursor + p_r, :]
+            zc_observed = zc[:, start_cursor : start_cursor + p_r, :]
             # T then R
             # T
             zc_observed_t = []
             for i in range(p_r):
                 zc_observed_t.append(
-                    model.secondary_unroll(
-                        zc_observed[:, i : p_t + i, :], g_t
-                    )[:, -1, :]
+                    model.secondary_unroll(zc_observed[:, i : p_t + i, :], g_t)[
+                        :, -1, :
+                    ]
                 )
             zc_observed_t = torch.stack(zc_observed_t, dim=1)  # (B, p_r, d_zc)
             # R:
@@ -110,9 +112,9 @@ class SymmLossInduced(SymmLoss):
             zc_observed_rt = []
             for i in range(g_r):
                 zc_observed_rt.append(
-                    model.secondary_unroll(
-                        zc_observed_r[:, i : p_t + i, :], g_t
-                    )[:, -1, :]
+                    model.secondary_unroll(zc_observed_r[:, i : p_t + i, :], g_t)[
+                        :, -1, :
+                    ]
                 )
             zc_observed_rt = torch.stack(zc_observed_rt, dim=1)
 

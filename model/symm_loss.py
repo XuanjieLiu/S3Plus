@@ -6,6 +6,8 @@ import torch.nn.functional as F
 
 from utils.training_utils import compute_loss_weight, compute_loss_weights
 
+# TODO: merge with model
+
 
 class SymmLoss:
     def __init__(self, config, use_isymm=True):
@@ -43,7 +45,6 @@ class SymmLoss:
         g_t = torch.randint(1, 2, size=())
         p_r = torch.randint(7, 8, size=())
         g_r = torch.randint(1, 2, size=())
-
 
         return p_t, g_t, p_r, g_r
 

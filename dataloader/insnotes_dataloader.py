@@ -173,9 +173,16 @@ class InsNotesTestDataset(Dataset):
         # manually generate content labels
         if self.mode == "major":
             p_list = [0, 2, 4, 5, 7, 9, 11]
-            while len(p_list) < audio.shape[0]:
-                p_list += p_list
-            p_list = p_list[start : start + self.n_segments]
+        elif self.mode == "major_down":
+            p_list = [11, 9, 7, 5, 4, 2, 0]
+        elif self.mode == "minor":
+            p_list = [0, 2, 3, 5, 7, 8, 10]
+        elif self.mode == "minor_down":
+            p_list = [10, 8, 7, 5, 3, 2, 0]
+        while len(p_list) < audio.shape[0]:
+            p_list += p_list
+        p_list = p_list[start : start + self.n_segments]
+
         pitches = [(item + root) % 12 for item in p_list]
 
         contents = torch.tensor(pitches)

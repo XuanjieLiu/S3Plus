@@ -1,0 +1,154 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from brokenaxes import brokenaxes
+
+
+plt.rcParams.update({
+    "font.family": "Times New Roman",
+    "font.size": 12,
+    "axes.titlesize": 14,
+    "axes.labelsize": 13,
+    "legend.fontsize": 11,
+    "xtick.labelsize": 11,
+    "ytick.labelsize": 11,
+    "grid.alpha": 0.25,
+    "lines.linewidth": 2,
+    "lines.markersize": 7,
+    "figure.dpi": 120,
+})
+
+def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
+    assert len(paths_to_csv) == 2
+    assert "val" in paths_to_csv[0]
+    assert "all" in paths_to_csv[1]
+    if domain == "x":
+        df_val = pd.read_csv(paths_to_csv[0], index_col=0, usecols=[0] + list(range(1, 8)))
+        df_all = pd.read_csv(paths_to_csv[1], index_col=0, usecols=[0] + list(range(1, 8)))
+        x = np.arange(0, 7)
+    elif domain == "z":
+        df_val = pd.read_csv(paths_to_csv[0], index_col=0, usecols=[0] + list(range(8, 15)))
+        df_all = pd.read_csv(paths_to_csv[1], index_col=0, usecols=[0] + list(range(8, 15)))
+        x = np.arange(7, 14)
+
+    try:
+        df_val_series = get_rows(df_val, "symm0.3k4")
+        df_all_series = get_rows(df_all, "symm0.3k4")
+        common_rows = df_val_series.index.intersection(df_all_series.index)
+        diff_series = df_all_series.loc[common_rows] / df_val_series.loc[common_rows] * 100
+        plot_series_belt(ax, x, diff_series, 'With Intrinsic Symmetry (K=4)', ['forestgreen', 'forestgreen'], linestyle='-')
+    except Exception as e:
+        print(f"Error processing {domain}: {e}")
+
+
+    try:
+        df_val_series = get_rows(df_val, "symm0.3k1")
+        df_all_series = get_rows(df_all, "symm0.3k1")
+        common_rows = df_val_series.index.intersection(df_all_series.index)
+        diff_series = df_all_series.loc[common_rows] / df_val_series.loc[common_rows] * 100
+        plot_series_belt(ax, x, diff_series, 'With Intrinsic Symmetry (K=1)', ['yellowgreen', 'yellowgreen'], linestyle='-')
+    except Exception as e:
+        print(f"Error processing {domain}: {e}")
+    
+    
+    try:
+        df_val_series = get_rows(df_val, "nosymm")
+        df_all_series = get_rows(df_all, "nosymm")
+        common_rows = df_val_series.index.intersection(df_all_series.index)
+        diff_series = df_all_series.loc[common_rows] / df_val_series.loc[common_rows] * 100
+        plot_series_belt(ax, x, diff_series, 'Without Intrinsic Symmetry', ['sienna', 'sienna'], linestyle='-')
+    except Exception as e:
+        print(f"Error processing {domain}: {e}")
+
+    tests = [str(i) for i in range(0, 7)]
+        
+    ax.set_xticks(x)
+    ax.set_xticklabels(tests)
+    ax.set_xlabel('Number of Predicted Steps')
+    ax.set_ylabel('Accuracy Preservation (%)')
+    ax.set_ylim(0, 100)
+
+    # ax.set_title('')
+    ax.legend(frameon=False)
+    ax.grid(True, linestyle='--', linewidth=0.7, alpha=0.3)
+
+    # plt.tight_layout()
+
+def plot_series_belt(ax, x, data_series, label, colors, linestyle):
+    mean_diff_series = data_series.mean(axis=0).values
+    std_diff_series = data_series.std(axis=0).values
+
+    ax.plot(x, mean_diff_series, label=label, color=colors[0], marker='o', markerfacecolor='white', markeredgewidth=1.5, linestyle=linestyle)
+    ax.fill_between(x, mean_diff_series - std_diff_series, mean_diff_series + std_diff_series, color=colors[1], alpha=0.1)
+
+
+
+def get_rows(df, keyword):
+    subset = df[df.index.str.contains(keyword)]
+    return subset
+
+def get_rows_mean_std(df, keyword):
+    subset = df[df.index.str.contains(keyword)]
+    mean = subset.mean(axis=0).values
+    std = subset.std(axis=0).values
+    return mean, std
+
+
+if __name__ == "__main__":
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+    fig.suptitle("Preservation of Prediction Accuracies on OOD Inclusion", fontsize=18)
+
+
+    row_vars = ["On X Domain", "On Z Domain"]
+    for i in range(2):
+        fig.text(
+            0.1,  # x坐标，调整位置
+            0.7 - i*0.4,  # y坐标，随行数变化
+            row_vars[i], 
+            va="center", ha="right", 
+            fontsize=16, rotation=0
+        )
+
+    col_vars = [
+        # "Train & Val: 1 Key", 
+        "Train & Val: 3 Keys", 
+        "Train & Val: 6 Keys"
+    ]
+    for j in range(2):
+        fig.text(
+            0.25 + j*0.25,  # x坐标，随列变化，需根据实际调整
+            0.9,           # y坐标，顶部
+            col_vars[j],
+            ha="center", va="bottom",
+            fontsize=16
+        )
+
+    plot_certain_val_domain(
+        ax=axs[0, 1],
+        paths_to_csv=["major_sax_val6_induced_val_0823.csv", "major_sax_val6_induced_all_0823.csv"], val=6, domain="x"
+    )
+    plot_certain_val_domain(
+        ax=axs[1, 1],
+        paths_to_csv=["major_sax_val6_induced_val_0823.csv", "major_sax_val6_induced_all_0823.csv"], val=6, domain="z"
+    )
+    plot_certain_val_domain(
+        ax=axs[0, 0],
+        paths_to_csv=["major_sax_val3_induced_val_0827.csv", "major_sax_val3_induced_all_0827.csv"], val=3, domain="x"
+    )
+    plot_certain_val_domain(
+        ax=axs[1, 0],
+        paths_to_csv=["major_sax_val3_induced_val_0827.csv", "major_sax_val3_induced_all_0827.csv"], val=3, domain="z"
+    )
+    # plot_certain_val_domain(
+    #     ax=axs[0, 0],
+    #     paths_to_csv=["major_sax_val1_induced_val_0827.csv", "major_sax_val1_induced_all_0827.csv"], val=3, domain="x"
+    # )
+    # plot_certain_val_domain(
+    #     ax=axs[1, 0],
+    #     paths_to_csv=["major_sax_val1_induced_val_0827.csv", "major_sax_val1_induced_all_0827.csv"], val=3, domain="z"
+    # )
+    # axs[0, 0].axis('off')
+    # axs[1, 0].axis('off')
+    # axs[1, 2].axis('off')
+
+    plt.savefig('performance_plot.pdf')

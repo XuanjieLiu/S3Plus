@@ -39,8 +39,12 @@ class PseudoMelGen:
 
         if mode == "major":
             p_list = [0, 2, 4, 5, 7, 9, 11]
+        elif mode == "major_down":
+            p_list = [11, 9, 7, 5, 4, 2, 0]
         elif mode == "minor":
             p_list = [0, 2, 3, 5, 7, 8, 10]
+        elif mode == "minor_down":
+            p_list = [10, 8, 7, 5, 3, 2, 0]
         elif mode == "dorian":
             p_list = [0, 2, 3, 5, 7, 9, 10]
         elif mode == "phrygian":
@@ -244,8 +248,8 @@ def gen_directory(save_dir, mode="major", ood=False, styles="all"):
 def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="all"):
     """
     generate multiple directories of mode scales, including val and ood sets
-    val: from 3 scales to 11 scales
-    ood: from 9 scales to 1 scale
+    val: from 1 scales to 11 scales
+    ood: from 11 scales to 1 scale
 
     """
     S_LIST = [
@@ -299,7 +303,7 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
     for i in range(len(S_LIST)):
         generators.append(PseudoMelGen(ins_index=i))
 
-    for num_vals in range(3, 12):  # from 3 to 11 scales
+    for num_vals in range(3, 7):  # number of in-distribution scales
         save_dir_val = os.path.join(save_dir, save_name + "val" + str(num_vals))
         os.makedirs(save_dir_val, exist_ok=True)
         for round in tqdm(range(10)):  # number of rounds for larger dataset
@@ -385,12 +389,12 @@ if __name__ == "__main__":
     # gen_directory("../data/insnotes_major_ood", ood=True)
     # print("Generated insnotes_major_ood")
 
-    gen_directory("../data/sax_major_all", ood=False, styles="1")
+    # gen_directory("../data/sax_major_all", ood=False, styles="1")
 
     gen_directories_val_ood_spectrum(
-        save_dir="../data/sax_major_val_ood_spectrum",
-        save_name="sax_major_",
-        mode="major",
+        save_dir="../data/sax_minordown_val_ood_spectrum",
+        save_name="sax_minordown_",
+        mode="minor_down",
         styles="1",
     )
 
