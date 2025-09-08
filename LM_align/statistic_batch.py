@@ -12,7 +12,7 @@ from dataloader_plus import MultiImgDataset
 EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 EXP_NAME_LIST = [
-    "2025.8.30",
+    "2025.9.05_10codes",
 ]
 EVAL_RECORD_NAMES = [
     'Train_record.txt',
