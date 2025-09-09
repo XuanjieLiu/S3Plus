@@ -53,7 +53,6 @@ class TesterInduced(Tester):
             mode=config["inducement"],
         )
 
-
     def test(
         self,
         future_pred_acc=False,
@@ -99,9 +98,10 @@ class TesterInduced(Tester):
                     zc_vq, zc_idx, commit_loss, zs = self.model.encode(
                         batch_data, quantize=True
                     )
-                    zc_prompt, zc_idx_prompt = zc_vq[
-                        :, :7, :
-                    ].clone(), zc_idx[:, :7].clone()
+                    zc_prompt, zc_idx_prompt = (
+                        zc_vq[:, :7, :].clone(),
+                        zc_idx[:, :7].clone(),
+                    )
                     zc_future_pred = self.model.unroll(zc_prompt, 7)
                     zc_future_pred_vq, zc_idx_future_pred, _ = self.model.quantize(
                         zc_future_pred

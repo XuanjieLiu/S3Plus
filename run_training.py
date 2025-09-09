@@ -55,7 +55,10 @@ if __name__ == "__main__":
     if config["method"] == "ISymm":
         from trainer import Trainer
     elif config["method"] == "ISymm_Induced":
-        from trainer_induced import TrainerInduced as Trainer
+        if "downstream" in config and config["downstream"] is not None:
+            from trainer_induced_downstream import TrainerInducedDownstream as Trainer
+        else:
+            from trainer_induced import TrainerInduced as Trainer
 
     trainer = Trainer(config)
     trainer.prepare_data()

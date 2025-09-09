@@ -195,11 +195,14 @@ class Trainer:
             self.scheduler = optim.lr_scheduler.LambdaLR(
                 self.optimizer,
                 lambda step: cosine_annealing_with_warmup(
-                    step,
-                    optimizer_config["lr_anneal_steps"],
-                    optimizer_config["lr_anneal_min_factor"],
-                    optimizer_config["warmup_steps"],
-                    optimizer_config["warmup_factor"],
+                    t=step,
+                    lr_anneal_steps=optimizer_config["lr_anneal_steps"],
+                    lr_anneal_min_factor=optimizer_config["lr_anneal_min_factor"],
+                    lr_anneal_restart_decay_factor=optimizer_config[
+                        "lr_anneal_restart_decay_factor"
+                    ],
+                    warmup_steps=optimizer_config["warmup_steps"],
+                    warmup_factor=optimizer_config["warmup_factor"],
                 ),
                 last_epoch=self.start_step
                 - 1,  # important for resuming training. the keyword is "last_epoch" but it's actually "last_step"
@@ -208,12 +211,12 @@ class Trainer:
             self.scheduler = optim.lr_scheduler.LambdaLR(
                 self.optimizer,
                 lambda step: exponential_decay_with_warmup(
-                    step,
-                    optimizer_config["lr_decay_factor"],
-                    optimizer_config["lr_decay_steps"],
-                    optimizer_config["lr_decay_min_factor"],
-                    optimizer_config["warmup_steps"],
-                    optimizer_config["warmup_factor"],
+                    t=step,
+                    lr_decay_factor=optimizer_config["lr_decay_factor"],
+                    lr_decay_steps=optimizer_config["lr_decay_steps"],
+                    lr_decay_min_factor=optimizer_config["lr_decay_min_factor"],
+                    warmup_steps=optimizer_config["warmup_steps"],
+                    warmup_factor=optimizer_config["warmup_factor"],
                 ),
                 last_epoch=self.start_step - 1,  # important for resuming training
             )

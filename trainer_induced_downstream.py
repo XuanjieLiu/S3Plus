@@ -29,7 +29,7 @@ from utils.eval_utils import *
 from trainer import Trainer
 
 
-class TrainerInducedDownStream(Trainer):
+class TrainerInducedDownstream(Trainer):
     def __init__(self, config):
         super().__init__(config)
 
@@ -51,7 +51,7 @@ class TrainerInducedDownStream(Trainer):
             data_type=config["data_type"],
             # shuffle=True,  # when distributed, shuffle is omitted
             # distributed=False,
-            mode="major",
+            mode=config["downstream"],
         )
         logging.info("Train dataloader ready.")
         self.inducement_loader = dataloader_module.get_dataloader(
@@ -74,6 +74,7 @@ class TrainerInducedDownStream(Trainer):
             # shuffle=False,  # when distributed, shuffle is omitted
             test=True,
             # distributed=False,
+            mode=config["downstream"],
         )
         # check how many steps in the validation dataloader if using "whole" as the validation strategy
         if config["val_steps"] == "whole":
@@ -95,7 +96,7 @@ class TrainerInducedDownStream(Trainer):
                 if "Induced" in method_specs:
                     Model = import_module(
                         "model.simple_rnn_insnotes_induced_pretrained"
-                    ).SymmCSAEwithSecondaryPrior
+                    ).SymmCSAEwithSecondaryPriorPretrained
 
         model_config = self.config["model_config"]
         optimizer_config = self.config["optimizer_config"]
@@ -146,12 +147,15 @@ class TrainerInducedDownStream(Trainer):
         if optimizer_config["scheduler"] == "cosine_annealing":
             self.scheduler = optim.lr_scheduler.LambdaLR(
                 self.optimizer,
-                lambda step: cosine_annealing_with_warmup(
-                    step,
-                    optimizer_config["lr_anneal_steps"],
-                    optimizer_config["lr_anneal_min_factor"],
-                    optimizer_config["warmup_steps"],
-                    optimizer_config["warmup_factor"],
+                lambda t: cosine_annealing_with_warmup(
+                    t=t,
+                    lr_anneal_steps=optimizer_config["lr_anneal_steps"],
+                    lr_anneal_min_factor=optimizer_config["lr_anneal_min_factor"],
+                    lr_anneal_restart_decay_factor=optimizer_config[
+                        "lr_anneal_restart_decay_factor"
+                    ],
+                    warmup_steps=optimizer_config["warmup_steps"],
+                    warmup_factor=optimizer_config["warmup_factor"],
                 ),
                 last_epoch=self.start_step
                 - 1,  # important for resuming training. the keyword is "last_epoch" but it's actually "last_step"
@@ -159,13 +163,13 @@ class TrainerInducedDownStream(Trainer):
         elif optimizer_config["scheduler"] == "exponential_decay":
             self.scheduler = optim.lr_scheduler.LambdaLR(
                 self.optimizer,
-                lambda step: exponential_decay_with_warmup(
-                    step,
-                    optimizer_config["lr_decay_factor"],
-                    optimizer_config["lr_decay_steps"],
-                    optimizer_config["lr_decay_min_factor"],
-                    optimizer_config["warmup_steps"],
-                    optimizer_config["warmup_factor"],
+                lambda t: exponential_decay_with_warmup(
+                    t=t,
+                    lr_decay_factor=optimizer_config["lr_decay_factor"],
+                    lr_decay_steps=optimizer_config["lr_decay_steps"],
+                    lr_decay_min_factor=optimizer_config["lr_decay_min_factor"],
+                    warmup_steps=optimizer_config["warmup_steps"],
+                    warmup_factor=optimizer_config["warmup_factor"],
                 ),
                 last_epoch=self.start_step - 1,  # important for resuming training
             )
@@ -201,8 +205,8 @@ class TrainerInducedDownStream(Trainer):
             batch_data_induced = batch_data_induced.to(device=self.device)
             # forward
             with torch.autocast(self.device.type):
-                losses = self.loss.compute_loss(
-                    step, self.model, batch_data, batch_data_induced
+                losses = self.model.compute_loss(
+                    step, self.config["loss_config"], batch_data
                 )
             # backward
             self.optimizer.zero_grad(set_to_none=True)
@@ -255,7 +259,9 @@ class TrainerInducedDownStream(Trainer):
                     batch_data = batch_data.to(device=self.device)
                     # forward
                     with torch.no_grad():
-                        losses = self.loss.compute_loss(step, self.model, batch_data)
+                        losses = self.model.compute_loss(
+                            step, self.config["loss_config"], batch_data
+                        )
                         # accumulate running loss
                         for k, v in losses.items():
                             if k not in running_losses_val:
@@ -284,10 +290,6 @@ class TrainerInducedDownStream(Trainer):
                 x = x.reshape((x.shape[1], x.shape[2])).T
                 x_hat = x_hat.reshape((x_hat.shape[1], x_hat.shape[2])).T
 
-                # x = x.reshape((x.shape[2], x.shape[0] * x.shape[3])).T
-                # x_hat = x_hat.reshape(
-                #     (x_hat.shape[2], x_hat.shape[0] * x_hat.shape[3])
-                # ).T
                 x_plot = plot_spectrogram(x, c, s)
                 x_hat_plot = plot_spectrogram(x_hat, c, s)
 
@@ -305,8 +307,7 @@ class TrainerInducedDownStream(Trainer):
                     title="AE content confusion matrix",
                 )
 
-                # TODO: plot prior content confusion mtx
-
+                # write to log
                 self._write_summary(
                     step + self.start_step,
                     running_losses_val,
@@ -324,51 +325,3 @@ class TrainerInducedDownStream(Trainer):
             # scheduler step
             step += 1
             self.scheduler.step()
-
-    def _write_summary(self, i_step, losses, partition="train", fig=None, plot=None):
-        if self.config["debug"]:
-            return
-        log_dict = {}
-        for k, v in losses.items():
-            log_dict[f"{partition}/{k}"] = v
-        if partition == "val":
-            log_dict["lr"] = self.optimizer.param_groups[0]["lr"]
-        wandb.log(log_dict, step=i_step)
-        if fig is not None:
-            if isinstance(fig, list):
-                for i, f in enumerate(fig):
-                    if f is not None:
-                        wandb.log({f"{partition}/fig_{i}": wandb.Image(f)}, step=i_step)
-            elif isinstance(fig, np.ndarray):
-                wandb.log({f"{partition}/fig": wandb.Image(fig)}, step=i_step)
-        if plot is not None:
-            if isinstance(plot, list):
-                for i, p in enumerate(plot):
-                    if p is not None:
-                        wandb.log(
-                            {f"{partition}/plot_{i}": wandb.Plotly(p)}, step=i_step
-                        )
-            elif isinstance(plot, plt.Figure):
-                wandb.log({f"{partition}/plot": wandb.Image(plot)}, step=i_step)
-
-    def _save_checkpoint(self, step, val_loss):
-        # keep the best checkpoints
-        self.performance_history = self.performance_history or {}
-        if len(self.performance_history) > self.config["save_top_k"]:
-            # remove the worst checkpoint
-            worst_step = max(self.performance_history, key=self.performance_history.get)
-            worst_path = os.path.join(self.log_dir, f"cp_step{worst_step}.pt")
-            os.remove(worst_path)
-            del self.performance_history[worst_step]
-
-        # save the current checkpoint
-        save_info = {
-            "step": step,
-            "model": self.model.state_dict(),
-            "optimizer": self.optimizer.state_dict(),
-        }
-        save_name = f"cp_step{step}.pt"
-        save_path = os.path.join(self.log_dir, save_name)
-        torch.save(save_info, save_path)
-        self.performance_history[step] = val_loss
-        logging.info(f"Checkpoint saved at {save_path}")

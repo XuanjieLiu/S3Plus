@@ -105,7 +105,10 @@ if __name__ == "__main__":
 
     # ready for testing
     if "Induced" in config["method"]:
-        from tester_inducement import TesterInduced as Tester
+        if "downstream" in config:
+            from tester_inducement_downstream import TesterInducedDownstream as Tester
+        else:
+            from tester_inducement import TesterInduced as Tester
     elif "ISymm" in config["method"]:
         from tester import Tester
 

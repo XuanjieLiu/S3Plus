@@ -1,29 +1,53 @@
 import sys
 from os import path
-import random
 
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), "../../"))
-
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# from torch.autograd import Variable
-from vector_quantize_pytorch import VectorQuantize
 
-from model.modules.insnotes import Encoder, Decoder
-
-from model.simple_rnn_insnotes import SymmCSAEwithPrior
 from model.simple_rnn_insnotes_induced import SymmCSAEwithSecondaryPrior
+from utils.training_utils import compute_loss_weight
 
 
 class SymmCSAEwithSecondaryPriorPretrained(SymmCSAEwithSecondaryPrior):
     def __init__(self, config):
         super().__init__(config)
+
+        assert "ae_checkpoint" in config, "Please provide pretrained checkpoint path!"
+        ae_checkpoint = config["ae_checkpoint"]
+        save_info = torch.load(ae_checkpoint)
+        self.load_state_dict(save_info["model"])
+
+        self.init_prior()
         self.freeze_z()
         self.freeze_secondary_prior()
+
+    def init_prior(self):
+        # re-initialize prior
+        config = self.config
+        if "GRU" in config.keys() and config["GRU"]:
+            self.prior = nn.RNN(
+                input_size=self.d_zc,
+                hidden_size=self.d_zc,
+                num_layers=self.n_layers_rnn,
+                batch_first=True,
+            )
+        else:
+            self.prior = nn.RNN(
+                input_size=self.d_zc,
+                hidden_size=self.d_zc,
+                num_layers=self.n_layers_rnn,
+                batch_first=True,
+            )
+        for name, param in self.prior.named_parameters():
+            if "weight" in name:
+                nn.init.xavier_uniform_(param)
+            elif "bias" in name:
+                nn.init.constant_(param, 0.0)
 
     def freeze_z(self):
         for param in self.encoder.parameters():

@@ -195,6 +195,7 @@ def gen_directory(save_dir, mode="major", ood=False, styles="all"):
     generate a directory maybe for testing, mode scales
     if ood is True, generate out-of-distribution keys (for now they are A, A#, B)
     """
+    os.makedirs(save_dir, exist_ok=True)
     S_LIST = [
         "Soprano Sax",
         "Pipe Organ",
@@ -219,7 +220,7 @@ def gen_directory(save_dir, mode="major", ood=False, styles="all"):
     for round in tqdm(range(10)):
         for i in range(len(S_LIST)):
             if not ood:
-                for j in range(12):
+                for j in range(12):  # all roots
                     audio, contents = generators[i].gen_melody(
                         mel_len=90, mode=mode, root=j
                     )
@@ -391,12 +392,13 @@ if __name__ == "__main__":
 
     # gen_directory("../data/sax_major_all", ood=False, styles="1")
 
-    gen_directories_val_ood_spectrum(
-        save_dir="../data/sax_minordown_val_ood_spectrum",
-        save_name="sax_minordown_",
-        mode="minor_down",
-        styles="1",
-    )
+    gen_directory("../data/sax_minordown_all", mode="minor_down", ood=False, styles="1")
+    # gen_directories_val_ood_spectrum(
+    #     save_dir="../data/sax_minordown_val_ood_spectrum",
+    #     save_name="sax_minordown_",
+    #     mode="minor_down",
+    #     styles="1",
+    # )
 
     # os.makedirs("../data/insnotes_nth_val", exist_ok=True)
     # gen_directory_with_dataset_input(

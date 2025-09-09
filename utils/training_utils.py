@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import torch
 
@@ -31,25 +32,38 @@ def setup_seed(seed):
 
 
 def cosine_annealing_with_warmup(
-    epoch, lr_anneal_epochs, lr_anneal_min_factor, warmup_epochs, warmup_factor
+    t,
+    lr_anneal_steps=100,
+    lr_anneal_min_factor=0.0,
+    lr_anneal_restart_decay_factor=1.0,
+    warmup_steps=10,
+    warmup_factor=1.0,
 ):
     """
     Cosine annealing with warmup learning rate schedule.
     """
-    if epoch < warmup_epochs:
+    if t < warmup_steps:
         return warmup_factor
     else:
-        return lr_anneal_min_factor + 0.5 * (
-            1.0 + np.cos(np.pi * (epoch - warmup_epochs) / lr_anneal_epochs)
-        ) * (1.0 - lr_anneal_min_factor)
+        # Remove warmup
+        t = t - warmup_steps
+        cycle = t // lr_anneal_steps
+        cycle_progress = (t % lr_anneal_steps) / lr_anneal_steps
+        # Each restart, decay the max factor
+        max_factor = lr_anneal_restart_decay_factor**cycle
+        min_factor = lr_anneal_min_factor
+        cosine_factor = min_factor + (max_factor - min_factor) * 0.5 * (
+            1 + math.cos(math.pi * cycle_progress)
+        )
+        return cosine_factor
 
 
 def exponential_decay_with_warmup(
-    epoch,
+    t,
+    lr_decay_steps,
     lr_decay_factor,
-    lr_decay_epochs,
     lr_decay_min_factor,
-    warmup_epochs,
+    warmup_steps,
     warmup_factor,
 ):
     """
@@ -57,12 +71,12 @@ def exponential_decay_with_warmup(
     Decays by lr_decay_factor every lr_decay_epochs epochs.
     When lr smaller than lr_min_factor, lr stays at lr_min_factor.
     """
-    if epoch < warmup_epochs:
+    if t < warmup_steps:
         return warmup_factor
     else:
         return max(
             lr_decay_min_factor,
-            lr_decay_factor ** ((epoch - warmup_epochs) / lr_decay_epochs),
+            lr_decay_factor ** ((t - warmup_steps) / lr_decay_steps),
         )
 
 
