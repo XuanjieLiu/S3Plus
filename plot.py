@@ -128,6 +128,9 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
 
 
 def plot_series_belt(ax, x, data_series, label, colors, linestyle):
+    """
+    Plot a series with a shaded error band.
+    """
     mean_diff_series = data_series.mean(axis=0).values
     std_diff_series = data_series.std(axis=0).values
 
@@ -150,11 +153,17 @@ def plot_series_belt(ax, x, data_series, label, colors, linestyle):
 
 
 def get_rows(df, keyword):
+    """
+    Get a subset of the DataFrame that contains rows with a specific keyword.
+    """
     subset = df[df.index.str.contains(keyword)]
     return subset
 
 
 def get_rows_mean_std(df, keyword):
+    """
+    Get the mean and standard deviation of rows in a DataFrame that contain a specific keyword.
+    """
     subset = df[df.index.str.contains(keyword)]
     mean = subset.mean(axis=0).values
     std = subset.std(axis=0).values
@@ -332,5 +341,55 @@ def plot_downstream_exp():
     plt.savefig("performance_downstream_plot.pdf")
 
 
+def plot_interval_probing_exp():
+    """
+    two subplots for val3 and val6, three pillars for k4, k1, nosymm
+    """
+    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
+    col_vars = ["Train & Val: 3 Keys", "Train & Val: 6 Keys"]
+    for j in range(2):
+        fig.text(
+            0.28 + j * 0.45,
+            0.92,
+            col_vars[j],
+            ha="center",
+            va="bottom",
+            fontsize=15,
+        )
+
+    csv_files = [
+        "major_sav_val3_induced_probe_0914.csv",
+        "major_sav_val6_induced_probe_0914.csv",
+    ]
+    bar_labels = [
+        "With Intrinsic Symmetry (K=4)",
+        "With Intrinsic Symmetry (K=1)",
+        "Without Intrinsic Symmetry",
+    ]
+    keywords = ["symm0.3k4", "symm0.3k1", "nosymm"]
+    colors = ["forestgreen", "yellowgreen", "sienna"]
+
+    for idx, ax in enumerate(axs):
+        means = []
+        stds = []
+        for k, keyword in enumerate(keywords):
+            df = pd.read_csv(csv_files[idx], index_col=0)
+            mean, std = get_rows_mean_std(df, keyword)
+            means.append(mean[0])
+            stds.append(std[0])
+
+        means = np.array(means)
+        stds = np.array(stds)
+        x = np.arange(len(bar_labels))
+
+        bars = ax.bar(x, means, color=colors, yerr=stds, capsize=5, alpha=0.7)
+        ax.set_ylabel("Interval Prober Val Accuracy (%)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(bar_labels, rotation=15)
+
+    plt.savefig("interval_probing_plot.pdf")
+
+
 if __name__ == "__main__":
-    plot_downstream_exp()
+    # plot_downstream_exp()
+    plot_interval_probing_exp()

@@ -107,6 +107,10 @@ if __name__ == "__main__":
     if "Induced" in config["method"]:
         if "downstream" in config:
             from tester_inducement_downstream import TesterInducedDownstream as Tester
+        elif config.get("probing", 0) == 1:
+            from tester_inducement_probing import TesterInducedProbing as Tester
+        elif config.get("probing", 0) == 2:
+            from tester_inducement_probing_2 import TesterInducedProbing as Tester
         else:
             from tester_inducement import TesterInduced as Tester
     elif "ISymm" in config["method"]:
@@ -115,11 +119,14 @@ if __name__ == "__main__":
     tester = Tester(config)
     tester.prepare_data()
     tester.build_model()
-    tester.test(
-        future_pred_acc=known_args.future_pred_acc,
-        recon_acc=known_args.recon_acc,
-        future_pred_waveform=known_args.future_pred_waveform,
-        recon_waveform=known_args.recon_waveform,
-        vis_tsne=config.get("vis_tsne", False),
-        confusion_mtx=config.get("confusion_mtx", False),
-    )
+
+    test_kwargs = {
+        "future_pred_acc": getattr(known_args, "future_pred_acc", None),
+        "recon_acc": getattr(known_args, "recon_acc", None),
+        "future_pred_waveform": getattr(known_args, "future_pred_waveform", None),
+        "recon_waveform": getattr(known_args, "recon_waveform", None),
+        "vis_tsne": config.get("vis_tsne", False),
+        "confusion_mtx": config.get("confusion_mtx", False),
+    }
+
+    tester.test(**test_kwargs)

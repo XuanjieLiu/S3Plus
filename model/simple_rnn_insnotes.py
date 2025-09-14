@@ -68,7 +68,7 @@ class SymmCSAEwithPrior(nn.Module):
         size = sum(p.numel() for p in self.parameters())
         return "Number of trainable parameters: {:.2f} M".format(size / 1024**2)
 
-    def encode(self, x, quantize=True):
+    def encode(self, x, quantize=True, freeze_codebook=False):
         """
         x: input tensor of shape (B, T, c, h, w)
         """
@@ -85,7 +85,9 @@ class SymmCSAEwithPrior(nn.Module):
             zc = z
             zs = None
         if quantize:
-            zc_vq, indices, commit_loss = self.quantize(zc)
+            zc_vq, indices, commit_loss = self.quantize(
+                zc, freeze_codebook=freeze_codebook
+            )
             return zc_vq, indices, commit_loss, zs
         else:
             return zc, zs
