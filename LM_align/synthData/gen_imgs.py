@@ -44,28 +44,29 @@ def pre_generate_oneSeqBox_dataset(num_samples, box_seq, output_dir, canvas_size
         seq_a.append(a)
         seq_b.append(b)
         assert a + b <= num_box, f"Error: a + b = {a} + {b} = {a+b} > num_box = {num_box}"
-        datapoint = gen_one_data_from_boxes_seq(box_seq, a, b, obj_label, canvas_size)
-        image_a, image_b, image_c, label = datapoint
-        # 保存到 sample_{index:04d} 文件夹下
-        sample_dir = os.path.join(output_dir, f"sample_{sample_index:04d}")
-        os.makedirs(sample_dir, exist_ok=True)
-        image_a.save(os.path.join(sample_dir, "image_a.png"))
-        image_b.save(os.path.join(sample_dir, "image_b.png"))
-        image_c.save(os.path.join(sample_dir, "image_c.png"))
-        # 保存 label 为 JSON 格式
-        with open(os.path.join(sample_dir, "label.json"), "w", encoding="utf-8") as f:
-            json.dump(label, f, ensure_ascii=False, indent=2)
-        # print(f"Saved sample {sample_index}: {label}")
-        generated += 1
-        sample_index += 1
+        datapoints = recurrent_generate_data(box_seq, a+b, obj_label, canvas_size)
+        for datapoint in datapoints:
+            image_a, image_b, image_c, label = datapoint
+            # 保存到 sample_{index:04d} 文件夹下
+            sample_dir = os.path.join(output_dir, f"sample_{sample_index:04d}")
+            os.makedirs(sample_dir, exist_ok=True)
+            image_a.save(os.path.join(sample_dir, "image_a.png"))
+            image_b.save(os.path.join(sample_dir, "image_b.png"))
+            image_c.save(os.path.join(sample_dir, "image_c.png"))
+            # 保存 label 为 JSON 格式
+            with open(os.path.join(sample_dir, "label.json"), "w", encoding="utf-8") as f:
+                json.dump(label, f, ensure_ascii=False, indent=2)
+            # print(f"Saved sample {sample_index}: {label}")
+            generated += 1
+            sample_index += 1
 
     print(f"Pre-generation complete. Generated {generated} samples.")
     if is_plot_hist:
         plot_hist(seq_a, seq_b)
 
 
-num_samples_train = 128 # 根据需要调整样本数量
-num_samples_val = 64
+num_samples_train = 8 # 根据需要调整样本数量
+num_samples_val = 4
 output_dir_train = "new_icon_train"
 output_dir_val = "new_icon_val"
 num_box = 12
