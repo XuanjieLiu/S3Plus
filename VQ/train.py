@@ -4,7 +4,8 @@ import sys
 
 from VQ.plot_multistyle_zc import MultiStyleZcEvaler
 from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z, calc_multi_emb_plus_accu, \
-    calc_one2one_plus_accu, calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency
+    calc_one2one_plus_accu, calc_plus_z_self_cycle_consistency, calc_plus_z_mode_emb_label_cycle_consistency, \
+    calc_emb_select_plus_accu
 
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 import torch.nn as nn
@@ -241,7 +242,7 @@ class PlusTrainer:
         loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
         train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
         eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
-        eval_keys = ['one2n_accu', 'one2n_accu_cycle', 'one2one_accu', 'one2one_accu_cycle',
+        eval_keys = ['emb_select_accu', 'emb_select_accu_cycle', 'one2n_accu', 'one2n_accu_cycle', 'one2one_accu', 'one2one_accu_cycle',
                 'emb_self_consistency', 'emb_label_consistency', 'z_c_recognition_rate', 'z_c_cycle_recognition_rate']
         eval_loss_counter_keys = ([f'train_{key}' for key in eval_keys] + [f'eval_{key}' for key in eval_keys] +
                                   ['one2n_match_rate', 'one2one_matching_rate', 'nna_score'])
@@ -316,6 +317,7 @@ class PlusTrainer:
     def overall_plus_eval(self, epoch_num, data_loader, result_path):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
         all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader)
+        emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
         one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
         one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
         emb_self_consistency = calc_plus_z_self_cycle_consistency(all_plus_z)
@@ -324,7 +326,7 @@ class PlusTrainer:
         eval_path = os.path.join(result_path, f'{epoch_num}_accu_{one2n_accu_cycle}')
         plot_plusZ_against_label(all_enc_z, all_plus_z, eval_path,
                                  is_scatter_lines=True, y_label="Emb idx")
-        return [one2n_accu, one2n_accu_cycle, one2one_accu, one2one_accu_cycle,
+        return [emb_select_accu, emb_select_accu_cycle, one2n_accu, one2n_accu_cycle, one2one_accu, one2one_accu_cycle,
                 emb_self_consistency, emb_label_consistency, z_c_recognition_rate, z_c_cycle_recognition_rate]
 
     def single_img_eval(self, epoch_num):

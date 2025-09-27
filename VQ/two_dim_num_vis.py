@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from VQ.eval_common import EvalHelper
 from matplotlib import collections as matcoll
 from common_func import add_gaussian_noise
+from sklearn.manifold import TSNE
+
 
 matplotlib.use('AGG')
 COLOR_LIST = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'hotpink', 'gray', 'steelblue', 'olive']
@@ -185,9 +187,6 @@ def multiple_nearest_neighbor_analysis(num_z_c, num_labels, n_times=10):
     return mean_score
 
 
-
-
-
 class MumEval:
     def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.config = config
@@ -212,7 +211,7 @@ class MumEval:
     def reload_model(self, model_path):
         self.model.load_state_dict(self.model.load_tensor(model_path))
 
-    def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True, is_draw_graph=True):
+    def num_eval_two_dim(self, data_loader, result_path=None, is_show_all_emb=True, is_draw_graph=True, use_tsne=True):
         num_z_c, num_labels = self.get_num_z_and_labels(data_loader)
         has_duplicate_labels = len(set(num_labels)) < len(num_labels)
         if not has_duplicate_labels:
@@ -220,10 +219,11 @@ class MumEval:
         else:
             nna_score = multiple_nearest_neighbor_analysis(num_z_c, num_labels)
         print(f'Nearest neighbor analysis score: {nna_score}')
-        if is_draw_graph and (self.latent_code_1 == 2 or self.latent_code_1 == 3):
+        if is_draw_graph:
             result_name = make_result_name(result_path, nna_score)
-            self.plot_num_position_graph(num_z_c, num_labels, is_show_all_emb, result_name)
+            self.plot_num_position_graph(num_z_c, num_labels, is_show_all_emb, result_name, use_tsne)
         return nna_score
+
 
     def get_num_z_and_labels(self, data_loader):
         num_z, num_labels = load_enc_eval_data(
@@ -236,13 +236,16 @@ class MumEval:
         return num_z_c, num_labels
 
 
-    def plot_num_position_graph(self, num_z_c, num_labels, is_show_all_emb=True, result_name=None):
-        if self.latent_code_1 == 2 or self.latent_code_1 == 3:
-            all_embs = get_all_code_embs(self.model) if is_show_all_emb else None
-            if self.latent_code_1 == 2:
-                plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
-            elif self.latent_code_1 == 3:
-                plot_num_position_in_three_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+    def plot_num_position_graph(self, num_z_c, num_labels, is_show_all_emb=True, result_name=None, use_tsne=False):
+        all_embs = get_all_code_embs(self.model) if is_show_all_emb else None
+        if self.latent_code_1 == 2:
+            plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
+        elif use_tsne and self.latent_code_1 >= 3:
+            tsne = TSNE(n_components=2, perplexity=5, random_state=42)
+            trans_num_z_c = tsne.fit_transform(num_z_c)
+            plot_num_position_in_two_dim_repr(trans_num_z_c, num_labels, result_name, all_embs=None)
+        elif self.latent_code_1 == 3:
+            plot_num_position_in_three_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
 
     def num_eval_two_dim_with_gaussian_noise(self, data_loader, result_path=None, is_show_all_emb=True,
                                              is_draw_graph=True, noise_batch: int = 10, noise_std=0.2):
