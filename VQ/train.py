@@ -175,6 +175,8 @@ class PlusTrainer:
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
         self.is_twice_oper = config['is_twice_oper']
+        self.plus_l1_weight = config.get('plus_l1_weight', 0.0)
+        self.plus_l1_include_bias = config.get('plus_l1_include_bias', False)
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -502,6 +504,19 @@ class PlusTrainer:
         recon_loss = nn.MSELoss(reduction='mean')(recon, data)
         return recon_loss
 
+    def l1_on_plusnet_params(self):
+        if self.plus_l1_weight <= 0:
+            return torch.zeros(1, device=DEVICE)[0]
+        l1 = torch.zeros(1, device=DEVICE)[0]
+        for name, p in self.model.plus_net.named_parameters():
+            if p is None or not p.requires_grad:
+                continue
+            if (not self.plus_l1_include_bias) and ('bias' in name):
+                continue
+            l1 = l1 + p.abs().sum()
+        return self.plus_l1_weight * l1
+
+
     def loss_func(self, vae_loss, e_q_loss, plus_loss, operations_loss, loss_counter):
         xloss_ED = vae_loss
         plus_recon_loss, plus_z_loss = plus_loss
@@ -509,6 +524,7 @@ class PlusTrainer:
         loss += xloss_ED + e_q_loss
         loss += plus_recon_loss + plus_z_loss
         loss += operations_loss
+        loss += self.l1_on_plusnet_params()
         loss_counter.add_values([xloss_ED.item(),
                                  e_q_loss.item(),
                                  plus_recon_loss.item(),
