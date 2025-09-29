@@ -27,6 +27,12 @@ EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 # EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
+    # High-dim test
+    "2025.09.27_10vq_Zc[4]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    "2025.09.27_256vq_Zc[1]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    "2025.09.28_10vq_Zc[4]_Zs[0]_edim2_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    "2025.09.28_16vq_Zc[4]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+
     # # continue Mahjong
     # "2025.08.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm_continue",
     # "2025.08.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll_continue",
@@ -46,10 +52,10 @@ EXP_NAME_LIST = [
     # "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
     #
     # Main experiments, multi style mahjong
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
     #
     # # Main experiments, single style blue points
     # "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
