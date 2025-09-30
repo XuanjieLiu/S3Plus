@@ -18,7 +18,7 @@ CONFIG = {
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
     'latent_code_2': 0,
-    'embedding_dim': 4,
+    'embedding_dim': 2,
     'is_plot_zc_value': True,
     'embeddings_num': 10,
     'is_plot_vis_num': False,
