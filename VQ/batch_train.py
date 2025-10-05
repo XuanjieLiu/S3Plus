@@ -24,11 +24,15 @@ if __name__ == '__main__':
         sys.path.pop()
         print(t_config.CONFIG)
         num_sub_exp = t_config.CONFIG.get('num_sub_exp', 20)
+        init_random_split_seed = t_config.CONFIG.get('random_split_seed', None)
         print(f'Number of sub-experiments: {num_sub_exp}')
         exp_num_list = [str(i) for i in range(1, num_sub_exp + 1)]
         for exp_num in exp_num_list:
             os.makedirs(exp_num, exist_ok=True)
             sub_exp_path = os.path.join(exp_path, exp_num)
+            if init_random_split_seed is not None:
+                t_config.CONFIG['random_split_seed'] = init_random_split_seed + int(exp_num)
+                print(f'Updated random_split_seed to {t_config.CONFIG["random_split_seed"]}')
             print(f'Sub-Exp path: {sub_exp_path}')
             os.chdir(sub_exp_path)
             if is_need_train(t_config.CONFIG):
