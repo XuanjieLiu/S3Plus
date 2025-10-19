@@ -300,6 +300,21 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
         "F",
     ]  # circle of fifths
 
+    roots = [
+        "C",
+        "D",
+        "E",
+        "F#",
+        "G#",
+        "A#",
+        "C#",
+        "D#",
+        "F",
+        "G",
+        "A",
+        "B",
+    ]  # double whole-tone
+
     generators = []
     for i in range(len(S_LIST)):
         generators.append(PseudoMelGen(ins_index=i))
@@ -390,9 +405,14 @@ if __name__ == "__main__":
     # gen_directory("../data/insnotes_major_ood", ood=True)
     # print("Generated insnotes_major_ood")
 
-    # gen_directory("../data/sax_major_all", ood=False, styles="1")
+    gen_directory("../data/sax_major_all_2", ood=False, styles="1")
+    gen_directories_val_ood_spectrum(
+        save_dir="../data/sax_major_val_ood_spectrum_2",
+        save_name="sax_major_",
+        styles="1",
+    )
 
-    gen_directory("../data/sax_minordown_all", mode="minor_down", ood=False, styles="1")
+    # gen_directory("../data/sax_minordown_all", mode="minor_down", ood=False, styles="1")
     # gen_directories_val_ood_spectrum(
     #     save_dir="../data/sax_minordown_val_ood_spectrum",
     #     save_name="sax_minordown_",

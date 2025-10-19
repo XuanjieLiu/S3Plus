@@ -59,6 +59,8 @@ if __name__ == "__main__":
             from trainer_induced_downstream import TrainerInducedDownstream as Trainer
         else:
             from trainer_induced import TrainerInduced as Trainer
+    elif config["method"] == "ISymm_Transition":
+        from trainer_transition import Trainer
 
     trainer = Trainer(config)
     trainer.prepare_data()
