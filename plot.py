@@ -51,7 +51,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_val_series,
-            "With Intrinsic Symmetry (K=4) on Val Set",
+            "w/ symmetry (K=4) on val set",
             ["forestgreen", "forestgreen"],
             linestyle="--",
         )
@@ -59,7 +59,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_all_series,
-            "With Intrinsic Symmetry (K=4) on All Set",
+            "w/ symmetry (K=4) on all set",
             ["forestgreen", "forestgreen"],
             linestyle="-",
         )
@@ -74,7 +74,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_val_series,
-            "With Intrinsic Symmetry (K=1) on Val Set",
+            "w/ symmetry (K=1) on val set",
             ["yellowgreen", "yellowgreen"],
             linestyle="--",
         )
@@ -82,7 +82,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_all_series,
-            "With Intrinsic Symmetry (K=1) on All Set",
+            "w/ symmetry (K=1) on all set",
             ["yellowgreen", "yellowgreen"],
             linestyle="-",
         )
@@ -97,7 +97,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_val_series,
-            "Without Intrinsic Symmetry on Val Set",
+            "w/o symmetry on val set",
             ["sienna", "sienna"],
             linestyle="--",
         )
@@ -105,7 +105,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
             ax,
             x,
             df_all_series,
-            "Without Intrinsic Symmetry on All Set",
+            "w/o symmetry on all set",
             ["sienna", "sienna"],
             linestyle="-",
         )
@@ -171,14 +171,14 @@ def get_rows_mean_std(df, keyword):
 
 
 def plot_main_exp():
-    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+    fig, axs = plt.subplots(2, 2, figsize=(10, 6))
     # fig.suptitle("Preservation of Prediction Accuracies on OOD Inclusion", fontsize=18)
 
-    row_vars = ["On X Domain", "On Z Domain"]
+    row_vars = ["X Domain", "Z Domain"]
     for i in range(2):
         fig.text(
-            0.1,  # x coordinate, adjust position
-            0.7 - i * 0.4,  # y coordinate
+            0.11,  # x coordinate, adjust position
+            0.78 - i * 0.4,  # y coordinate
             row_vars[i],
             va="center",
             ha="right",
@@ -193,9 +193,9 @@ def plot_main_exp():
     ]
     for j in range(2):
         fig.text(
-            0.33
+            0.35
             + j
-            * 0.4,  # x coordinate, change with column, need to adjust based on actual
+            * 0.43,  # x coordinate, change with column, need to adjust based on actual
             0.95,  # y coordinate, top
             col_vars[j],
             ha="center",
@@ -241,19 +241,24 @@ def plot_main_exp():
     )
 
     handles, labels = axs[0, 0].get_legend_handles_labels()
+    reorder = [0, 2, 4, 1, 3, 5]
+    handles = [handles[i] for i in reorder]
+    labels = [labels[i] for i in reorder]
+
     fig.legend(
         handles,
         labels,
         loc="lower center",
         handlelength=4,
-        ncol=3,
-        bbox_to_anchor=(0.55, 0),  # (x, y) coordinates
+        ncol=2,
+        bbox_to_anchor=(0.5, 0),  # (x, y) coordinates
+        fontsize=14,
     )
 
     plt.tight_layout(
-        rect=[0.1, 0.05, 1, 0.95]
+        rect=[0.1, 0.15, 1, 0.95]
     )  # the subplots will be put between left, bottom, right, top
-    plt.savefig("performance_plot.pdf")
+    plt.savefig("performance_plot.svg", transparent=True, dpi=500)
 
 
 def plot_downstream_exp():
@@ -345,7 +350,7 @@ def plot_interval_probing_exp():
     """
     two subplots for val3 and val6, three pillars for k4, k1, nosymm
     """
-    fig, axs = plt.subplots(1, 2, figsize=(10, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4))
     col_vars = ["Train & Val: 3 Keys", "Train & Val: 6 Keys"]
     for j in range(2):
         fig.text(
@@ -362,9 +367,9 @@ def plot_interval_probing_exp():
         "major_sav_val6_induced_probe_0914.csv",
     ]
     bar_labels = [
-        "With Intrinsic Symmetry (K=4)",
-        "With Intrinsic Symmetry (K=1)",
-        "Without Intrinsic Symmetry",
+        "w/ symmetry (K=4)",
+        "w/ symmetry (K=1)",
+        "w/o symmetry",
     ]
     keywords = ["symm0.3k4", "symm0.3k1", "nosymm"]
     colors = ["forestgreen", "yellowgreen", "sienna"]
@@ -387,9 +392,14 @@ def plot_interval_probing_exp():
         ax.set_xticks(x)
         ax.set_xticklabels(bar_labels, rotation=15)
 
-    plt.savefig("interval_probing_plot.pdf")
+    plt.tight_layout(
+        rect=[0.0, 0.05, 1, 0.95]
+    )  # the subplots will be put between left, bottom, right, top
+
+    plt.savefig("interval_probing_plot.svg", transparent=True, dpi=500)
 
 
 if __name__ == "__main__":
+    plot_main_exp()
     # plot_downstream_exp()
     plot_interval_probing_exp()
