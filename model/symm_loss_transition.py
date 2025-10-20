@@ -106,15 +106,12 @@ class SymmLossTransition(SymmLoss):
 
         # retrain transition prior
         if is_train:
-            transition_energy_loss = self.train_energy_net(model, zc_vq, n_steps=1)
+            transition_energy_loss = self.train_energy_net(model, zc_vq, n_steps=10)
         else:
             transition_energy_loss = self.ebm_infonce_loss(model, zc_vq, indices)
 
         # symmetry loss
-        isymm_loss_weight = self.config["weights"].get("isymm_loss", 0.0)
-        if isinstance(isymm_loss_weight, str):
-            isymm_loss_weight = compute_loss_weight(isymm_loss_weight, step)
-        if isymm_loss_weight > 0 and step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
+        if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
             g_t = torch.randint(1, self.config["isymm_k"] + 1, size=())
