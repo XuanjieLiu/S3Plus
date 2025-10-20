@@ -29,7 +29,7 @@ from utils.eval_utils import *
 from trainer import Trainer
 
 
-class TrainerInduced(Trainer):
+class TrainerTransition(Trainer):
     def __init__(self, config):
         super().__init__(config)
 
@@ -84,7 +84,7 @@ class TrainerInduced(Trainer):
                 if "Transition" in method_specs:
                     Model = import_module(
                         "model.simple_rnn_insnotes_transition"
-                    ).SymmCSAEwithSecondaryPrior
+                    ).SymmCSAEwithTransition
                     Loss = import_module("model.symm_loss_transition").SymmLossTransition
                 else:
                     Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
@@ -256,7 +256,7 @@ class TrainerInduced(Trainer):
                     batch_data = batch_data.to(device=self.device)
                     # forward
                     with torch.no_grad():
-                        losses = self.loss.compute_loss(step, self.model, batch_data)
+                        losses = self.loss.compute_loss(step, self.model, batch_data, is_train=False)
                         # accumulate running loss
                         for k, v in losses.items():
                             if k not in running_losses_val:

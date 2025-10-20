@@ -3,6 +3,8 @@ import yaml
 import random
 import argparse
 
+# os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, default="config.yaml")
@@ -60,7 +62,7 @@ if __name__ == "__main__":
         else:
             from trainer_induced import TrainerInduced as Trainer
     elif config["method"] == "ISymm_Transition":
-        from trainer_transition import Trainer
+        from trainer_transition import TrainerTransition as Trainer
 
     trainer = Trainer(config)
     trainer.prepare_data()
