@@ -306,13 +306,20 @@ class TrainerTransition(Trainer):
                     title="AE content confusion matrix",
                 )
 
-                # TODO: plot prior content confusion mtx
+                # plot transition mtx
+                codebook = self.model.vq.codebook.detach()  # (n_atoms, d_zc)
+                energies = self.model.compute_energies(codebook, codebook)  # (n_atoms, n_atoms)
+                transition_mtx = F.softmax(energies / 0.3, dim=-1).cpu().numpy()
+                transition_plot = plot_confusion_mtx(
+                    transition_mtx,
+                    title="Transition probability matrix",
+                )
 
                 self._write_summary(
                     step + self.start_step,
                     running_losses_val,
                     "val",
-                    fig=[x_plot, x_hat_plot, confusion_plot],
+                    fig=[x_plot, x_hat_plot, confusion_plot, transition_plot],
                 )
 
                 # checkpoint

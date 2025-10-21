@@ -109,12 +109,12 @@ class SymmCSAEwithPrior(nn.Module):
         out = self.decoder(z)
         return out
 
-    def forward(self, x):
+    def forward(self, x, freeze_codebook=False):
         """
         Basic forward without going through the prior
         """
         zc, zs = self.encode(x, quantize=False)
-        zc_vq, indices, commit_loss = self.quantize(zc)
+        zc_vq, indices, commit_loss = self.quantize(zc, freeze_codebook=freeze_codebook)
         out = self.decode(zc_vq, zs)
         return out, zc, zc_vq, indices, commit_loss, zs
 

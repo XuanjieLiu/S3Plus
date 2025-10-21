@@ -92,9 +92,13 @@ class SymmLossTransition(SymmLoss):
         """
         # get the AE output
         x_hat, zc, zc_vq, indices, commit_loss, zs = model(
-            x
+            x, freeze_codebook=not is_train
         )  # vq loss and recon loss
         ae_loss = F.mse_loss(x_hat, x)
+
+        # zc_vq, indices, _ = model.quantize(
+        #     zc, freeze_codebook=True
+        # ) # ensure using the updated codebook
 
         # get the prior output
         if isinstance(self.config["ntf_ratio"], str):
@@ -108,6 +112,9 @@ class SymmLossTransition(SymmLoss):
         if is_train:
             transition_energy_loss = self.train_energy_net(model, zc_vq, n_steps=10)
         else:
+            # model.energy_net.train()
+            # transition_energy_loss = self.train_energy_net(model, zc_vq, n_steps=10)
+            # model.energy_net.eval()
             transition_energy_loss = self.ebm_infonce_loss(model, zc_vq, indices)
 
         # symmetry loss

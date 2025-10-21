@@ -65,6 +65,21 @@ roots = [
     "F",
 ]  # circle of fifths
 
+roots = [
+    "C",
+    "D",
+    "E",
+    "F#",
+    "G#",
+    "A#",
+    "C#",
+    "D#",
+    "F",
+    "G",
+    "A",
+    "B",
+]  # double whole-tone
+
 
 def worker_init_fn(worker_id):
     worker_info = get_worker_info()
@@ -105,7 +120,7 @@ class InsNotesDataset(IterableDataset):
             i = random.randint(0, len(S_LIST) - 1)  # instrument
             if not self.data_type:
                 j = random.randint(0, len(C_LIST) - 4)  # root
-            elif isinstance(self.data_type, int):
+            elif isinstance(self.data_type, int): # use specified roots
                 j = random.randint(0, self.data_type - 1)
                 j = C_LIST.index(roots[j])
             audio, contents = generators[i].gen_melody(
