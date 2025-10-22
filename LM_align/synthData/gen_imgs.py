@@ -71,8 +71,10 @@ output_dir_train = "new_icon_train"
 output_dir_val = "new_icon_val"
 num_box = 12
 canvas_size = (224, 224)
-min_size = 20
-max_size = 40
+# min_size = 20
+# max_size = 40
+min_size = 40
+max_size = 60
 
 box_seq = generate_non_overlapping_boxes(num_box, canvas_size, min_size, max_size, max_attempts=1000, max_retry=5)
 pre_generate_oneSeqBox_dataset(num_samples_train, box_seq, output_dir_train, canvas_size=canvas_size)
