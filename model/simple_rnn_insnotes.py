@@ -51,7 +51,7 @@ class SymmCSAEwithPrior(nn.Module):
         if "GRU" in config.keys() and config["GRU"]:
             self.prior = nn.RNN(
                 input_size=self.d_zc,
-                hidden_size=self.d_zc,
+                hidden_size=config.get("d_hidden_prior", self.d_zc),
                 num_layers=self.n_layers_rnn,
                 batch_first=True,
             )
@@ -59,7 +59,7 @@ class SymmCSAEwithPrior(nn.Module):
         else:
             self.prior = nn.RNN(
                 input_size=self.d_zc,
-                hidden_size=self.d_zc,
+                hidden_size=config.get("d_hidden_prior", self.d_zc),
                 num_layers=self.n_layers_rnn,
                 batch_first=True,
             )
