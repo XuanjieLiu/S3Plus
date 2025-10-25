@@ -28,16 +28,16 @@ class SymmLossTransition(SymmLoss):
     #     """
     #     B, T = indices.shape
     #     transition = torch.zeros(n_atoms, n_atoms, device=indices.device)
-        
+
     #     for b in range(B):
     #         seq = indices[b]
     #         src = seq[:-1]
     #         dst = seq[1:]
-            
+
     #         # count transitions in this batch
     #         mat = torch.zeros(n_atoms, n_atoms, device=indices.device)
     #         mat.index_add_(0, src, torch.nn.functional.one_hot(dst, n_atoms).float())
-            
+
     #         transition += mat
 
     #     # average across batches
@@ -56,8 +56,10 @@ class SymmLossTransition(SymmLoss):
         """
         B, N, D = z.shape
 
-        anchors = z[:, :-1, :].reshape(B*(N-1), D)
-        next_idx = z_idx[:, 1:].reshape(B*(N-1),)
+        anchors = z[:, :-1, :].reshape(B * (N - 1), D)
+        next_idx = z_idx[:, 1:].reshape(
+            B * (N - 1),
+        )
         codebook = model.vq.codebook.detach()
         logits = model.compute_energies(anchors, codebook)  # (B*(N-1), n_atoms)
         logits = logits / temperature
@@ -74,7 +76,7 @@ class SymmLossTransition(SymmLoss):
         z = z.detach()  # stop gradient
         B, N, D = z.shape
 
-        z, z_idx, _ = model.quantize(z.reshape(B*N, D), freeze_codebook=True)
+        z, z_idx, _ = model.quantize(z.reshape(B * N, D), freeze_codebook=True)
         z = z.reshape(B, N, D)
         z_idx = z_idx.reshape(B, N)
 
@@ -127,7 +129,7 @@ class SymmLossTransition(SymmLoss):
             start_cursor = torch.randint(
                 0, zc.shape[1] - p_r + 1, size=()
             ).item()  # TODO: use different cursor for each batch item
-            zc_observed = zc[:, start_cursor : start_cursor + p_r, :] # (B, p_r, d_zc)
+            zc_observed = zc[:, start_cursor : start_cursor + p_r, :]  # (B, p_r, d_zc)
 
             # T then R
             # T
@@ -144,8 +146,9 @@ class SymmLossTransition(SymmLoss):
             #     scores.append(s)
             #     gumbels.append(g)
             # zc_observed_t = torch.stack(zc_observed_t, dim=0)
+            schedule_tau = max(0.3, 1.0 * (0.9995**step))
             zc_observed_t, probs, scores, gumbels = model.transition_forward(
-                zc_observed, gumbels=None
+                zc_observed, gumbels=None, tau=schedule_tau
             )
             # R:
             zc_observed_tr = model.unroll(zc_observed_t, g_r)
@@ -162,7 +165,7 @@ class SymmLossTransition(SymmLoss):
             #     zc_observed_rt.append(zc_observed_r_this_next)
             # zc_observed_rt = torch.stack(zc_observed_rt, dim=0)
             zc_observed_rt = model.transition_forward(
-                zc_observed_r, gumbels=gumbels
+                zc_observed_r, gumbels=gumbels, tau=schedule_tau
             )[0]
 
             isymm_loss = F.mse_loss(zc_observed_rt, zc_observed_tr, reduction="mean")

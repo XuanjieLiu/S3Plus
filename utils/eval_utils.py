@@ -145,6 +145,8 @@ def plot_confusion_mtx(mtx, title="Confusion Matrix"):
     ax = sns.heatmap(mtx, cmap="Purples", vmin=0, vmax=1, cbar=False)
     ax.set_xlabel("Content Index", fontsize=16)
     ax.set_ylabel("Codebook Index", fontsize=16)
+    ax.set_title(title, fontsize=20)
+
     confusion.add_axes(ax)
     confusion.canvas.draw()
     gcf = plt.gcf()

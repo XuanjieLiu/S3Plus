@@ -52,8 +52,9 @@ optimizer_config:
   weight_decay: 0.0
 
   scheduler: "exponential_decay" # "cosine_annealing", "exponential_decay"
-  lr_anneal_steps: 100
+  lr_anneal_steps: 2000
   lr_anneal_min_factor: 0.01
+  lr_anneal_restart_decay_factor: 0.5
   lr_decay_factor: 0.99
   lr_decay_steps: 10
   lr_decay_min_factor: 0.001

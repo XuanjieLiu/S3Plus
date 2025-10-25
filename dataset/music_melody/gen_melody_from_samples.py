@@ -322,7 +322,7 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
     for num_vals in range(3, 7):  # number of in-distribution scales
         save_dir_val = os.path.join(save_dir, save_name + "val" + str(num_vals))
         os.makedirs(save_dir_val, exist_ok=True)
-        for round in tqdm(range(10)):  # number of rounds for larger dataset
+        for round in tqdm(range(50)):  # number of rounds for larger dataset
             for i in range(len(S_LIST)):  # instrument
                 for j in range(num_vals):  # in-distribution roots
                     r = C_LIST.index(roots[j])
@@ -335,7 +335,7 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
                     )
         save_dir_ood = os.path.join(save_dir, save_name + "ood" + str(12 - num_vals))
         os.makedirs(save_dir_ood, exist_ok=True)
-        for round in tqdm(range(10)):
+        for round in tqdm(range(50)):
             for i in range(len(S_LIST)):
                 for j in range(num_vals, 12):  # ood roots
                     r = C_LIST.index(roots[j])

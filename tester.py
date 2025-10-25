@@ -25,11 +25,7 @@ class Tester:
         # basic configs
         self.config = config
         if self.config["debug"]:
-            self.portion = 1
-            self.config["n_epochs"] = 1
-            self.config["n_steps"] = 100
-            self.config["log_every_n_steps"] = 1
-            self.config["save_top_k"] = 1
+            self.portion = 0.1
         else:
             self.portion = 1
 

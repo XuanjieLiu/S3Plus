@@ -98,7 +98,10 @@ class SymmCSAEwithTransition(SymmCSAEwithPrior):
 
             z1_expand = z1.unsqueeze(2).expand(-1, -1, n_atoms, -1)
             z_cat = torch.cat(
-                [z1_expand, z_candidates.unsqueeze(0).unsqueeze(0).expand(B, N, -1, -1)],
+                [
+                    z1_expand,
+                    z_candidates.unsqueeze(0).unsqueeze(0).expand(B, N, -1, -1),
+                ],
                 dim=-1,
             )
             energy = self.energy_net(z_cat).squeeze(-1)  # (B, N, n_atoms)
@@ -141,8 +144,14 @@ class SymmCSAEwithTransition(SymmCSAEwithPrior):
                 .exponential_()
                 .log()
             )  # ~Gumbel(0,1)
-        scores = self.compute_energies(z, codebook)  # higher = more compatible. (B, N, n_atoms)
-        chosen_gumbels = torch.gather(gumbels, dim=1, index=z_indices.unsqueeze(-1).expand(-1, -1, gumbels.size(2)))
+        scores = self.compute_energies(
+            z, codebook
+        )  # higher = more compatible. (B, N, n_atoms)
+        chosen_gumbels = torch.gather(
+            gumbels,
+            dim=1,
+            index=z_indices.unsqueeze(-1).expand(-1, -1, gumbels.size(2)),
+        )
         probs, chosen_gumbels = gumbel_softmax(
             scores, tau=tau, hard=hard, gumbels=chosen_gumbels
         )  # (B, N, n_atoms). when hard=True, one-hot vectors

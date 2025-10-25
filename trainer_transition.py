@@ -85,7 +85,9 @@ class TrainerTransition(Trainer):
                     Model = import_module(
                         "model.simple_rnn_insnotes_transition"
                     ).SymmCSAEwithTransition
-                    Loss = import_module("model.symm_loss_transition").SymmLossTransition
+                    Loss = import_module(
+                        "model.symm_loss_transition"
+                    ).SymmLossTransition
                 else:
                     Model = import_module("model.simple_rnn_insnotes").SymmCSAEwithPrior
                     Loss = import_module("model.symm_loss").SymmLoss
@@ -202,9 +204,7 @@ class TrainerTransition(Trainer):
             batch_data = batch_data.to(device=self.device)
             # forward
             with torch.autocast(self.device.type):
-                losses = self.loss.compute_loss(
-                    step, self.model, batch_data
-                )
+                losses = self.loss.compute_loss(step, self.model, batch_data)
             # backward
             self.optimizer.zero_grad(set_to_none=True)
             if self.pcgrad is not None:
@@ -256,7 +256,9 @@ class TrainerTransition(Trainer):
                     batch_data = batch_data.to(device=self.device)
                     # forward
                     with torch.no_grad():
-                        losses = self.loss.compute_loss(step, self.model, batch_data, is_train=False)
+                        losses = self.loss.compute_loss(
+                            step, self.model, batch_data, is_train=False
+                        )
                         # accumulate running loss
                         for k, v in losses.items():
                             if k not in running_losses_val:
@@ -307,9 +309,14 @@ class TrainerTransition(Trainer):
                 )
 
                 # plot transition mtx
-                codebook = self.model.vq.codebook.detach()  # (n_atoms, d_zc)
-                energies = self.model.compute_energies(codebook, codebook)  # (n_atoms, n_atoms)
-                transition_mtx = F.softmax(energies / 0.3, dim=-1).cpu().numpy()
+                with torch.no_grad():
+                    codebook = self.model.vq.codebook  # (n_atoms, d_zc)
+                    energies = self.model.compute_energies(
+                        codebook, codebook
+                    )  # (n_atoms, n_atoms)
+                transition_mtx = (
+                    F.softmax(energies / 0.3, dim=-1).detach().cpu().numpy()
+                )
                 transition_plot = plot_confusion_mtx(
                     transition_mtx,
                     title="Transition probability matrix",
