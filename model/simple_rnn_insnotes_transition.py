@@ -167,3 +167,11 @@ class SymmCSAEwithTransition(SymmCSAEwithPrior):
     #     z_vq, z_indices, _ = self.quantize(z, freeze_codebook=True)
     #     z_next, _, _ = self.transition_forward(z_vq, temperature=temperature, hard=hard, gum)
     #     return z_next
+
+    def freeze_transition(self):
+        for param in self.energy_net.parameters():
+            param.requires_grad = False
+
+    def unfreeze_secondary_prior(self):
+        for param in self.energy_net.parameters():
+            param.requires_grad = True

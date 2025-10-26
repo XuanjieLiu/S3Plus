@@ -120,6 +120,8 @@ class SymmLossTransition(SymmLoss):
             transition_energy_loss = self.ebm_infonce_loss(model, zc_vq, indices)
 
         # symmetry loss
+        # important: freeze the transition model
+        model.freeze_transition()
         if step > self.config["start_isymm_at_n_steps"] and self.use_isymm:
             p_t, g_t, p_r, g_r = self.sample_lengths(self, zc)
             p_t = 1
@@ -169,6 +171,7 @@ class SymmLossTransition(SymmLoss):
             )[0]
 
             isymm_loss = F.mse_loss(zc_observed_rt, zc_observed_tr, reduction="mean")
+        model.unfreeze_transition()
 
         losses = {}
         total_loss = 0
