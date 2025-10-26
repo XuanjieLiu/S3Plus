@@ -172,6 +172,6 @@ class SymmCSAEwithTransition(SymmCSAEwithPrior):
         for param in self.energy_net.parameters():
             param.requires_grad = False
 
-    def unfreeze_secondary_prior(self):
+    def unfreeze_transition(self):
         for param in self.energy_net.parameters():
             param.requires_grad = True
