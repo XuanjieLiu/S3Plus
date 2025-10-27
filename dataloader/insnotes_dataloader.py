@@ -80,6 +80,21 @@ roots = [
     "B",
 ]  # double whole-tone
 
+roots = [
+    "C",
+    "E",
+    "G#",
+    "D",
+    "F#",
+    "A#",
+    "C#",
+    "F",
+    "A",
+    "D#",
+    "G",
+    "B",
+]  # double whole-tone, using four augmented triads
+
 
 def worker_init_fn(worker_id):
     worker_info = get_worker_info()

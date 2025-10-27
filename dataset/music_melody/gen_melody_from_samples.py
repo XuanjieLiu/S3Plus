@@ -302,18 +302,18 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
 
     roots = [
         "C",
-        "D",
         "E",
-        "F#",
         "G#",
+        "D",
+        "F#",
         "A#",
         "C#",
-        "D#",
         "F",
-        "G",
         "A",
+        "D#",
+        "G",
         "B",
-    ]  # double whole-tone
+    ]  # double whole-tone, using four augmented triads
 
     generators = []
     for i in range(len(S_LIST)):
