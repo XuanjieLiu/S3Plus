@@ -19,6 +19,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.cuda.amp import GradScaler
+from accelerate import Accelerator
 from matplotlib import pyplot as plt
 import seaborn as sns
 import wandb
@@ -79,6 +80,16 @@ class Trainer:
             else:
                 wandb.init(project="SV3", name=self.name)
             wandb.config.update(config)
+
+        # accelerator
+        precision_map = {"float32": "no", "float16": "fp16", "bfloat16": "bf16"}
+        precision = config.get("precision", None)
+        if precision in precision_map:
+            precision = precision_map[precision]
+        self.accelerator = Accelerator(mixed_precision=precision)
+        logging.info(
+            f"\n>>>>>>>>>>\nUsing Accelerator:\n{self.accelerator.state}<<<<<<<<<<\n"
+        )
 
         # performance history: {step: val_loss}
         self.performance_history = {}

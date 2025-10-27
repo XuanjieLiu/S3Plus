@@ -44,8 +44,8 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
         x = np.arange(7, 14)
 
     try:
-        df_val_series = get_rows(df_val, "symm1") * 100
-        df_all_series = get_rows(df_all, "symm1") * 100
+        df_val_series = get_rows(df_val, "symm0.3") * 100
+        df_all_series = get_rows(df_all, "symm0.3") * 100
         common_rows = df_val_series.index.intersection(df_all_series.index)
         plot_series_belt(
             ax,

@@ -18,7 +18,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.cuda.amp import GradScaler
+from accelerate import Accelerator
 from matplotlib import pyplot as plt
 import seaborn as sns
 import wandb
@@ -107,9 +107,6 @@ class TrainerTransition(Trainer):
         logging.info("Model set up.")
         logging.info(self.model.get_model_size())
 
-        # precision
-        self.scaler = GradScaler()
-
         # optimizer
         if optimizer_config["optimizer"] == "AdamW":
             self.optimizer = optim.AdamW(
@@ -193,9 +190,18 @@ class TrainerTransition(Trainer):
         config = self.config
         n_steps = config["steps"]
         step = 0
+
+        self.model, self.optimizer, self.train_loader, self.val_loader = (
+            self.accelerator.prepare(
+                self.model, self.optimizer, self.train_loader, self.val_loader
+            )
+        )
+
         self.model.train()
         running_losses_train = {}
         train_loader = self.train_loader
+
+
         while step < n_steps:
             # training loop
 
@@ -203,24 +209,23 @@ class TrainerTransition(Trainer):
             # Move data to device
             batch_data = batch_data.to(device=self.device)
             # forward
-            with torch.autocast(self.device.type):
+            with self.accelerator.autocast():
                 losses = self.loss.compute_loss(step, self.model, batch_data)
             # backward
             self.optimizer.zero_grad(set_to_none=True)
-            if self.pcgrad is not None:
-                pc_grad_losses = [x[1] for x in losses.items() if x[0] != "total_loss"]
-                pc_grad_losses = [self.scaler.scale(x) for x in pc_grad_losses]
-                self.pcgrad.pc_backward(
-                    pc_grad_losses,
-                )
-            else:
-                self.scaler.scale(losses["total_loss"]).backward()
+            # if self.pcgrad is not None:
+            #     pc_grad_losses = [x[1] for x in losses.items() if x[0] != "total_loss"]
+            #     pc_grad_losses = [self.scaler.scale(x) for x in pc_grad_losses]
+            #     self.pcgrad.pc_backward(
+            #         pc_grad_losses,
+            #     )
+            # else:
+            self.accelerator.backward(losses["total_loss"])
             # grad clipping
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=10.0)
 
             # optimizer step
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
+            self.optimizer.step()
 
             # accumulate running loss
             for k, v in losses.items():
