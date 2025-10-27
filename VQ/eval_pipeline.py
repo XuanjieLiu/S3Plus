@@ -27,12 +27,16 @@ EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 # EXP_NUM_LIST = ['1']
 EXP_NAME_LIST = [
-    # High-dim test
+    # High-dim test blue points orderliness
+    "2025.10.26_10vq_Zc[4]_Zs[0]_edim4_[0-20]_plus1024_1_tripleSet_Fullsymm",
+    "2025.10.26_16vq_Zc[8]_Zs[0]_edim8_[0-20]_plus1024_1_tripleSet_Fullsymm",
+
+    # High-dim test Mahjong
     # "2025.09.27_10vq_Zc[4]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
     # "2025.09.27_256vq_Zc[1]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
     # "2025.09.28_10vq_Zc[4]_Zs[0]_edim2_[0-20]_plus1024_1_SingleStyleMahjong_symm",
     # "2025.09.28_16vq_Zc[4]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
-    "2025.09.29_10vq_Zc[4]_Zs[0]_edim4_[0-20]_plus1024_1_SingleStyleMahjong_symm",
+    # "2025.09.29_10vq_Zc[4]_Zs[0]_edim4_[0-20]_plus1024_1_SingleStyleMahjong_symm",
 
     # # continue Mahjong
     # "2025.08.23_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm_continue",
