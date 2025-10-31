@@ -25,7 +25,7 @@ plt.rcParams.update(
 def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
     assert len(paths_to_csv) == 2
     assert "val" in paths_to_csv[0]
-    assert "all" in paths_to_csv[1]
+    assert "ood" in paths_to_csv[1]
     if domain == "x":
         df_val = pd.read_csv(
             paths_to_csv[0], index_col=0, usecols=[0] + list(range(1, 8))
@@ -44,8 +44,8 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
         x = np.arange(7, 14)
 
     try:
-        df_val_series = get_rows(df_val, "symm0.3") * 100
-        df_all_series = get_rows(df_all, "symm0.3") * 100
+        df_val_series = get_rows(df_val, "symm0.2") * 100
+        df_all_series = get_rows(df_all, "symm0.2") * 100
         common_rows = df_val_series.index.intersection(df_all_series.index)
         plot_series_belt(
             ax,
@@ -118,7 +118,7 @@ def plot_certain_val_domain(ax, paths_to_csv, val=6, domain="x"):
     ax.set_xticklabels(tests)
     ax.set_xlabel("Number of Predicted Step")
     ax.set_ylabel("Accuracy (%)")
-    ax.set_ylim(0, 100)
+    ax.set_ylim(50, 100)
 
     # ax.set_title('')
     # ax.legend(frameon=False)
@@ -206,8 +206,8 @@ def plot_main_exp():
     plot_certain_val_domain(
         ax=axs[0, 1],
         paths_to_csv=[
-            "major_sax_val6_transition_val_1025.csv",
-            "major_sax_val6_transition_all_1025.csv",
+            "major_sax_val6_transition_val_1031.csv",
+            "major_sax_val6_transition_ood_1031.csv",
         ],
         val=6,
         domain="x",
@@ -215,8 +215,8 @@ def plot_main_exp():
     plot_certain_val_domain(
         ax=axs[1, 1],
         paths_to_csv=[
-            "major_sax_val6_transition_val_1025.csv",
-            "major_sax_val6_transition_all_1025.csv",
+            "major_sax_val6_transition_val_1031.csv",
+            "major_sax_val6_transition_ood_1031.csv",
         ],
         val=6,
         domain="z",
@@ -260,7 +260,7 @@ def plot_main_exp():
     )  # the subplots will be put between left, bottom, right, top
     # plt.savefig("performance_plot.svg", transparent=True, dpi=500)
 
-    plt.savefig("transition_performance_plot.pdf", dpi=500)
+    plt.savefig("transition_performance_plot_1031.pdf", dpi=500)
 
 
 def plot_downstream_exp():

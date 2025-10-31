@@ -319,10 +319,10 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
     for i in range(len(S_LIST)):
         generators.append(PseudoMelGen(ins_index=i))
 
-    for num_vals in range(3, 7):  # number of in-distribution scales
+    for num_vals in range(3, 4):  # number of in-distribution scales
         save_dir_val = os.path.join(save_dir, save_name + "val" + str(num_vals))
         os.makedirs(save_dir_val, exist_ok=True)
-        for round in tqdm(range(50)):  # number of rounds for larger dataset
+        for round in tqdm(range(100)):  # number of rounds for larger dataset
             for i in range(len(S_LIST)):  # instrument
                 for j in range(num_vals):  # in-distribution roots
                     r = C_LIST.index(roots[j])
@@ -335,7 +335,7 @@ def gen_directories_val_ood_spectrum(save_dir, save_name, mode="major", styles="
                     )
         save_dir_ood = os.path.join(save_dir, save_name + "ood" + str(12 - num_vals))
         os.makedirs(save_dir_ood, exist_ok=True)
-        for round in tqdm(range(50)):
+        for round in tqdm(range(100)):
             for i in range(len(S_LIST)):
                 for j in range(num_vals, 12):  # ood roots
                     r = C_LIST.index(roots[j])
@@ -405,9 +405,9 @@ if __name__ == "__main__":
     # gen_directory("../data/insnotes_major_ood", ood=True)
     # print("Generated insnotes_major_ood")
 
-    gen_directory("../data/sax_major_all_2", ood=False, styles="1")
+    gen_directory("../data/sax_major_all_3", ood=False, styles="1")
     gen_directories_val_ood_spectrum(
-        save_dir="../data/sax_major_val_ood_spectrum_2",
+        save_dir="../data/sax_major_val_ood_spectrum_3",
         save_name="sax_major_",
         styles="1",
     )
