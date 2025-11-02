@@ -354,7 +354,7 @@ class AlignTrain:
             print(f"No checkpoint found, training from scratch")
 
     def load_model(self, ckpt_path):
-        checkpoint = torch.load(ckpt_path)
+        checkpoint = torch.load(ckpt_path, map_location=DEVICE)
         self.model_proj.load_state_dict(checkpoint['model_proj_state_dict'])
         if 'model_vision_state_dict' in checkpoint:
             self.model_vision.load_state_dict(checkpoint['model_vision_state_dict'])
