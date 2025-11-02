@@ -170,7 +170,7 @@ if "__main__" == __name__:
         evaluator = AlignEvaler(t_config.CONFIG)
 
         # Init statistic lists
-        label_acc_dict, obj_acc_dict = {}, {}
+        val_label_acc_dict, val_obj_acc_dict, ood_label_acc_dict, ood_obj_acc_dict = {}, {}, {}, {}
 
         for (key, value) in selected_sub_exps.items():
             seb_exp_num = int(key.split('_')[-1])
@@ -178,14 +178,19 @@ if "__main__" == __name__:
             print(f'  Sub-exp {seb_exp_num}, ckpt epoch {ckpt_epoch}')
             ckpt_path = os.path.join(exp_path, str(seb_exp_num), f'checkpoint_{ckpt_epoch}.pt')
             evaluator.load_model(ckpt_path)
-            label_acc, obj_acc = evaluator.evaluate_one_epoch(val_dataloader)
-            label_acc_dict[key] = label_acc
-            obj_acc_dict[key] = obj_acc
+
+            # Evaluate on validation set
+            val_label_acc_dict[key], val_obj_acc_dict[key] = evaluator.evaluate_one_epoch(val_dataloader)
+
+            # Evaluate on OOD set
+            ood_label_acc_dict[key], ood_obj_acc_dict[key] = evaluator.evaluate_one_epoch(ood_dataloader)
 
         # Save results
         all_results = {
-            "label_acc": label_acc_dict,
-            "obj_acc": obj_acc_dict,
+            "val_label_acc": val_label_acc_dict,
+            "val_obj_acc": val_obj_acc_dict,
+            "ood_label_acc": ood_label_acc_dict,
+            "ood_obj_acc": ood_obj_acc_dict,
         }
         results_path = os.path.join(exp_path, f'eval_results.json')
         upsert_json(results_path, all_results)
