@@ -48,7 +48,7 @@ class PreGeneratedDataset(Dataset):
     
 
 class onlineGenDataset(Dataset):
-    def __init__(self, num_samples, reuse_times, transform=None, obj_list=OBJ_LIST):
+    def __init__(self, num_samples, reuse_times, transform=None, obj_list=OBJ_LIST, auto_update=True):
         """
         Parameters
         ----------
@@ -63,12 +63,13 @@ class onlineGenDataset(Dataset):
         self.data_size = num_samples * reuse_times
         self.transform = transform
         self.obj_list = obj_list
+        self.auto_update = auto_update
 
     def __len__(self):
         return self.data_size
 
     def __getitem__(self, index):
-        if index + 1 == self.data_size:
+        if index + 1 == self.data_size and self.auto_update:
             self.chunk = gen_recurrent_data(self.num_samples, obj_list=self.obj_list)
         if index % self.num_samples == 0:
             random.shuffle(self.chunk)

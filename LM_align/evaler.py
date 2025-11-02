@@ -62,15 +62,15 @@ def select_exps_by_train_acc(json_path: str, acc_threshold: float) -> Dict[str, 
     return result
 
 
-def init_online_synth_dataloaders(num_samples):
+def init_test_online_synth_dataloaders(num_samples):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor()
     ])
-    val_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform)
+    val_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, auto_update=False)
     val_dataloader = DataLoader(val_dataset, batch_size=128, shuffle=False)
 
-    ood_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, obj_list=OBJ_LIST_2)
+    ood_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, obj_list=OBJ_LIST_2, auto_update=False)
     ood_dataloader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
 
     return val_dataloader, ood_dataloader
@@ -156,7 +156,7 @@ if "__main__" == __name__:
     ACC_THRESHOLD = 0.3
     # 统一 dataloader
     print('Initializing online synthetic dataloaders...')
-    val_dataloader, ood_dataloader = init_online_synth_dataloaders(num_samples=DATA_SAMPLES)
+    val_dataloader, ood_dataloader = init_test_online_synth_dataloaders(num_samples=DATA_SAMPLES)
     for exp_name in EXP_NAME_LIST:
         exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
         all_results_details_path = os.path.join(exp_path, "all_results_details.json")  # Need to run statistic.py first
