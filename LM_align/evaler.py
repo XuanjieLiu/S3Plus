@@ -5,6 +5,7 @@ import os
 import json
 from typing import Dict
 from importlib import reload
+from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torchvision import transforms
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../'))
@@ -110,26 +111,30 @@ class AlignEvaler(AlignTrain):
         super().__init__(config, init_loaders=False)
 
     def evaluate_one_epoch(self, data_loader):
-        self.model_proj.eval()
-        pred_label_list = np.array([])
-        label_list = np.array([])
-        objs_list = np.array([])
-        for i, data_batch in enumerate(data_loader):
-            img_a, img_b, img_c, label_a, label_b, label_c, objs = self.databatch2imgs(data_batch)
-            e_a, e_q_loss_a, z_a = self.img2emb(img_a)
-            e_b, e_q_loss_b, z_b = self.img2emb(img_b)
-            e_c, e_q_loss_c, z_c = self.img2emb(img_c)
+        with torch.no_grad():
+            self.model_proj.eval()
+            pred_label_list = np.array([])
+            label_list = np.array([])
+            objs_list = np.array([])
+            for i, data_batch in enumerate(tqdm(data_loader,
+                                                total=len(data_loader),
+                                                desc="Evaluating",
+                                                unit="batch")):
+                img_a, img_b, img_c, label_a, label_b, label_c, objs = self.databatch2imgs(data_batch)
+                e_a, e_q_loss_a, z_a = self.img2emb(img_a)
+                e_b, e_q_loss_b, z_b = self.img2emb(img_b)
+                e_c, e_q_loss_c, z_c = self.img2emb(img_c)
 
-            # Calculate accuracy
-            e_all = torch.cat((e_a, e_b, e_c), dim=0)
-            label_all = np.concatenate((label_a, label_b, label_c))
-            pred_label = self.embs2label(e_all)
+                # Calculate accuracy
+                e_all = torch.cat((e_a, e_b, e_c), dim=0)
+                label_all = np.concatenate((label_a, label_b, label_c))
+                pred_label = self.embs2label(e_all)
 
-            pred_label_list = np.concatenate((pred_label_list, pred_label))
-            label_list = np.concatenate((label_list, label_all))
-            objs_list = np.concatenate((objs_list, np.array(np.concatenate((objs, objs, objs)))))
-        label_acc, obj_acc = compute_label_obj_accuracies(pred_label_list, label_list, objs_list)
-        return label_acc, obj_acc
+                pred_label_list = np.concatenate((pred_label_list, pred_label))
+                label_list = np.concatenate((label_list, label_all))
+                objs_list = np.concatenate((objs_list, np.array(np.concatenate((objs, objs, objs)))))
+            label_acc, obj_acc = compute_label_obj_accuracies(pred_label_list, label_list, objs_list)
+            return label_acc, obj_acc
 
 
 
@@ -178,12 +183,11 @@ if "__main__" == __name__:
             print(f'  Sub-exp {seb_exp_num}, ckpt epoch {ckpt_epoch}')
             ckpt_path = os.path.join(exp_path, str(seb_exp_num), f'checkpoint_{ckpt_epoch}.pt')
             evaluator.load_model(ckpt_path)
-
-            # Evaluate on validation set
-            val_label_acc_dict[key], val_obj_acc_dict[key] = evaluator.evaluate_one_epoch(val_dataloader)
-
-            # Evaluate on OOD set
-            ood_label_acc_dict[key], ood_obj_acc_dict[key] = evaluator.evaluate_one_epoch(ood_dataloader)
+            with torch.no_grad():
+                # Evaluate on validation set
+                val_label_acc_dict[key], val_obj_acc_dict[key] = evaluator.evaluate_one_epoch(val_dataloader)
+                # Evaluate on OOD set
+                ood_label_acc_dict[key], ood_obj_acc_dict[key] = evaluator.evaluate_one_epoch(ood_dataloader)
 
         # Save results
         all_results = {
