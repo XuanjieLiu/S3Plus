@@ -126,13 +126,14 @@ EVAL_TERMS = [
 
 
 class AlignTrain:
-    def __init__(self, config):
+    def __init__(self, config, init_loaders=True):
         self.config = config
         self.data_type = config['data_type']
-        self.data_loader_train = load_dataloader(config, type='train')
-        self.data_loader_val = load_dataloader(config, type='val')
-        self.data_loader_val_ood = load_dataloader(config, type='val_ood')
-        self.data_loader_anchor = load_dataloader_anchor(config)
+        if init_loaders:
+            self.data_loader_train = load_dataloader(config, type='train')
+            self.data_loader_val = load_dataloader(config, type='val')
+            self.data_loader_val_ood = load_dataloader(config, type='val_ood')
+            self.data_loader_anchor = load_dataloader_anchor(config)
         self.model_vision, proj_in_dim = load_vision_model(config)
         self.sps_loader = load_VQSPS_loader(config)
         self.model_sps = self.sps_loader.model.to(DEVICE)
@@ -153,7 +154,7 @@ class AlignTrain:
         self.ckpt_name = config['ALIGN']['ckpt_name']
         self.results_dir = config['ALIGN']['result_dir']
         self.wandb_run = None
-        os.makedirs(self.results_dir, exist_ok=True)
+
         
 
     def init_codebook(self):
@@ -318,12 +319,12 @@ class AlignTrain:
 
 
     def train(self):
+        os.makedirs(self.results_dir, exist_ok=True)
         self.init_wandb()
         self.resume()
         train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['train_record_path'])
         val_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['val_record_path'])
         val_ood_loss_counter = LossCounter(EVAL_TERMS, record_path=self.config['ALIGN']['val_ood_record_path'])
-        os.makedirs(self.results_dir, exist_ok=True)
         if self.config['vision_model'] == VISION_MODEL_DINO:
             optimizer = optim.Adam(self.model_proj.parameters(), lr=self.config['ALIGN']['LR'])
         elif self.config['vision_model'] == VISION_MODEL_LIGHTViT or self.config['vision_model'] == VISION_MODEL_CNN:
