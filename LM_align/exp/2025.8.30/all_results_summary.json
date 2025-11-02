@@ -1,0 +1,26 @@
+{
+    "Train_record_accuracy": {
+        "value": "0.09 \\pm 0.22",
+        "mean": 0.09031575,
+        "std": 0.2160543206964107,
+        "max": 0.720947,
+        "min": 0.0,
+        "count": 20
+    },
+    "Val_record_accuracy": {
+        "value": "0.08 \\pm 0.21",
+        "mean": 0.08411465000000001,
+        "std": 0.2099480187763807,
+        "max": 0.699219,
+        "min": 0.0,
+        "count": 20
+    },
+    "Val_ood_record_accuracy": {
+        "value": "0.08 \\pm 0.17",
+        "mean": 0.0763021,
+        "std": 0.17232896155838112,
+        "max": 0.617188,
+        "min": 0.0,
+        "count": 20
+    }
+}
