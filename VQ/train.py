@@ -333,7 +333,7 @@ class PlusTrainer:
     def overall_plus_eval(self, epoch_num, data_loader, result_path):
         plus_eval = VQvaePlusEval(self.config, loaded_model=self.model)
         all_enc_z, all_plus_z = plus_eval.load_plusZ_eval_data(data_loader)
-        emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
+        emb_select_accu, emb_select_accu_cycle, _, _ = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
         one2n_accu, one2n_accu_cycle = calc_multi_emb_plus_accu(all_enc_z, all_plus_z)
         one2one_accu, one2one_accu_cycle = calc_one2one_plus_accu(all_enc_z, all_plus_z)
         emb_self_consistency = calc_plus_z_self_cycle_consistency(all_plus_z)

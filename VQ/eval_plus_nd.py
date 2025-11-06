@@ -375,7 +375,7 @@ def interpolate_plus_eval(
     a_list, b_list, c_list = get_all_plus_pairs(plus_z)
     smallest = min(min(a_list), min(b_list))
     largest = max(max(a_list), max(b_list))
-    accu_list, accu_cycle_list = [], []
+    accu_list_modedict, accu_cycle_list_modedict, accu_list_selection, accu_list_selection_cycle = [], [], [], []
 
     for i in range(n_trials):
         pair_strings = set()
@@ -421,17 +421,32 @@ def interpolate_plus_eval(
         for j in range(len(plus_emb_idx)):
             plus_itp_list.append(PlusInfo(
                 emb_idx=plus_emb_idx[j],
+                emb_value=plus_emb[j],
                 cycle_emb_idx=plus_emb_cycle_idx[j],
+                cycle_emb_value=plus_emb_cycle[j],
                 label_c=label_c[j],
             ))
+
+        # Calculate accu by mode emb_label_dict
         emb_label_dict = mode_emb_label_dict(enc_z)
-        accu, accu_cycle = plus_accuracy(emb_label_dict, plus_itp_list)
-        accu_list.append(accu)
-        accu_cycle_list.append(accu_cycle)
-    accu_mean = sum(accu_list) / len(accu_list)
-    accu_cycle_mean = sum(accu_cycle_list) / len(accu_cycle_list)
-    print(f"Interpolated Plus Accu: {accu_mean:.4f}, Cycle Accu: {accu_cycle_mean:.4f}")
-    return accu_mean, accu_cycle_mean
+        accu_modedict, accu_cycle_modedict = plus_accuracy(emb_label_dict, plus_itp_list)
+        accu_list_modedict.append(accu_modedict)
+        accu_cycle_list_modedict.append(accu_cycle_modedict)
+
+        # Calculate accu by selection
+        accu_selection, accu_cycle_selection, plus_itp_label_list, plus_itp_cycle_label_list = calc_emb_select_plus_accu(
+            enc_z, plus_itp_list
+        )
+        accu_list_selection.append(accu_selection)
+        accu_list_selection_cycle.append(accu_cycle_selection)
+
+    accu_mean_modedict = sum(accu_list_modedict) / len(accu_list_modedict)
+    accu_cycle_mean_modedict = sum(accu_cycle_list_modedict) / len(accu_cycle_list_modedict)
+    accu_mean_selection = sum(accu_list_selection) / len(accu_list_selection)
+    accu_cycle_mean_selection = sum(accu_list_selection_cycle) / len(accu_list_selection_cycle)
+    print(f"Interpolated Plus Mode dict Accu: {accu_mean_modedict:.4f}, Cycle Accu: {accu_cycle_mean_modedict:.4f}")
+    print(f"Interpolated Plus Selection Accu: {accu_mean_selection:.4f}, Cycle Accu: {accu_cycle_mean_selection:.4f}")
+    return accu_mean_modedict, accu_cycle_mean_modedict, accu_mean_selection, accu_cycle_mean_selection
 
 
 def _sample_EncInfo_by_label(
@@ -485,6 +500,8 @@ def calc_emb_select_plus_accu(enc_z: List[EncInfo], plus_z: List[PlusInfo]):
     accu = 0
     accu_cycle = 0
     n_total = len(plus_z)
+    selected_option_labels = []
+    selected_cycle_option_labels = []
 
     for item in plus_z:
         label_c = item.label_c
@@ -498,16 +515,22 @@ def calc_emb_select_plus_accu(enc_z: List[EncInfo], plus_z: List[PlusInfo]):
         min_distance_idx = distances.index(min(distances))
         min_cycle_distance_idx = cycle_distances.index(min(cycle_distances))
 
+        # 找到匹配选项的 label
+        selected_option_label = options[min_distance_idx].label
+        selected_cycle_option_label = options[min_cycle_distance_idx].label
+        selected_option_labels.append(selected_option_label)
+        selected_cycle_option_labels.append(selected_cycle_option_label)
+
         # 检查是否匹配
-        if options[min_distance_idx].label == label_c:
+        if selected_option_label == label_c:
             accu += 1
-        if options[min_cycle_distance_idx].label == label_c:
+        if selected_cycle_option_label == label_c:
             accu_cycle += 1
 
     accu_mean = accu / n_total if n_total > 0 else 0
     accu_cycle_mean = accu_cycle / n_total if n_total > 0 else 0
     print(f"Emb Select Plus Accu: {accu_mean:.4f}, Cycle Accu: {accu_cycle_mean:.4f}")
-    return accu_mean, accu_cycle_mean
+    return accu_mean, accu_cycle_mean, selected_option_labels, selected_cycle_option_labels
 
 
 def find_min_idx_and_value(lst: List[float]) -> Tuple[int, float]:

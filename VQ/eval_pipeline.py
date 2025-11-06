@@ -152,6 +152,7 @@ def pipeline_eval(exp_name: str):
     os.makedirs(pipeline_dir, exist_ok=True)
     all_results = {}
     all_ckpts = find_all_ckpts(config, exp_path)
+
     # eval plus accu
     if eval_config.get(EVAL_ITEM_PLUS) is not None and EVAL_ITEM_PLUS in EVAL_TERMS:
         plus_evaler = VQvaePlusEval(config)
@@ -191,7 +192,7 @@ def pipeline_eval(exp_name: str):
                 # emb_select_accu_cycle_list.append(emb_select_accu_cycle)
 
                 # 计算 emb select accu
-                emb_select_accu, emb_select_accu_cycle = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
+                emb_select_accu, emb_select_accu_cycle, _, _ = calc_emb_select_plus_accu(all_enc_z, all_plus_z)
                 emb_select_accu_list.append(emb_select_accu)
                 emb_select_accu_cycle_list.append(emb_select_accu_cycle)
                 # 计算 one2n accu
@@ -271,21 +272,29 @@ def pipeline_eval(exp_name: str):
         for sub_config in interpolate_configs:
             name = sub_config['name']
             data_loader = make_data_loader(sub_config, MultiImgDataset)
-            itp_result_name = f"{name}"
-            itp_cycle_result_name = f"{name}_cycle"
-            itp_result_list = []
-            itp_cycle_result_list = []
+            itp_modedict_name = f"{name}_modedict"
+            itp_cycle_modedict_name = f"{name}_cycle_modedict"
+            itp_selection_name = f"{name}_selection"
+            itp_cycle_selection_name = f"{name}_cycle_selection"
+            itp_score_modedict_list = []
+            itp_cycle_score_modedict_list = []
+            itp_score_selection_list = []
+            itp_cycle_score_selection_list = []
             for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
                 interpolate_evaler.reload_model(ckpt_path)
                 all_enc_z, all_plus_z = interpolate_evaler.load_plusZ_eval_data(data_loader)
                 # 计算 interpolate
-                itp_score, itp_cycle_score = interpolate_plus_eval(interpolate_evaler.model,
+                itp_score_modedict, itp_cycle_score_modedict, itp_score_selection, itp_cycle_score_selection  = interpolate_plus_eval(interpolate_evaler.model,
                                                                    all_enc_z, all_plus_z,
                                                                    sub_config.get('interpolate_num', 10))
-                itp_result_list.append(itp_score)
-                itp_cycle_result_list.append(itp_cycle_score)
-            all_results[itp_result_name] = itp_result_list
-            all_results[itp_cycle_result_name] = itp_cycle_result_list
+                itp_score_modedict_list.append(itp_score_modedict)
+                itp_cycle_score_modedict_list.append(itp_cycle_score_modedict)
+                itp_score_selection_list.append(itp_score_selection)
+                itp_cycle_score_selection_list.append(itp_cycle_score_selection)
+            all_results[itp_modedict_name] = itp_score_modedict_list
+            all_results[itp_cycle_modedict_name] = itp_cycle_score_modedict_list
+            all_results[itp_selection_name] = itp_score_selection_list
+            all_results[itp_cycle_selection_name] = itp_cycle_score_selection_list
 
     # save all_results to json
     save_all_results(pipeline_dir, all_results, all_ckpts)
