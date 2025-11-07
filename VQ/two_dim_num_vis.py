@@ -87,7 +87,7 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
     if result_path is None:
         plt.show()
     else:
-        plt.savefig(f'{result_path}.png')
+        plt.savefig(f'{result_path}.png', bbox_inches='tight', pad_inches=0)
         plt.cla()
         plt.clf()
         plt.close()
@@ -333,7 +333,7 @@ def test_two_dim_vis():
     single_img_eval_set = SingleImgDataset(DATASET_PATH)
     single_img_eval_loader = DataLoader(single_img_eval_set, batch_size=256)
     evaler = MumEval(t_config.CONFIG, model_path)
-    evaler.num_eval_two_dim(single_img_eval_loader)
+    evaler.num_eval_two_dim(single_img_eval_loader, result_path="C:/Users/Lxj/Downloads/aa.png")
 
 
 if __name__ == "__main__":
