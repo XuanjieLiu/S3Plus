@@ -58,7 +58,8 @@ def num_position_in_two_dim_repr(plt_func: matplotlib.pyplot, num_z, num_labels,
     for i in range(0, len(num_z)):
         plt_func.scatter(X[i], Y[i],
                          marker=f'${sorted_label[i]}$',
-                         s=200,
+                        #  s=200,
+                         s=250,
                          alpha=min(1, 1 / max_repeating_num * 1.3),
                          c=COLOR_LIST[sorted_label[i] % len(COLOR_LIST)])
         if all_embs is None:
@@ -72,7 +73,7 @@ def num_position_in_two_dim_repr(plt_func: matplotlib.pyplot, num_z, num_labels,
     plt_func.ylabel('z2')
 
 
-def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None):
+def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None, hide_axis=True):
     plt.figure(figsize=(5, 5))
     num_position_in_two_dim_repr(plt, num_z, num_labels, all_embs)
     if x_limit is not None:
@@ -81,6 +82,8 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
         plt.ylim(y_limit[0], y_limit[1])
     if x_limit is None and y_limit is None:
         plt.axis('equal')
+    if hide_axis:
+        plt.axis('off')
     if result_path is None:
         plt.show()
     else:
