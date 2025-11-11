@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from collections import Counter
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../'))
-from LM_align.synthData.SynthCommon import OBJ_LIST, gen_recurrent_plan
+from synthData.SynthCommon import OBJ_LIST, gen_recurrent_plan
 from train_align import AlignTrain
 from synthData.SynthImgsDataset import PlanRenderDataset, PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2
 
@@ -261,9 +261,11 @@ if "__main__" == __name__:
         canvas_size=(224,224)
     )
     # 统计 val_dataloader 中 a+b+c 的总体分布
-    counts_all, ratios_all = count_numeric_labels_per_epoch(val_dataloader, key="all")
-    print("Counts (all):", counts_all)
-    print("Ratios (all):", ratios_all)
+    val_counts_all, val_ratios_all = count_numeric_labels_per_epoch(val_dataloader, key="all")
+    ood_counts_all, ood_ratios_all = count_numeric_labels_per_epoch(ood_dataloader, key="all")
+    print("VAL Counts (all):", val_counts_all)
+    print("OOD Counts (all):", ood_counts_all)
+
     for exp_name in EXP_NAME_LIST:
         exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
         all_results_details_path = os.path.join(exp_path, "all_results_details.json")  # Need to run statistic.py first
@@ -302,8 +304,10 @@ if "__main__" == __name__:
             "val_obj_acc": val_obj_acc_dict,
             "ood_label_acc": ood_label_acc_dict,
             "ood_obj_acc": ood_obj_acc_dict,
-            "n_label_counts_all": counts_all,
-            "n_label_ratios_all": ratios_all
+            "val_n_label_counts_all": val_counts_all,
+            "val_n_label_ratios_all": val_ratios_all,
+            "ood_n_label_counts_all": ood_counts_all,
+            "ood_n_label_ratios_all": ood_ratios_all
         }
         results_path = os.path.join(exp_path, f'eval_results.json')
         upsert_json(results_path, all_results)
