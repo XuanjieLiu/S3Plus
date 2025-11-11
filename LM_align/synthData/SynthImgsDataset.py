@@ -1,10 +1,12 @@
 
+from matplotlib import transforms
 from torch.utils.data import Dataset
 import os
 from PIL import Image
 import json
 import random
-from LM_align.synthData.SynthCommon import gen_recurrent_data, OBJ_LIST, OBJ_LIST_2
+from LM_align.synthData.SynthCommon import TriplePlan, draw_objects_on_image, gen_recurrent_data, OBJ_LIST, OBJ_LIST_2, gen_recurrent_plan
+from typing import List, Tuple
 
 # ----------------------------
 # Dataset: 从本地预生成的数据读取
@@ -79,3 +81,37 @@ class onlineGenDataset(Dataset):
             image_b = self.transform(image_b)
             image_c = self.transform(image_c)
         return {"image_a": image_a, "image_b": image_b, "image_c": image_c, "label": label}
+    
+
+
+# ----------------------------用 plan + obj_list 渲染出 Dataset（与原字段保持一致）----------------------------
+class PlanRenderDataset(Dataset):
+    """给定同一份 plan，用不同 obj_list 渲染出两套数据。"""
+    def __init__(self, plans: List[TriplePlan], obj_list: List[str],
+                 transform=None, canvas_size=(224,224)):
+        assert len(obj_list) > 0
+        self.plans = plans
+        self.obj_list = obj_list
+        self.transform = transform
+        self.canvas_size = canvas_size
+
+    def __len__(self):
+        return len(self.plans)
+
+    def __getitem__(self, idx):
+        plan = self.plans[idx]
+        # 为了可重复且平均分配，不依赖随机数：循环使用 obj_list
+        obj_label = self.obj_list[idx % len(self.obj_list)]
+
+        img_a = draw_objects_on_image(obj_label, plan.boxes_a, self.canvas_size)
+        img_b = draw_objects_on_image(obj_label, plan.boxes_b, self.canvas_size)
+        img_c = draw_objects_on_image(obj_label, plan.boxes_c, self.canvas_size)
+
+        if self.transform:
+            img_a = self.transform(img_a)
+            img_b = self.transform(img_b)
+            img_c = self.transform(img_c)
+
+        label = {"obj": obj_label, "a": plan.a, "b": plan.b, "c": plan.c}
+        return {"image_a": img_a, "image_b": img_b, "image_c": img_c, "label": label}
+#----------------------------用 plan + obj_list 渲染出 Dataset（与原字段保持一致）----------------------------

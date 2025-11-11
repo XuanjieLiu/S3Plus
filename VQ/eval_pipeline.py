@@ -261,6 +261,7 @@ def pipeline_eval(exp_name: str):
             for sub_exp, ckpt_path in zip(EXP_NUM_LIST, all_ckpts):
                 img_path = os.path.join(img_dir_path, f'{sub_exp}.png')
                 orderliness_evaler.reload_model(ckpt_path)
+                # plot_num_position_in_two_dim_repr 默认画图，消除边距且去掉坐标轴
                 nna_score = orderliness_evaler.num_eval_two_dim(data_loader, img_path)
                 orderliness_list.append(nna_score)
             all_results[f'{name}'] = orderliness_list

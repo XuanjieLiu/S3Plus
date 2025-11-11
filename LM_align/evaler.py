@@ -3,14 +3,81 @@ import numpy as np
 import sys
 import os
 import json
-from typing import Dict
+from typing import Dict, Tuple, Literal, Any
 from importlib import reload
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torchvision import transforms
+from collections import Counter
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../'))
+from LM_align.synthData.SynthCommon import OBJ_LIST, gen_recurrent_plan
 from train_align import AlignTrain
-from synthData.SynthImgsDataset import PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2
+from synthData.SynthImgsDataset import PlanRenderDataset, PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2
+
+
+LabelKey = Literal["a", "b", "c", "all"]
+def _to_list(x: Any):
+    """把 batch 中的张量/列表安全地转换成 Python list[int]。"""
+    import torch
+    if isinstance(x, torch.Tensor):
+        return x.detach().cpu().tolist()
+    if isinstance(x, list) or isinstance(x, tuple):
+        return list(x)
+    # 单个标量
+    return [int(x)]
+
+def count_numeric_labels_per_epoch(
+    dataloader,
+    key: LabelKey = "all"
+) -> Tuple[Dict[int, int], Dict[int, float]]:
+    """
+    统计某个 dataloader 在一个 epoch 中的数字label分布。
+
+    Parameters
+    ----------
+    dataloader : torch.utils.data.DataLoader
+        承载样本的 DataLoader。其 batch 应包含键 'label'，
+        而 'label' 内应含有整数型的 'a'、'b'、'c' 字段。
+    key : {'a','b','c','all'}
+        - 'a' / 'b' / 'c'：只统计对应字段
+        - 'all'：把 a、b、c 三个字段拼在一起统一统计（默认）
+
+    Returns
+    -------
+    counts : Dict[int, int]
+        每个数字label出现的次数（整型字典）。
+    ratios : Dict[int, float]
+        每个数字label出现的比例（counts 归一化得到）。
+    """
+    counter = Counter()
+
+    for batch in dataloader:
+        labels = batch["label"]  # 可能是“字典的批”，也可能是“由若干字典组成的列表”
+        if isinstance(labels, dict):
+            # PyTorch 默认 collate：'a','b','c' 可能已经是 LongTensor[batch]
+            if key == "all":
+                for k in ("a", "b", "c"):
+                    vals = _to_list(labels[k])
+                    for v in vals:
+                        counter[int(v)] += 1
+            else:
+                vals = _to_list(labels[key])
+                for v in vals:
+                    counter[int(v)] += 1
+        else:
+            # 一些自定义 collate 会给出 list[dict]
+            # labels 是 list of dict: [{"a":int,"b":int,"c":int,...}, ...]
+            for ld in labels:
+                if key == "all":
+                    for k in ("a", "b", "c"):
+                        counter[int(ld[k])] += 1
+                else:
+                    counter[int(ld[key])] += 1
+
+    total = sum(counter.values()) if counter else 0
+    counts = dict(sorted(counter.items(), key=lambda kv: kv[0]))
+    ratios = {k: (v / total if total > 0 else 0.0) for k, v in counts.items()}
+    return counts, ratios
 
 
 def upsert_json(json_path: str, big_dict: dict):
@@ -62,6 +129,7 @@ def select_exps_by_train_acc(json_path: str, acc_threshold: float) -> Dict[str, 
     return result
 
 
+
 def init_test_online_synth_dataloaders(num_samples):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -74,6 +142,35 @@ def init_test_online_synth_dataloaders(num_samples):
     ood_dataloader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
 
     return val_dataloader, ood_dataloader
+
+
+# ----------------------------一次性构建“成对”的 val / ood EVAL DataLoader（完全同分布）----------------------------
+def init_test_online_synth_dataloaders_paired(num_samples,
+                                              obj_list_val=OBJ_LIST,
+                                              obj_list_ood=OBJ_LIST_2,
+                                              canvas_size=(224,224)):
+    """
+    产生两套 dataloader：完全相同的 (a,b,c) 与 盒子分布/顺序，
+    仅 icon 来自不同 obj_list。
+    """
+    transform = transforms.Compose([
+        transforms.Resize(canvas_size),
+        transforms.ToTensor()
+    ])
+
+    # 共享同一份 plan
+    plans = gen_recurrent_plan(num_samples, canvas_size=canvas_size)
+
+    val_dataset = PlanRenderDataset(plans, obj_list=obj_list_val,
+                                    transform=transform, canvas_size=canvas_size)
+    ood_dataset = PlanRenderDataset(plans, obj_list=obj_list_ood,
+                                    transform=transform, canvas_size=canvas_size)
+
+    # 注意：为了严格一一对应，建议 shuffle=False
+    val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False)
+    ood_loader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
+    return val_loader, ood_loader
+# -------------------------------------------------------------------------------------
 
 
 def compute_label_obj_accuracies(pred_label, label_all, objs_all):
@@ -156,7 +253,17 @@ if "__main__" == __name__:
     ACC_THRESHOLD = 0.3
     # 统一 dataloader
     print('Initializing online synthetic dataloaders...')
-    val_dataloader, ood_dataloader = init_test_online_synth_dataloaders(num_samples=DATA_SAMPLES)
+    # val_dataloader, ood_dataloader = init_test_online_synth_dataloaders(num_samples=DATA_SAMPLES)
+    val_dataloader, ood_dataloader = init_test_online_synth_dataloaders_paired(
+        num_samples=DATA_SAMPLES,
+        obj_list_val=OBJ_LIST,      # 第一套 icon
+        obj_list_ood=OBJ_LIST_2,    # 第二套 icon
+        canvas_size=(224,224)
+    )
+    # 统计 val_dataloader 中 a+b+c 的总体分布
+    counts_all, ratios_all = count_numeric_labels_per_epoch(val_dataloader, key="all")
+    print("Counts (all):", counts_all)
+    print("Ratios (all):", ratios_all)
     for exp_name in EXP_NAME_LIST:
         exp_path = os.path.join(EXP_ROOT_PATH, exp_name)
         all_results_details_path = os.path.join(exp_path, "all_results_details.json")  # Need to run statistic.py first
@@ -195,6 +302,8 @@ if "__main__" == __name__:
             "val_obj_acc": val_obj_acc_dict,
             "ood_label_acc": ood_label_acc_dict,
             "ood_obj_acc": ood_obj_acc_dict,
+            "n_label_counts_all": counts_all,
+            "n_label_ratios_all": ratios_all
         }
         results_path = os.path.join(exp_path, f'eval_results.json')
         upsert_json(results_path, all_results)

@@ -74,6 +74,7 @@ def num_position_in_two_dim_repr(plt_func: matplotlib.pyplot, num_z, num_labels,
 
 
 def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_limit=None, y_limit=None, all_embs=None, hide_axis=True):
+    # 默认隐藏 x, y 轴
     plt.figure(figsize=(5, 5))
     num_position_in_two_dim_repr(plt, num_z, num_labels, all_embs)
     if x_limit is not None:
@@ -87,6 +88,7 @@ def plot_num_position_in_two_dim_repr(num_z, num_labels, result_path=None, x_lim
     if result_path is None:
         plt.show()
     else:
+        # 保存图片时消除边距
         plt.savefig(f'{result_path}.png', bbox_inches='tight', pad_inches=0)
         plt.cla()
         plt.clf()

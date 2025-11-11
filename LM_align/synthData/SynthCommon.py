@@ -7,6 +7,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
+from typing import List, Tuple
 plt.rcParams['font.family'] = ['Noto Color Emoji', 'DejaVu Sans']
 # ----------------------------
 # 全局配置与 Emoji 映射
@@ -377,3 +379,58 @@ def gen_recurrent_data(num_samples, canvas_size=(224, 224), obj_list=OBJ_LIST):
     return data
 
 
+#----------------------------生成“计划”：不画图，只决定 a/b/c 和三个视图的盒子----------------------------
+@dataclass
+class TriplePlan:
+    # 三张图用到的盒子（位置完全固定），以及 a,b,c
+    boxes_a: List[Tuple[int,int,int,int]]
+    boxes_b: List[Tuple[int,int,int,int]]
+    boxes_c: List[Tuple[int,int,int,int]]
+    a: int
+    b: int
+    c: int
+
+def recurrent_generate_plan(boxes, c, max_iter=1000) -> List[TriplePlan]:
+    """与 recurrent_generate_data 对齐，但不渲染，只返回 plan。"""
+    plans = []
+    max_num = c
+    rest_iter = max_iter
+    box_idx = list(range(len(boxes)))
+    while rest_iter > 0 and max_num >= 2:
+        a = random.randint(1, max_num - 1)
+        b = max_num - a
+        if b < 0:
+            break
+        c_idx = random.sample(box_idx, max_num)
+        a_idx = random.sample(c_idx, a)
+        b_idx = [i for i in c_idx if i not in a_idx]
+
+        boxes_a = [boxes[i] for i in a_idx]
+        boxes_b = [boxes[i] for i in b_idx]
+        boxes_c = [boxes[i] for i in c_idx]
+
+        plans.append(TriplePlan(
+            boxes_a=boxes_a, boxes_b=boxes_b, boxes_c=boxes_c,
+            a=a, b=b, c=max_num
+        ))
+
+        rest_iter -= 1
+        if a >= b:
+            max_num = a
+            box_idx = a_idx
+        else:
+            max_num = b
+            box_idx = b_idx
+    return plans
+
+def gen_recurrent_plan(num_samples, canvas_size=(224,224), min_size=30, max_size=40) -> List[TriplePlan]:
+    """直到收集到 num_samples 条 plan 为止。"""
+    plans: List[TriplePlan] = []
+    while len(plans) < num_samples:
+        c = random.randint(8, 10)
+        boxes = generate_non_overlapping_boxes(c, canvas_size, min_size, max_size)
+        if boxes is None:
+            continue
+        plans.extend(recurrent_generate_plan(boxes, c, max_iter=1000))
+    return plans[:num_samples]
+#----------------------------在线生成数据集的 DataLoader 初始化----------------------------
