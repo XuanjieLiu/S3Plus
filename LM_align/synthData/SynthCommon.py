@@ -16,7 +16,9 @@ plt.rcParams['font.family'] = ['Noto Color Emoji', 'DejaVu Sans']
 OBJ_LIST = ['white_king', 'white_rook', 'white_knight', 'sun', 'cloud',
             'telephone', 'crossed_swords', 'radioactive', 'heart', 'skull']
 
-OBJ_LIST_2 = ['white_queen', 'white_bishop', 'white_pawn', 'horse']
+OBJ_LIST_2 = ['white_bishop', 'white_pawn', 'flag', 'sparkle', 'umbrella']
+# OBJ_LIST_2 = ['umbrella']
+
 
 EMOJI_MAP = {
     # ♔–♟ Chess symbols
@@ -353,7 +355,7 @@ def recurrent_generate_data(boxes, c, obj_label, canvas_size, max_iter=1000):
         image_a = draw_objects_on_image(obj_label, boxes_a, canvas_size)
         image_b = draw_objects_on_image(obj_label, boxes_b, canvas_size)
         image_c = draw_objects_on_image(obj_label, boxes_c, canvas_size)
-        label = {"obj": obj_label, "a": a, "b": b, "c": c}
+        label = {"obj": obj_label, "a": len(boxes_a), "b": len(boxes_b), "c": len(boxes_c)}
         data.append((image_a, image_b, image_c, label))
         rest_iter -= 1
         if a >= b:

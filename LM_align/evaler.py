@@ -7,12 +7,12 @@ from typing import Dict, Tuple, Literal, Any
 from importlib import reload
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from torchvision import transforms
+
 from collections import Counter
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../'))
-from synthData.SynthCommon import OBJ_LIST, gen_recurrent_plan
+from synthData.SynthImgsDataset import init_test_online_synth_dataloaders, init_test_online_synth_dataloaders_paired
 from train_align import AlignTrain
-from synthData.SynthImgsDataset import PlanRenderDataset, PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2
+from synthData.SynthImgsDataset import PlanRenderDataset, PreGeneratedDataset, onlineGenDataset, OBJ_LIST_2, OBJ_LIST
 
 
 LabelKey = Literal["a", "b", "c", "all"]
@@ -130,49 +130,6 @@ def select_exps_by_train_acc(json_path: str, acc_threshold: float) -> Dict[str, 
 
 
 
-def init_test_online_synth_dataloaders(num_samples):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor()
-    ])
-    val_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, auto_update=False)
-    val_dataloader = DataLoader(val_dataset, batch_size=128, shuffle=False)
-
-    ood_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, obj_list=OBJ_LIST_2, auto_update=False)
-    ood_dataloader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
-
-    return val_dataloader, ood_dataloader
-
-
-# ----------------------------一次性构建“成对”的 val / ood EVAL DataLoader（完全同分布）----------------------------
-def init_test_online_synth_dataloaders_paired(num_samples,
-                                              obj_list_val=OBJ_LIST,
-                                              obj_list_ood=OBJ_LIST_2,
-                                              canvas_size=(224,224)):
-    """
-    产生两套 dataloader：完全相同的 (a,b,c) 与 盒子分布/顺序，
-    仅 icon 来自不同 obj_list。
-    """
-    transform = transforms.Compose([
-        transforms.Resize(canvas_size),
-        transforms.ToTensor()
-    ])
-
-    # 共享同一份 plan
-    plans = gen_recurrent_plan(num_samples, canvas_size=canvas_size)
-
-    val_dataset = PlanRenderDataset(plans, obj_list=obj_list_val,
-                                    transform=transform, canvas_size=canvas_size)
-    ood_dataset = PlanRenderDataset(plans, obj_list=obj_list_ood,
-                                    transform=transform, canvas_size=canvas_size)
-
-    # 注意：为了严格一一对应，建议 shuffle=False
-    val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False)
-    ood_loader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
-    return val_loader, ood_loader
-# -------------------------------------------------------------------------------------
-
-
 def compute_label_obj_accuracies(pred_label, label_all, objs_all):
     """
     返回：
@@ -235,14 +192,14 @@ class AlignEvaler(AlignTrain):
 
 
 
-def test_1():
-    pred_label = [0, 1, 2, 2, 4, 0, 1, 2, 3, 0, 0, 1, 2, 1, 4, 0, 2, 2, 3, 4]
-    label_all = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
-    objs_all = ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'C', 'A', 'B', 'C', 'A', 'B']
+# def test_1():
+#     pred_label = [0, 1, 2, 2, 4, 0, 1, 2, 3, 0, 0, 1, 2, 1, 4, 0, 2, 2, 3, 4]
+#     label_all = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+#     objs_all = ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'C', 'A', 'B', 'C', 'A', 'B']
 
-    label_acc, obj_acc = compute_label_obj_accuracies(pred_label, label_all, objs_all)
-    print("Label Accuracies:", label_acc)
-    print("Object Accuracies:", obj_acc)
+#     label_acc, obj_acc = compute_label_obj_accuracies(pred_label, label_all, objs_all)
+#     print("Label Accuracies:", label_acc)
+#     print("Object Accuracies:", obj_acc)
 
 
 if "__main__" == __name__:

@@ -1,12 +1,14 @@
 
-from matplotlib import transforms
+from torchvision import transforms
 from torch.utils.data import Dataset
 import os
 from PIL import Image
 import json
 import random
-from LM_align.synthData.SynthCommon import TriplePlan, draw_objects_on_image, gen_recurrent_data, OBJ_LIST, OBJ_LIST_2, gen_recurrent_plan
+from synthData.SynthCommon import TriplePlan, draw_objects_on_image, gen_recurrent_data, OBJ_LIST, OBJ_LIST_2, gen_recurrent_plan
 from typing import List, Tuple
+from pathlib import Path
+from torch.utils.data import DataLoader
 
 # ----------------------------
 # Dataset: 从本地预生成的数据读取
@@ -115,3 +117,133 @@ class PlanRenderDataset(Dataset):
         label = {"obj": obj_label, "a": plan.a, "b": plan.b, "c": plan.c}
         return {"image_a": img_a, "image_b": img_b, "image_c": img_c, "label": label}
 #----------------------------用 plan + obj_list 渲染出 Dataset（与原字段保持一致）----------------------------
+
+def export_dataloader_to_dir(dataloader, dataset_dir: str):
+    """
+    将 dataloader 中的所有 (image_a, image_b, image_c, label) 数据
+    导出为文件结构化的数据集。
+
+    输出结构:
+      dataset_dir/
+        00000/
+          image_a.png
+          image_b.png
+          image_c.png
+          label.json
+        00001/
+          image_a.png
+          image_b.png
+          image_c.png
+          label.json
+        ...
+
+    Parameters
+    ----------
+    dataloader : torch.utils.data.DataLoader
+        含有键 "image_a"、"image_b"、"image_c"、"label" 的 batch。
+    dataset_dir : str
+        输出根目录路径。
+    """
+    os.makedirs(dataset_dir, exist_ok=True)
+
+    sample_idx = 0
+    for batch in dataloader:
+        # batch 可能是张量批，也可能是 list[dict]
+        batch_size = None
+
+        # PyTorch 默认 collate，把同名字段堆叠为张量
+        batch_size = batch["image_a"].size(0)
+        for i in range(batch_size):
+            # 单个样本
+            image_a = batch["image_a"][i]
+            image_b = batch["image_b"][i]
+            image_c = batch["image_c"][i]
+            label = {k: (v[i].item() if hasattr(v, "size") else v[i])
+                     for k, v in batch["label"].items()}
+
+            _save_sample(dataset_dir, sample_idx, image_a, image_b, image_c, label)
+            sample_idx += 1
+
+    print(f"✅ Export complete. {sample_idx} samples saved to {dataset_dir}.")
+
+
+def _save_sample(root_dir: str, index: int, image_a, image_b, image_c, label: dict):
+    """
+    保存单个样本到 root_dir/index 下。
+    image_a/b/c 可能是 tensor 或 PIL.Image。
+    """
+    import torch
+    from torchvision.transforms.functional import to_pil_image
+
+    sample_dir = Path(root_dir) / f"{index:05d}"
+    sample_dir.mkdir(parents=True, exist_ok=True)
+
+    def _save_image(img, name):
+        if isinstance(img, torch.Tensor):
+            img = to_pil_image(img)
+        img.save(sample_dir / name)
+
+    _save_image(image_a, "image_a.png")
+    _save_image(image_b, "image_b.png")
+    _save_image(image_c, "image_c.png")
+
+    with open(sample_dir / "label.json", "w", encoding="utf-8") as f:
+        json.dump(label, f, ensure_ascii=False, indent=2)
+
+
+
+# ----------------------------一次性构建两个随机的 val / ood EVAL DataLoader----------------------------
+def init_test_online_synth_dataloaders(num_samples):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor()
+    ])
+    val_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, auto_update=False)
+    val_dataloader = DataLoader(val_dataset, batch_size=128, shuffle=False)
+
+    ood_dataset = onlineGenDataset(num_samples=num_samples, reuse_times=1, transform=transform, obj_list=OBJ_LIST_2, auto_update=False)
+    ood_dataloader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
+
+    return val_dataloader, ood_dataloader
+
+
+# ----------------------------一次性构建“成对”的 val / ood EVAL DataLoader（完全同分布）----------------------------
+def init_test_online_synth_dataloaders_paired(num_samples,
+                                              obj_list_val=OBJ_LIST,
+                                              obj_list_ood=OBJ_LIST_2,
+                                              canvas_size=(224,224)):
+    """
+    产生两套 dataloader：完全相同的 (a,b,c) 与 盒子分布/顺序，
+    仅 icon 来自不同 obj_list。
+    """
+    transform = transforms.Compose([
+        transforms.Resize(canvas_size),
+        transforms.ToTensor()
+    ])
+
+    # 共享同一份 plan
+    plans = gen_recurrent_plan(num_samples, canvas_size=canvas_size)
+
+    val_dataset = PlanRenderDataset(plans, obj_list=obj_list_val,
+                                    transform=transform, canvas_size=canvas_size)
+    ood_dataset = PlanRenderDataset(plans, obj_list=obj_list_ood,
+                                    transform=transform, canvas_size=canvas_size)
+
+    # 注意：为了严格一一对应，建议 shuffle=False
+    val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False)
+    ood_loader = DataLoader(ood_dataset, batch_size=128, shuffle=False)
+    return val_loader, ood_loader
+# -------------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    n_samples = 16
+    dataset_dir_1 = "/l/users/xuanjie.liu/S3Plus/LM_align/synthData/test_export_dataset_1"
+    dataset_dir_2 = "/l/users/xuanjie.liu/S3Plus/LM_align/synthData/test_export_dataset_2"
+    os.makedirs(dataset_dir_1, exist_ok=True)
+    os.makedirs(dataset_dir_2, exist_ok=True)
+    val_loader_1, ood_loader_1 = init_test_online_synth_dataloaders(n_samples)
+    val_loader_2, ood_loader_2 = init_test_online_synth_dataloaders_paired(n_samples)
+    export_dataloader_to_dir(val_loader_1, os.path.join(dataset_dir_1, "val"))
+    export_dataloader_to_dir(ood_loader_1, os.path.join(dataset_dir_1, "ood"))
+    export_dataloader_to_dir(val_loader_2, os.path.join(dataset_dir_2, "val"))
+    export_dataloader_to_dir(ood_loader_2, os.path.join(dataset_dir_2, "ood"))
