@@ -170,15 +170,25 @@ if __name__ == "__main__":
     '''
         读取测试图片
     '''
-    image = cv2.imread('./z_test/1-circle-blue.png')
-    if image is not None:
-        # 应用随机高斯模糊
-        # blurred_image = random_gaussian_blur(image)
-        blurred_image = cv2.GaussianBlur(image, (19, 19), 19)  # 使用固定的核大小和标准差
-        # 显示原始图片和模糊后的图片
-        cv2.imshow('Original Image', image)
-        cv2.imshow('Blurred Image', blurred_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    else:
-        print("无法读取图片，请检查图片路径。")
+    # image = cv2.imread('./z_test/1-circle-blue.png')
+    # if image is not None:
+    #     # 应用随机高斯模糊
+    #     # blurred_image = random_gaussian_blur(image)
+    #     blurred_image = cv2.GaussianBlur(image, (19, 19), 19)  # 使用固定的核大小和标准差
+    #     # 显示原始图片和模糊后的图片
+    #     cv2.imshow('Original Image', image)
+    #     cv2.imshow('Blurred Image', blurred_image)
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
+    # else:
+    #     print("无法读取图片，请检查图片路径。")
+
+    '''
+        模糊 data_plot single style
+    '''
+    source_oneStyle_directory_path = './data_plot/(0,20)-FixedPos-oneStyle-big'
+    target_oneStyle_directory_path = './data_plot/blur-(0,20)-FixedPos-oneStyle-big'
+    os.makedirs(target_oneStyle_directory_path, exist_ok=True)
+    copy_files_n_times(source_oneStyle_directory_path, target_oneStyle_directory_path, 16)
+    # 虚化
+    process_png_files(target_oneStyle_directory_path, skip_function=is_zero)

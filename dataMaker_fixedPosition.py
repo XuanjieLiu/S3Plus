@@ -47,14 +47,14 @@ NEW_SHAPE_COLOR_CONF = [
 ]
 
 
-def make_dataset_1(data_path, numbers, markers, colors):
+def make_dataset_1(data_path, numbers, markers, colors, size=18):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
         for mar in markers:
             for color in colors:
                 position = DOT_POSITIONS[i]
                 fig_path = os.path.join(data_path, f'{i}-{MARK_NAME_SPACE[mar]}-{color}')
-                plot_a_scatter(position, fig_path, marker=mar, color=color, is_fill=i != 0)
+                plot_a_scatter(position, fig_path, marker=mar, color=color, is_fill=i != 0, size=size)
 
 
 def make_arabic_num_dataset(data_path, numbers, colors):
@@ -65,19 +65,19 @@ def make_arabic_num_dataset(data_path, numbers, colors):
             plot_arabic_numbers(i, fig_path, color)
 
 
-def make_ZHENG_num_dataset(data_path, numbers, colors, marker_name='zheng'):
+def make_ZHENG_num_dataset(data_path, numbers, colors, marker_name='zheng', fig_size=0.64, lim=0.5):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
         for color in colors:
             fig_path = os.path.join(data_path, f'{i}-{marker_name}-{color}')
-            plot_lines(ZHENG_POSITIONS[i], fig_path, color)
+            plot_lines(ZHENG_POSITIONS[i], fig_path, color, fig_size=fig_size, lim=lim)
 
-def make_EU_tally_mark_num_dataset(data_path, numbers, colors, maker_name='eutally'):
+def make_EU_tally_mark_num_dataset(data_path, numbers, colors, maker_name='eutally', fig_size=0.64, lim=0.5):
     os.makedirs(data_path, exist_ok=True)
     for i in numbers:
         for color in colors:
             fig_path = os.path.join(data_path, f'{i}-{maker_name}-{color}')
-            plot_lines(EU_tally_mark_POSITIONS[i], fig_path, color, line_width=1.5)
+            plot_lines(EU_tally_mark_POSITIONS[i], fig_path, color, line_width=1.5, fig_size=fig_size, lim=lim)
 
 if __name__ == "__main__":
     """
@@ -86,6 +86,10 @@ if __name__ == "__main__":
     # data_path = f'{DATA_ROOT}/(0,20)-FixedPos-oneStyle_EU_tally'
     # make_EU_tally_mark_num_dataset(data_path, range(0, 21), ['blue'])
 
-    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-mahjong'
-    make_EU_tally_mark_num_dataset(data_path, range(0, 21), ['blue'])
-    make_ZHENG_num_dataset(data_path, range(0, 21), ['blue'])
+    big_EU_data_path = f'data_plot/(0,20)-FixedPos-EU-big'
+    make_EU_tally_mark_num_dataset(big_EU_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
+    big_Zheng_data_path = f'data_plot/(0,20)-FixedPos-ZHENG-big'
+    make_ZHENG_num_dataset(big_Zheng_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
+
+    # data_path = f'data_plot/(0,20)-FixedPos-multiStyle-big'
+    # make_dataset_1(data_path, NUMBERS, TRAIN_MARKERS, TRAIN_COLORS, size=48)

@@ -54,20 +54,24 @@ def plot_arabic_numbers(num, save_dir, color: str):
     return
 
 
-def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=True):
+def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=True, size: int=18):
     x = [n[0] for n in position_list]
     y = [n[1] for n in position_list]
     fig = plt.figure(figsize=(0.64, 0.64))
     a1 = fig.add_axes([0, 0, 1, 1])
+    # a1 = fig.add_axes([0, 0, 0, 0])
     a1.scatter(x, y,
                c=color if is_fill else 'none',
                facecolors=color if is_fill else 'none',
                edgecolors=color,
                marker=marker,
-               s=18,
+               s=size,
                )
     a1.set_ylim(-0.5, 0.5)
     a1.set_xlim(-0.5, 0.5)
+    plt.axis('off')
+    # 隐藏axes
+
     # plt.show()
     plt.savefig(save_dir)
     plt.cla()
@@ -76,11 +80,11 @@ def plot_a_scatter(position_list, save_dir, marker: str, color: str, is_fill=Tru
     return
 
 
-def plot_lines(line_list, save_dir = './a.png', color: str='b', line_width: float=2.):
+def plot_lines(line_list, save_dir = './a.png', color: str='b', line_width: float=2., fig_size=0.64, lim=0.5):
     # 创建一个新的图形和轴
     fig, ax = plt.subplots()
     #设置figuresize
-    fig.set_size_inches(0.64, 0.64)
+    fig.set_size_inches(fig_size, fig_size)
     # 添加多条线段
     for l in line_list:
         x = [n[0] for n in l]
@@ -88,8 +92,8 @@ def plot_lines(line_list, save_dir = './a.png', color: str='b', line_width: floa
         line = Line2D(x, y, linewidth=line_width, color=color)
         ax.add_line(line)
     # 设置轴的范围
-    ax.set_ylim(-0.5, 0.5)
-    ax.set_xlim(-0.5, 0.5)
+    ax.set_ylim(-lim, lim)
+    ax.set_xlim(-lim, lim)
     # 隐藏轴
     ax.axis('off')
     # 保存图形

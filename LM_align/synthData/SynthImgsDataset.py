@@ -5,7 +5,7 @@ import os
 from PIL import Image
 import json
 import random
-from synthData.SynthCommon import TriplePlan, draw_objects_on_image, gen_recurrent_data, OBJ_LIST, OBJ_LIST_2, gen_recurrent_plan
+from synthData.SynthCommon_win import TriplePlan, draw_objects_on_image, gen_recurrent_data, OBJ_LIST, OBJ_LIST_2, gen_recurrent_plan
 from typing import List, Tuple
 from pathlib import Path
 from torch.utils.data import DataLoader
