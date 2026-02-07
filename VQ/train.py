@@ -578,15 +578,8 @@ def cal_v3_loss(z_content, e_content, z_style):
     v3_z_c = torch.stack([z_a, z_b, z_c], dim=1)
     v3_z_c_vq = torch.stack([e_a, e_b, e_c], dim=1)
     v3_z_s = torch.stack([z_s_a, z_s_b, z_s_c], dim=1)
-    # v3_losses = _compute_loss_pure(
-    #     v3_z_c,
-    #     v3_z_c_vq,
-    #     v3_z_s,
-    #     relativity=10,
-    #     eps=1e-5
-    # )
     v3_losses = _compute_loss_pure(
-        v3_z_c_vq,
+        v3_z_c,
         v3_z_c_vq,
         v3_z_s,
         relativity=10,
