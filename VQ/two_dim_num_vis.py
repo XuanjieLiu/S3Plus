@@ -246,7 +246,7 @@ class MumEval:
         if self.latent_code_1 == 2:
             plot_num_position_in_two_dim_repr(num_z_c, num_labels, result_name, all_embs=all_embs)
         elif use_tsne and self.latent_code_1 >= 3:
-            tsne = TSNE(n_components=2, perplexity=5, random_state=42)
+            tsne = TSNE(n_components=2, perplexity=5, random_state=42, init='pca')
             trans_num_z_c = tsne.fit_transform(num_z_c)
             plot_num_position_in_two_dim_repr(trans_num_z_c, num_labels, result_name, all_embs=None)
         elif self.latent_code_1 == 3:
