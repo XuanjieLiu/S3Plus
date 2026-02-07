@@ -195,6 +195,7 @@ class PlusTrainer:
         self.use_v3_loss = config.get('use_v3_loss', False)
         self.disable_rand_style_sample = config.get('disable_rand_style_sample', False)
         self.checkpoint_after = config.get('checkpoint_after', 0)
+        self.is_plot_num_line = config.get('is_plot_num_line', True)
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -373,7 +374,7 @@ class PlusTrainer:
 
         orderliness_evaler = MumEval(self.config, loaded_model=self.model)
         save_path = os.path.join(self.train_result_path, f'{epoch_num}')
-        nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, save_path)
+        nna_score = orderliness_evaler.num_eval_two_dim(self.single_img_eval_loader, save_path, is_draw_graph=self.is_plot_num_line)
         return [one2n_match_rate, one2one_matching_rate, nna_score]
 
     def plot_plus_z(self, epoch_num, data_loader, result_path, result_name="plus_z"):

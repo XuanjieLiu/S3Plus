@@ -37,6 +37,7 @@ CONFIG = {
     'log_interval': 500,
     'eval_interval': 500,
     'is_save_img': True,
+    'is_plot_num_line': False,
     'batch_size': 256,
     'is_commutative_train': False,
     'is_commutative_all': False,
