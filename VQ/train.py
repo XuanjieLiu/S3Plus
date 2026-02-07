@@ -242,7 +242,12 @@ class PlusTrainer:
             
             # V3 loss calculation
             e_style = e_all[..., self.latent_code_1:]
-            v3_loss = cal_v3_loss(e_content, z_content, e_style) if self.use_v3_loss else None
+            v3_loss = cal_v3_loss(e_content, z_content, e_style) if self.use_v3_loss else {
+                "content_loss": torch.zeros(1)[0].to(DEVICE),
+                "style_loss": torch.zeros(1)[0].to(DEVICE),
+                "sample_loss": torch.zeros(1)[0].to(DEVICE),
+                "fragment_loss": torch.zeros(1)[0].to(DEVICE),
+            }
 
             loss = self.loss_func(vae_loss, e_q_loss, plus_loss, operations_loss, v3_loss, loss_counter)
             if optimizer is not None:
@@ -263,9 +268,7 @@ class PlusTrainer:
         self.model.train()
         if is_resume:
             self.resume()
-        loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
-        if self.use_v3_loss:
-            loss_counter_keys += ["content_loss", "style_loss", "sample_loss", "fragment_loss"]
+        loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper', "content_loss", "style_loss", "sample_loss", "fragment_loss"]
         train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
         eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
         eval_keys = ['emb_select_accu', 'emb_select_accu_cycle', 'one2n_accu', 'one2n_accu_cycle', 'one2one_accu', 'one2one_accu_cycle',
@@ -552,16 +555,18 @@ class PlusTrainer:
         loss += plus_recon_loss + plus_z_loss
         loss += operations_loss
         loss += self.l1_on_plusnet_params()
-        loss_counter.add_values([xloss_ED.item(),
-                                 e_q_loss.item(),
-                                 plus_recon_loss.item(),
-                                 plus_z_loss.item(),
-                                 operations_loss.item()
-                                 ])
-        if self.use_v3_loss:
-            for v3_loss_name, v3_loss_value in v3_loss.items():
-                loss += v3_loss_value
-                loss_counter.add_values([v3_loss_value.item()])
+        loss += sum(v3_loss.values())
+        loss_counter.add_values([
+            xloss_ED.item(),
+            e_q_loss.item(),
+            plus_recon_loss.item(),
+            plus_z_loss.item(),
+            operations_loss.item(),
+            v3_loss["content_loss"].item(),
+            v3_loss["style_loss"].item(),
+            v3_loss["sample_loss"].item(),
+            v3_loss["fragment_loss"].item(),
+        ])
         return loss
 
 
