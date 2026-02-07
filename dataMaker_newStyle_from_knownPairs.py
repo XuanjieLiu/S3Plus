@@ -144,15 +144,15 @@ if __name__ == "__main__":
     #     comp_plus,  # remember to change the comp_plus to comp_minus or reverse
     #     render_EU_tally_mark_num_dataset
     # )
-    render_new_dataset_from_old_dataset(
-        ['train', 'test'],
-        os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
-        os.path.join(DATA_ROOT, 'multi_style_pairs_minus(0,20)_mahjong'),
-        ['default'],
-        ['b'],
-        comp_minus,  # remember to change the comp_plus to comp_minus or reverse
-        render_EU_tally_mark_num_dataset
-    )
+    # render_new_dataset_from_old_dataset(
+    #     ['train', 'test'],
+    #     os.path.join(DATA_ROOT, 'single_style_pairs_minus(0,20)'),
+    #     os.path.join(DATA_ROOT, 'multi_style_pairs_minus(0,20)_mahjong'),
+    #     ['default'],
+    #     ['b'],
+    #     comp_minus,  # remember to change the comp_plus to comp_minus or reverse
+    #     render_EU_tally_mark_num_dataset
+    # )
 
 
 
@@ -174,6 +174,17 @@ if __name__ == "__main__":
     #     test_2_plus_tuple, test_2_path, ['default'], ['b'], comp_plus, render_ZHENG_num_dataset
     # )
 
-
+    """
+    Make arabic dataset from single style pairs dataset.
+    """
+    render_new_dataset_from_old_dataset(
+        ['train', 'test'],
+        os.path.join(DATA_ROOT, 'single_style_pairs(0,20)'),
+        os.path.join(DATA_ROOT, 'single_style_pairs_plus(0,20)_arabic'),
+        ['default'],
+        ['blue'],
+        comp_plus,  # remember to change the comp_plus to comp_minus or reverse
+        render_arabic_num_dataset
+    )
 
 

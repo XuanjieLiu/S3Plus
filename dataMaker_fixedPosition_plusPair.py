@@ -450,12 +450,10 @@ def make_dataset_multi_style_plus():
     render_dataset(test_set, test_root, comp_plus)
 
 
-def make_hundred_dataset_plus_arabic():
+def make_dataset_plus_arabic(start=0, end=20):
     marks = ['default']
-    colors = ['blue']
-    start = 0
-    end = 99
-    data_root = f'dataset/single_style_pairs({start},{end})_arabic'
+    colors = ['blue', 'green', 'red', 'black', 'purple', 'salmon', 'olive', 'orange', 'cyan', 'magenta']
+    data_root = f'dataset/single_style_pairs({start},{end})_arabic_colorful'
     os.makedirs(data_root, exist_ok=True)
     train_root = os.path.join(data_root, 'train')
     test_root = os.path.join(data_root, 'test')
@@ -463,7 +461,7 @@ def make_hundred_dataset_plus_arabic():
         start,
         end,
         3,
-        0.33,
+        0.3,
         marks,
         colors,
         sum_pairs(start),
@@ -560,4 +558,4 @@ if __name__ == "__main__":
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
     # make_dataset_single_style_plus_random_one_shot_triple()
-    make_hundred_dataset_plus_arabic()
+    make_dataset_plus_arabic()

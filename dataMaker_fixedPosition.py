@@ -86,10 +86,13 @@ if __name__ == "__main__":
     # data_path = f'{DATA_ROOT}/(0,20)-FixedPos-oneStyle_EU_tally'
     # make_EU_tally_mark_num_dataset(data_path, range(0, 21), ['blue'])
 
-    big_EU_data_path = f'data_plot/(0,20)-FixedPos-EU-big'
-    make_EU_tally_mark_num_dataset(big_EU_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
-    big_Zheng_data_path = f'data_plot/(0,20)-FixedPos-ZHENG-big'
-    make_ZHENG_num_dataset(big_Zheng_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
+    # big_EU_data_path = f'data_plot/(0,20)-FixedPos-EU-big'
+    # make_EU_tally_mark_num_dataset(big_EU_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
+    # big_Zheng_data_path = f'data_plot/(0,20)-FixedPos-ZHENG-big'
+    # make_ZHENG_num_dataset(big_Zheng_data_path, range(0, 21), ['blue'], fig_size=0.4, lim=0.25)
 
     # data_path = f'data_plot/(0,20)-FixedPos-multiStyle-big'
     # make_dataset_1(data_path, NUMBERS, TRAIN_MARKERS, TRAIN_COLORS, size=48)
+    arabic_colorful_data_path = f'{DATA_ROOT}/(0,20)-FixedPos-arabic-blue'
+    arabic_colorful_data_colors = ['blue']
+    make_arabic_num_dataset(arabic_colorful_data_path, NUMBERS, arabic_colorful_data_colors)

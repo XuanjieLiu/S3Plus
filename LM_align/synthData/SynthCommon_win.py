@@ -130,8 +130,8 @@ def draw_object(draw, obj_label, box):
     text_x = x + (w - text_w) / 2
     text_y = y + (h - text_h) / 2
     # draw.text((text_x, text_y), emoji_char, font=emoji_font, fill="black") # default for training
-    # draw.text((text_x, text_y), emoji_char, font=emoji_font, fill=EMOJI_COLOR_MAP.get(obj_label, "black"))  # color for visualization
-    draw.text((text_x, text_y), emoji_char, font=emoji_font, embedded_color=True) # colorful for better visualization
+    draw.text((text_x, text_y), emoji_char, font=emoji_font, fill=EMOJI_COLOR_MAP.get(obj_label, "black"))  # color for visualization
+    # draw.text((text_x, text_y), emoji_char, font=emoji_font, embedded_color=True) # colorful for better visualization
 
 # ----------------------------
 # 功能函数：根据给定框列表生成一张图像

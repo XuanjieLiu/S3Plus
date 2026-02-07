@@ -24,6 +24,7 @@ from visual_imgs import VisImgs
 from eval_common import EvalHelper
 from common_func import make_dataset_trans, solve_label_emb_one2one_matching
 from eval.dec_vis_eval_2digit import plot_dec_img
+import torch.nn.functional as F
 
 
 def make_translation_batch(batch_size, dim=np.array([1, 0, 1]), is_std_normal=False, t_range=(-3, 3)):
@@ -191,6 +192,9 @@ class PlusTrainer:
         self.is_twice_oper = config['is_twice_oper']
         self.plus_l1_weight = config.get('plus_l1_weight', 0.0)
         self.plus_l1_include_bias = config.get('plus_l1_include_bias', False)
+        self.use_v3_loss = config.get('use_v3_loss', False)
+        self.disable_rand_style_sample = config.get('disable_rand_style_sample', False)
+        self.checkpoint_after = config.get('checkpoint_after', 0)
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -215,6 +219,7 @@ class PlusTrainer:
             data = split_into_three(data_all)
             e_all, e_q_loss, z_all = self.model.batch_encode_to_z(data_all)
             e_content = e_all[..., 0:self.latent_code_1]
+            z_content = z_all[..., 0:self.latent_code_1]
 
             recon = self.model.batch_decode_from_z(e_all)
             recon_a, recon_b, recon_c = split_into_three(recon)
@@ -233,10 +238,13 @@ class PlusTrainer:
             if self.plus_by_embedding:
                 operations_loss += self.operation_loss_z(e_content)
             if self.plus_by_zcode:
-                z_content = z_all[..., 0:self.latent_code_1]
                 operations_loss += self.operation_loss_z(z_content)
+            
+            # V3 loss calculation
+            e_style = e_all[..., self.latent_code_1:]
+            v3_loss = cal_v3_loss(e_content, z_content, e_style) if self.use_v3_loss else None
 
-            loss = self.loss_func(vae_loss, e_q_loss, plus_loss, operations_loss, loss_counter)
+            loss = self.loss_func(vae_loss, e_q_loss, plus_loss, operations_loss, v3_loss, loss_counter)
             if optimizer is not None:
                 loss.backward()
                 optimizer.step()
@@ -256,6 +264,8 @@ class PlusTrainer:
         if is_resume:
             self.resume()
         loss_counter_keys = ['loss_ED', 'VQ_C', 'plus_recon', 'plus_z', 'loss_oper']
+        if self.use_v3_loss:
+            loss_counter_keys += ["content_loss", "style_loss", "sample_loss", "fragment_loss"]
         train_loss_counter = LossCounter(loss_counter_keys, self.train_record_path)
         eval_loss_counter = LossCounter(loss_counter_keys, self.eval_record_path)
         eval_keys = ['emb_select_accu', 'emb_select_accu_cycle', 'one2n_accu', 'one2n_accu_cycle', 'one2one_accu', 'one2one_accu_cycle',
@@ -296,7 +306,7 @@ class PlusTrainer:
             # Training phase
             self.one_epoch(epoch_num, train_loss_counter, self.train_loader, is_log, train_vis_img, optimizer)
 
-            if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0:
+            if epoch_num % self.checkpoint_interval == 0 and epoch_num != 0 and epoch_num >= self.checkpoint_after:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{epoch_num}.pt')
         print("train ends")
 
@@ -385,7 +395,10 @@ class PlusTrainer:
             return self.mean_mse(a, b.detach()) * self.plus_mse_scalar + self.mean_mse(a.detach(), b)
 
     def plus_loss(self, za, zb, zc, imgs_c, vis_imgs: VisImgs = None):
-        z_s = za[..., self.latent_code_1:] if random.random() > 0.5 else zb[..., self.latent_code_1:]
+        if self.disable_rand_style_sample:
+            z_s = zc[..., self.latent_code_1:]
+        else:
+            z_s = za[..., self.latent_code_1:] if random.random() > 0.5 else zb[..., self.latent_code_1:]
         if self.isVQStyle:
             z_s = self.model.vq_layer(z_s)[0]
         za_content = za[..., 0:self.latent_code_1]
@@ -531,7 +544,7 @@ class PlusTrainer:
         return self.plus_l1_weight * l1
 
 
-    def loss_func(self, vae_loss, e_q_loss, plus_loss, operations_loss, loss_counter):
+    def loss_func(self, vae_loss, e_q_loss, plus_loss, operations_loss, v3_loss, loss_counter):
         xloss_ED = vae_loss
         plus_recon_loss, plus_z_loss = plus_loss
         loss = torch.zeros(1)[0].to(DEVICE)
@@ -545,6 +558,90 @@ class PlusTrainer:
                                  plus_z_loss.item(),
                                  operations_loss.item()
                                  ])
+        if self.use_v3_loss:
+            for v3_loss_name, v3_loss_value in v3_loss.items():
+                loss += v3_loss_value
+                loss_counter.add_values([v3_loss_value.item()])
         return loss
 
 
+def cal_v3_loss(z_content, e_content, z_style):
+    z_a, z_b, z_c = split_into_three(z_content)
+    e_a, e_b, e_c = split_into_three(e_content)
+    z_s_a, z_s_b, z_s_c = split_into_three(z_style)
+    v3_z_c = torch.stack([z_a, z_b, z_c], dim=1)
+    v3_z_c_vq = torch.stack([e_a, e_b, e_c], dim=1)
+    v3_z_s = torch.stack([z_s_a, z_s_b, z_s_c], dim=1)
+    v3_losses = _compute_loss_pure(
+        v3_z_c,
+        v3_z_c_vq,
+        v3_z_s,
+        relativity=10,
+        eps=1e-5
+    )
+    return v3_losses
+
+def _compute_loss_pure(
+        z_c,
+        z_c_vq,
+        z_s,
+        relativity=10,
+        eps=1e-5
+    ):
+        """
+        Standard form of V3 loss
+
+        Output: a dict of losses.
+        z_c: (batch_size, n_fragments, d_emb_c)
+        z_s: (batch_size, n_fragments, d_emb_s)
+        vq_indices: (batch_size, n_fragments)
+        vq_commit_loss: already computed in VQ
+        y: (batch_size, n_fragments, W, H), of course it can be other shapes
+        """
+
+        # compute statistics
+        content_frag_var = torch.mean(mpd(z_c) / 2 + mpd(z_c_vq) / 2, dim=0)
+        content_samp_var = (
+            mpd(torch.mean(z_c, dim=1)) / 2 + mpd(torch.mean(z_c_vq, dim=1)) / 2
+        )
+        style_frag_var = torch.mean(mpd(z_s), dim=0)
+        style_samp_var = mpd(torch.mean(z_s, dim=1))
+
+        # compute the losses using the relative variability difference
+        r = relativity
+
+        content_loss = F.relu(r - content_frag_var / (content_samp_var + eps)) / r
+        style_loss = F.relu(r - style_samp_var / (style_frag_var + eps)) / r
+        sample_loss = F.relu(r - style_samp_var / (content_samp_var + eps)) / r
+        fragment_loss = F.relu(r - content_frag_var / (style_frag_var + eps)) / r
+
+        losses = {
+            "content_loss": content_loss,
+            "style_loss": style_loss,
+            "sample_loss": sample_loss,
+            "fragment_loss": fragment_loss,
+        }
+        return losses
+
+
+def mpd(x):
+    """
+    Mean pairwise distance
+    x is a tensor of shape (b, n, d) or (n, d)
+    """
+    if len(x.shape) == 2:
+        n, d = x.shape
+        x1 = x.unsqueeze(0).expand(n, n, d)
+        x2 = x.unsqueeze(1).expand(n, n, d)
+        stack = torch.stack([x1, x2], dim=0)
+        pairwise_d = torch.norm(stack[0] - stack[1], dim=-1)
+        mpd = torch.sum(torch.sum(pairwise_d, dim=0), dim=0) / (n * (n - 1))
+        return mpd  # scalar
+    elif len(x.shape) == 3:
+        b, n, d = x.shape
+        x1 = x.unsqueeze(1).expand(b, n, n, d)
+        x2 = x.unsqueeze(2).expand(b, n, n, d)
+        stack = torch.stack([x1, x2], dim=1)
+        pairwise_d = torch.norm(stack[:, 0] - stack[:, 1], dim=-1)
+        mpd = torch.sum(torch.sum(pairwise_d, dim=1), dim=1) / (n * (n - 1))
+        return mpd  # (b)
