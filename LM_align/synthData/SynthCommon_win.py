@@ -96,7 +96,7 @@ def generate_non_overlapping_boxes(num_boxes, canvas_size, min_size, max_size,
         if len(boxes) == num_boxes:
             return boxes
         else:
-            print(f"Retry {retry+1}/{max_retry}: only generated {len(boxes)} boxes out of {num_boxes}. Retrying.")
+            print(f"Retry {retry + 1}/{max_retry}: only generated {len(boxes)} boxes out of {num_boxes}. Retrying.")
     # 重试结束后仍未成功
     print(f"Skipping data point: failed to generate {num_boxes} non-overlapping boxes after {max_retry} retries.")
     return None
@@ -118,7 +118,9 @@ def draw_object(draw, obj_label, box):
     # 根据 box 尺寸设置字体大小，这里取最小边长作为字体大小
     font_size = int(min(w, h))
     try:
-        emoji_font = ImageFont.truetype("C:/Windows/Fonts/seguiemj.ttf", size=font_size)
+        relative_font_path = "fonts/seguiemj.ttf"  # 请确保这个路径下有合适的 emoji 字体文件
+        font_path = os.path.join(os.path.dirname(__file__), relative_font_path)
+        emoji_font = ImageFont.truetype(font_path, size=font_size)
     except Exception as e:
         print("Warning: load seguiemj.ttf failed, use default font. Error:", e)
         emoji_font = ImageFont.load_default()
@@ -130,8 +132,8 @@ def draw_object(draw, obj_label, box):
     text_x = x + (w - text_w) / 2
     text_y = y + (h - text_h) / 2
     # draw.text((text_x, text_y), emoji_char, font=emoji_font, fill="black") # default for training
-    draw.text((text_x, text_y), emoji_char, font=emoji_font, fill=EMOJI_COLOR_MAP.get(obj_label, "black"))  # color for visualization
-    # draw.text((text_x, text_y), emoji_char, font=emoji_font, embedded_color=True) # colorful for better visualization
+    # draw.text((text_x, text_y), emoji_char, font=emoji_font, fill=EMOJI_COLOR_MAP.get(obj_label, "black"))  # color for visualization
+    draw.text((text_x, text_y), emoji_char, font=emoji_font, embedded_color=True) # colorful for better visualization
 
 # ----------------------------
 # 功能函数：根据给定框列表生成一张图像
@@ -272,7 +274,6 @@ def plot_hist(X, Y):
     plt.xlabel("All")
     plt.ylabel("Density")
     plt.title("Distribution of All")
-
     plt.tight_layout()
     plt.show()
 
@@ -287,7 +288,7 @@ def recurrent_generate_data(boxes, c, obj_label, canvas_size, max_iter=1000):
     rest_iter = max_iter
     box_idx = list(range(len(boxes)))
     while rest_iter > 0 and max_num >= 2:
-        a = random.randint(1, max_num-1)
+        a = random.randint(1, max_num - 1)
         b = max_num - a
         if b < 0:
             print(f"Error: a = {a}, b = {b}, max_num = {max_num}")
@@ -375,7 +376,8 @@ def gen_recurrent_plan(num_samples, canvas_size=(224,224), min_size=30, max_size
     """直到收集到 num_samples 条 plan 为止。"""
     plans: List[TriplePlan] = []
     while len(plans) < num_samples:
-        c = random.randint(8, 10)
+        # c = random.randint(8, 10)
+        c = 10
         boxes = generate_non_overlapping_boxes(c, canvas_size, min_size, max_size)
         if boxes is None:
             continue
