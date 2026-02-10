@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+from typing import Any, Callable, Dict, List
 
 from VQ.plot_multistyle_zc import MultiStyleZcEvaler
 from eval_plus_nd import VQvaePlusEval, plot_plusZ_against_label, calc_ks_enc_plus_z, calc_multi_emb_plus_accu, \
@@ -11,7 +12,7 @@ sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'
 import torch.nn as nn
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from torchvision.utils import save_image
 import torch.optim as optim
 from dataloader_plus import MultiImgDataset
@@ -112,7 +113,7 @@ def init_dataloaders(config):
     if config.get('is_random_split_data', False):
         print("Using random split data")
         train_ratio = config['train_data_ratio']
-        dataset_all = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
+        dataset_all = make_dataset(config['train_data_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
         train_size = int(len(dataset_all) * train_ratio)
         eval_size = len(dataset_all) - train_size
         # 仅当提供了 split_seed 时，才把 generator 传进去；否则保持原行为
@@ -126,16 +127,27 @@ def init_dataloaders(config):
         plus_eval_loader = DataLoader(eval_dataset, **loader_config)
     else:
         print("Using predefined datasets")
-        plus_train_set = MultiImgDataset(config['train_data_path'], transform=trans, augment_times=aug_t)
-        plus_eval_set = MultiImgDataset(config['plus_eval_set_path'], transform=trans, augment_times=aug_t)
+        plus_train_set = make_dataset(config['train_data_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
+        plus_eval_set = make_dataset(config['plus_eval_set_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
         plus_train_loader = DataLoader(plus_train_set, **loader_config)
         plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
     if config.get('single_img_eval_set_path', None) is not None:
-        single_img_eval_set = SingleImgDataset(config['single_img_eval_set_path'], transform=trans, augment_times=aug_t)
+        single_img_eval_set = make_dataset(config['single_img_eval_set_path'], SingleImgDataset, transform=trans, augment_times=aug_t)
         single_img_eval_loader = DataLoader(single_img_eval_set, **loader_config)
     else:
         single_img_eval_loader = None
     return plus_train_loader, plus_eval_loader, single_img_eval_loader
+
+
+def make_dataset(data_path: str | List[str], dataset_cls: Callable[..., Any],
+                     transform: Any = None, augment_times: int = 1) -> ConcatDataset:
+    print(f"data_path is: {data_path}")
+    path_list = data_path if isinstance(data_path, list) else [data_path]
+    print(f"Making dataset from paths: {path_list}")
+    # 如果有多个 set_path, 创建多个 dataset 并合并
+    datasets = ConcatDataset([dataset_cls(path, augment_times=augment_times, transform=transform)
+                              for path in path_list])
+    return datasets
 
 
 class PlusTrainer:
