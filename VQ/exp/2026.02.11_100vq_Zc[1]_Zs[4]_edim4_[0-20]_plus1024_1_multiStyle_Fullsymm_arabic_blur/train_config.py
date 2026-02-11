@@ -18,7 +18,7 @@ CONFIG = {
     'plus_eval_set_path_2': None,
     'is_random_split_data': False,
     'is_blur': IS_BLUR,
-    'num_workers': 0,
+    'num_workers': 8,
     'latent_embedding_1': 1,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
