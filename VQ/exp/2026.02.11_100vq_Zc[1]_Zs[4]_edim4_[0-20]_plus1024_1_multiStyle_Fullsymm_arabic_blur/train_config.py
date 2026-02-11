@@ -85,6 +85,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
+    'blur_config': BLUR_CONFIG,
     'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {

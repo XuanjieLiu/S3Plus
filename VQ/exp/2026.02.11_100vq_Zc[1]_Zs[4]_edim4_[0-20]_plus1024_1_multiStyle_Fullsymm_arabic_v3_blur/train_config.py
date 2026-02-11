@@ -4,7 +4,7 @@ data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../..
 EVAL_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/test"
 TRAIN_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/train"
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-arabic-colorful"
-IS_BLUR = False
+IS_BLUR = True
 BLUR_CONFIG = {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
     'kernel_size_choices': (5, 7, 9),
     'sigma_range': (0.5, 3.0),
@@ -88,6 +88,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
+    'blur_config': BLUR_CONFIG,
     'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
