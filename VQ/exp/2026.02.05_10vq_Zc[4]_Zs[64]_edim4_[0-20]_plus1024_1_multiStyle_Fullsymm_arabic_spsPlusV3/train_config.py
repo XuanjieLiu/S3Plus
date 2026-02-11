@@ -1,29 +1,33 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
-EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet_ZHENG/test_1"
-EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet_ZHENG/test_2"
-TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet_ZHENG/train"
-SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle_ZHENG"
+EVAL_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/test"
+TRAIN_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/train"
+SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-arabic-colorful"
 IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
-    'plus_eval_set_path': [EVAL_SET_1, EVAL_SET_2],
-    'latent_embedding_1': 2,
+    'plus_eval_set_path': EVAL_SET,
+    'plus_eval_set_path_2': None,
+    'is_random_split_data': False,
+    'is_blur': IS_BLUR,
+    'num_workers': 0,
+    'latent_embedding_1': 4,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
-    'latent_code_2': 0,
-    'embedding_dim': 1,
-    'is_plot_zc_value': True,
+    'latent_code_2': 64,
+    'embedding_dim': 4,
+    'is_plot_zc_value': False,
     'embeddings_num': 10,
-    'is_plot_vis_num': True,
+    'is_plot_vis_num': False,
     'kld_loss_scalar': 0.0,
     'checkpoint_interval': 2000,
+    'checkpoint_after': 100000,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 50001,
+    'max_iter_num': 120001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'eval_result_path': 'EvalResults/',
@@ -33,12 +37,13 @@ CONFIG = {
     'log_interval': 500,
     'eval_interval': 2000,
     'is_save_img': True,
-    'batch_size': 128,
+    'is_plot_num_line': False,
+    'batch_size': 256,
     'is_commutative_train': False,
     'is_commutative_all': False,
-    'z_plus_loss_scalar': 0.0,
+    'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.0,
+    'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
     'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
@@ -47,19 +52,21 @@ CONFIG = {
     'commitment_scalar': 0.0025,
     'embedding_scalar': 0.01,
     'isVQStyle': False,
-    'plus_by_embedding': False,
+    'plus_by_embedding': True,
     'plus_by_zcode': False,
     'VQPlus_eqLoss_scalar': 0.5,
-    'is_zc_based_assoc': False,
+    'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
-    'is_assoc_on_e': False,
+    'is_assoc_on_e': True,
     'is_assoc_on_z': False,
-    'is_assoc_within_batch': False,
+    'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_symm_assoc': False,
-    'is_full_symm': False,
+    'is_symm_assoc': True,
+    'is_full_symm': True,
     'is_pure_assoc': False,
     'is_twice_oper': False,
+    'use_v3_loss': True,
+    'disable_rand_style_sample': True,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
@@ -88,7 +95,7 @@ CONFIG = {
             {
                 'name': 'eval_set',
                 'eval_set_path_list': [
-                    EVAL_SET_1, EVAL_SET_2
+                    EVAL_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
                 'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
@@ -143,7 +150,7 @@ CONFIG = {
                     'p_no_blur': 0.00,
                 },
                 'augment_times': AUGMENT_TIMES,
-                'interpolate_num': 1,
+                'interpolate_num': 10,
             },
         ],
     },
