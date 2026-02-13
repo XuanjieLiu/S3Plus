@@ -23,5 +23,5 @@ hostname
 source activate xxxxj
 
 
-cd /l/users/xuanjie.liu/S3Plus/VQ
+cd /nfs-stor/xuanjie.liu/S3Plus/VQ
 python batch_train.py $exp_list
