@@ -93,6 +93,10 @@ if __name__ == "__main__":
 
     # data_path = f'data_plot/(0,20)-FixedPos-multiStyle-big'
     # make_dataset_1(data_path, NUMBERS, TRAIN_MARKERS, TRAIN_COLORS, size=48)
-    arabic_colorful_data_path = f'{DATA_ROOT}/(0,20)-FixedPos-arabic-blue'
-    arabic_colorful_data_colors = ['blue']
-    make_arabic_num_dataset(arabic_colorful_data_path, NUMBERS, arabic_colorful_data_colors)
+
+    # arabic_colorful_data_path = f'{DATA_ROOT}/(0,20)-FixedPos-arabic-blue'
+    # arabic_colorful_data_colors = ['blue']
+    # make_arabic_num_dataset(arabic_colorful_data_path, NUMBERS, arabic_colorful_data_colors)
+
+    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-multiStyle'
+    make_dataset_1(data_path, NUMBERS, TRAIN_MARKERS, TRAIN_COLORS)
