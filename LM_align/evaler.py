@@ -188,7 +188,8 @@ class AlignEvaler(AlignTrain):
                 label_list = np.concatenate((label_list, label_all))
                 objs_list = np.concatenate((objs_list, np.array(np.concatenate((objs, objs, objs)))))
             label_acc, obj_acc = compute_label_obj_accuracies(pred_label_list, label_list, objs_list)
-            return label_acc, obj_acc
+            overall_acc = float(np.mean(pred_label_list == label_list)) if len(label_list) > 0 else 0.0
+            return label_acc, obj_acc, overall_acc
 
 
 
@@ -205,9 +206,9 @@ class AlignEvaler(AlignTrain):
 if "__main__" == __name__:
     EXP_ROOT_PATH = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/exp')
     sys.path.append(EXP_ROOT_PATH)
-    EXP_NAME_LIST = ["2025.9.05_10codes"]
+    EXP_NAME_LIST = ["2026.1.17_10codes_iconic"]
     DATA_SAMPLES = 2048
-    ACC_THRESHOLD = 0.3
+    ACC_THRESHOLD = 0.4
     # 统一 dataloader
     print('Initializing online synthetic dataloaders...')
     # val_dataloader, ood_dataloader = init_test_online_synth_dataloaders(num_samples=DATA_SAMPLES)
@@ -242,6 +243,7 @@ if "__main__" == __name__:
 
         # Init statistic lists
         val_label_acc_dict, val_obj_acc_dict, ood_label_acc_dict, ood_obj_acc_dict = {}, {}, {}, {}
+        val_overall_acc_dict, ood_overall_acc_dict = {}, {}
 
         for (key, value) in selected_sub_exps.items():
             seb_exp_num = int(key.split('_')[-1])
@@ -251,9 +253,9 @@ if "__main__" == __name__:
             evaluator.load_model(ckpt_path)
             with torch.no_grad():
                 # Evaluate on validation set
-                val_label_acc_dict[key], val_obj_acc_dict[key] = evaluator.evaluate_one_epoch(val_dataloader)
+                val_label_acc_dict[key], val_obj_acc_dict[key], val_overall_acc_dict[key] = evaluator.evaluate_one_epoch(val_dataloader)
                 # Evaluate on OOD set
-                ood_label_acc_dict[key], ood_obj_acc_dict[key] = evaluator.evaluate_one_epoch(ood_dataloader)
+                ood_label_acc_dict[key], ood_obj_acc_dict[key], ood_overall_acc_dict[key] = evaluator.evaluate_one_epoch(ood_dataloader)
 
         # Save results
         all_results = {
@@ -261,6 +263,8 @@ if "__main__" == __name__:
             "val_obj_acc": val_obj_acc_dict,
             "ood_label_acc": ood_label_acc_dict,
             "ood_obj_acc": ood_obj_acc_dict,
+            "val_overall_acc": val_overall_acc_dict,
+            "ood_overall_acc": ood_overall_acc_dict,
             "val_n_label_counts_all": val_counts_all,
             "val_n_label_ratios_all": val_ratios_all,
             "ood_n_label_counts_all": ood_counts_all,
@@ -269,8 +273,6 @@ if "__main__" == __name__:
         results_path = os.path.join(exp_path, f'eval_results.json')
         upsert_json(results_path, all_results)
         print(f'Saved evaluation results to {results_path}')
-
-
 
 
 

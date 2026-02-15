@@ -91,7 +91,8 @@ class SingleImgDataset(torch.utils.data.Dataset):
     def read_a_data_from_disk(self, data_name, apply_transform=False):
         data_path = os.path.join(self.dataset_path, data_name)
         img = Image.open(data_path).convert('RGB')
-        img_tensor = transforms.ToTensor()(img).to(DEVICE)
+        # Keep tensor on CPU; move batch to DEVICE in the main process.
+        img_tensor = transforms.ToTensor()(img)
 
         if apply_transform:
             img_tensor = self.transform(img_tensor)

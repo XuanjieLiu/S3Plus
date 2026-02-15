@@ -44,6 +44,7 @@ def load_plusZ_eval_data(loader, encode_func, plus_func, zc_dim):
         enc_z_list = []
         plus_z_list = []
         data, labels = sample
+        data = [x.to(DEVICE, non_blocking=True) for x in data]
         za, _ = encode_func(data[0])
         zb, _ = encode_func(data[1])
         zc, _ = encode_func(data[2])

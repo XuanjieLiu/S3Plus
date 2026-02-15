@@ -24,6 +24,9 @@ def find_best_epoch(file_path: str, metric_name: str, larger_is_better: bool) ->
             split_parts = line.split("-")
             # 第一个元素是 epoch 号
             epoch_num = int(split_parts[0])
+            # 跳过 epoch 号为 0 的行（通常是初始状态，不具有代表性）
+            if epoch_num == 0:
+                continue
             # 其余部分拼回去，保证科学计数法里的 '-' 不会被拆散
             rest_line = "-".join(split_parts[1:])
             # 再按逗号分割

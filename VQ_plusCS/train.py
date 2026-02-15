@@ -115,6 +115,7 @@ class PlusTrainer:
                 data, labels = sample
                 sizes = data[0].size()
                 data_all = torch.stack(data, dim=0).reshape(3 * sizes[0], sizes[1], sizes[2], sizes[3])
+                data_all = data_all.to(DEVICE, non_blocking=True)
                 z_all, e_q_loss = self.model.batch_encode_to_z(data_all)
                 z_content = z_all[..., 0:self.latent_code_1]
                 za, zb, zc = split_into_three(z_all)
