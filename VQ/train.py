@@ -208,6 +208,7 @@ class PlusTrainer:
         self.disable_rand_style_sample = config.get('disable_rand_style_sample', False)
         self.checkpoint_after = config.get('checkpoint_after', 0)
         self.is_plot_num_line = config.get('is_plot_num_line', True)
+        self.v3_loss_scalar = config.get('v3_loss_scalar', 1)
 
     def resume(self):
         if os.path.exists(self.model_path):
@@ -255,7 +256,7 @@ class PlusTrainer:
             
             # V3 loss calculation
             e_style = e_all[..., self.latent_code_1:]
-            v3_loss = cal_v3_loss(e_content, z_content, e_style) if self.use_v3_loss else {
+            v3_loss = cal_v3_loss(e_content, z_content, e_style, relativity=self.v3_loss_scalar) if self.use_v3_loss else {
                 "content_loss": torch.zeros(1)[0].to(DEVICE),
                 "style_loss": torch.zeros(1)[0].to(DEVICE),
                 "sample_loss": torch.zeros(1)[0].to(DEVICE),
@@ -583,7 +584,7 @@ class PlusTrainer:
         return loss
 
 
-def cal_v3_loss(z_content, e_content, z_style):
+def cal_v3_loss(z_content, e_content, z_style, relativity=0.1):
     z_a, z_b, z_c = split_into_three(z_content)
     e_a, e_b, e_c = split_into_three(e_content)
     z_s_a, z_s_b, z_s_c = split_into_three(z_style)
@@ -594,7 +595,7 @@ def cal_v3_loss(z_content, e_content, z_style):
         v3_z_c,
         v3_z_c_vq,
         v3_z_s,
-        relativity=10,
+        relativity=relativity,
         eps=1e-5
     )
     return v3_losses
@@ -603,7 +604,7 @@ def _compute_loss_pure(
         z_c,
         z_c_vq,
         z_s,
-        relativity=10,
+        relativity=1,
         eps=1e-5
     ):
         """
@@ -628,10 +629,10 @@ def _compute_loss_pure(
         # compute the losses using the relative variability difference
         r = relativity
 
-        content_loss = F.relu(r - content_frag_var / (content_samp_var + eps)) / r
-        style_loss = F.relu(r - style_samp_var / (style_frag_var + eps)) / r
-        sample_loss = F.relu(r - style_samp_var / (content_samp_var + eps)) / r
-        fragment_loss = F.relu(r - content_frag_var / (style_frag_var + eps)) / r
+        content_loss = F.relu(r - content_frag_var / (content_samp_var + eps)) * r
+        style_loss = F.relu(r - style_samp_var / (style_frag_var + eps)) * r
+        sample_loss = F.relu(r - style_samp_var / (content_samp_var + eps)) * r
+        fragment_loss = F.relu(r - content_frag_var / (style_frag_var + eps)) * r
 
         losses = {
             "content_loss": content_loss,
