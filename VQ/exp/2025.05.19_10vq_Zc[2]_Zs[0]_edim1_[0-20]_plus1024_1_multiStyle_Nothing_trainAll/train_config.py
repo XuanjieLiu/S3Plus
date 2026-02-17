@@ -2,7 +2,7 @@ import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
 EVAL_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test"
-SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
+SINGLE_IMG_SET = f"{data_root}/multi_style_eval_(0,20)_FixedPos_TrainStyle"
 IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
