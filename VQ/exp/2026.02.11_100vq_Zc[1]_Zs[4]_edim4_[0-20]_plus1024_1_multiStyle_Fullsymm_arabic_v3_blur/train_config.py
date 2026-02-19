@@ -18,7 +18,7 @@ CONFIG = {
     'plus_eval_set_path_2': None,
     'is_random_split_data': False,
     'is_blur': IS_BLUR,
-    'num_workers': 8,
+    'num_workers': 2,
     'latent_embedding_1': 1,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -63,7 +63,7 @@ CONFIG = {
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
     'is_assoc_on_e': True,
-    'is_assoc_on_z': False,
+    'is_assoc_on_z': True,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
     'is_symm_assoc': True,
@@ -71,7 +71,7 @@ CONFIG = {
     'is_pure_assoc': False,
     'is_twice_oper': False,
     'use_v3_loss': True,
-    'v3_loss_scalar': 1,
+    'v3_loss_scalar': 0.05,
     'disable_rand_style_sample': True,
     'network_config': {
         'enc_dec': {
