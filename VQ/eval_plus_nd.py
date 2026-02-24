@@ -415,7 +415,7 @@ def interpolate_plus_eval(
         plus_emb_idx = loaded_model.find_indices(plus_emb, False)
         plus_emb_cycle = loaded_model.batch_encode_to_z(
             loaded_model.batch_decode_from_z(torch.cat((plus_emb, style_enc_tensor), -1))
-        )[0]
+        )[0][..., 0:loaded_model.latent_code_1]
         plus_emb_cycle_idx = loaded_model.find_indices(plus_emb_cycle, True)
         plus_itp_list = []
         for j in range(len(plus_emb_idx)):

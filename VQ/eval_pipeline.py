@@ -18,11 +18,13 @@ from dataloader import SingleImgDataset, load_enc_eval_data_with_style
 from torch.utils.data import ConcatDataset
 from torch.utils.data import DataLoader
 from two_dim_num_vis import MumEval
+from eval.batch_other_task_eval_summary import ExpGroup, find_all_results, COMPARE_KEYS
 
 EVAL_ITEM_PLUS = 'plus_eval_configs'
 EVAL_ITEM_MATCHING_RATE = 'emb_matching_rate_configs'
 EVAL_ITEM_ORDERLINESS = 'orderliness_configs'
 EVAL_ITEM_INTERPOLATE = 'interpolate_configs'
+EVAL_ITEM_SUBSTRACTION = 'substraction_configs'
 
 EXP_NUM_LIST = [str(i) for i in range(1, 21)]
 # EXP_NUM_LIST = ['1']
@@ -57,10 +59,10 @@ EXP_NAME_LIST = [
     # "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
     #
     # Main experiments, multi style mahjong
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
-    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
     #
     # Main experiments, single style blue points
     # "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
@@ -74,17 +76,17 @@ EXP_NAME_LIST = [
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_symm",
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
 
-    # single style ZHENG
-    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Fullsymm",
-    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing",
-    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing_trainAll",
-    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_PureVQ",
+    # # single style ZHENG
+    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Fullsymm",
+    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing",
+    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing_trainAll",
+    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_PureVQ",
 
-    # single style EUTally
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing_trainAll",
-    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
+    # # single style EUTally
+    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
+    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
+    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing_trainAll",
+    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
 
 
 ]
@@ -93,6 +95,7 @@ EVAL_TERMS = [
     EVAL_ITEM_MATCHING_RATE,
     EVAL_ITEM_ORDERLINESS,
     EVAL_ITEM_INTERPOLATE,
+    EVAL_ITEM_SUBSTRACTION,
 ]
 
 
@@ -166,6 +169,22 @@ def pipeline_eval(exp_name: str):
     os.makedirs(pipeline_dir, exist_ok=True)
     all_results = {}
     all_ckpts = find_all_ckpts(config, exp_path)
+
+    # eval substraction
+    if EVAL_ITEM_SUBSTRACTION in EVAL_TERMS:
+        OTHER_TASK_EXP_NUM_LIST = [1]
+        substraction_means = []
+        name = 'substraction_one'
+        eg = ExpGroup(
+            exp_name=exp_name,
+            exp_alias='N/A',
+            sub_exp=[i for i in range(1, 21)],
+            record_name="minus_16_1.1_eval_record.txt",
+            is_load_record=False
+        )
+        result = find_all_results(eg, OTHER_TASK_EXP_NUM_LIST)
+        substraction_means = result[0]  # Assuming we're interested in the first key (e.g., accuracy)
+        all_results[name] = substraction_means
 
     # eval plus accu
     if eval_config.get(EVAL_ITEM_PLUS) is not None and EVAL_ITEM_PLUS in EVAL_TERMS:
