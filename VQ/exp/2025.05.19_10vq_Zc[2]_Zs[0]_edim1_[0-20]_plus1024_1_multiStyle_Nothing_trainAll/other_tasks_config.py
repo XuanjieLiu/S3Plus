@@ -4,6 +4,7 @@ data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../..
 CONFIG = [
     {
         'task_name': "minus_16_1.1",
+        'num_sub_exp': 1,
         'train_data_path': f"{data_root}/multi_style_pairs_minus(0,20)/train",
         'eval_data_path': f"{data_root}/multi_style_pairs_minus(0,20)/test",
         'batch_size': 128,
