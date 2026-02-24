@@ -71,7 +71,7 @@ CONFIG = {
     'is_pure_assoc': False,
     'is_twice_oper': False,
     'use_v3_loss': True,
-    'v3_loss_scalar': 0.05,
+    'v3_relativity': 3,
     'disable_rand_style_sample': True,
     'network_config': {
         'enc_dec': {

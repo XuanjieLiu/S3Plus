@@ -4,7 +4,7 @@ data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../..
 EVAL_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/test"
 TRAIN_SET = f"{data_root}/multi_style_pairs_plus(0,20)_arabic_colorful/train"
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-arabic-colorful"
-IS_BLUR = True
+IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': TRAIN_SET,
@@ -66,6 +66,7 @@ CONFIG = {
     'is_pure_assoc': False,
     'is_twice_oper': False,
     'use_v3_loss': True,
+    'v3_relativity': 3,
     'disable_rand_style_sample': True,
     'network_config': {
         'enc_dec': {
