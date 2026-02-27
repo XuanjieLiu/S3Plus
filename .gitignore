@@ -20,7 +20,6 @@ slurm_*.err
 /fruit_recognition_dataset_oneFruit
 /LM_align/synthData/**/*.png
 /LM_align/synthData/**/*.json
-PIPELINE_EVAL/
 new_icon_train/
 new_icon_val/
 
