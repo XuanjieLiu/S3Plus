@@ -1,0 +1,146 @@
+{
+    "substraction_one": {
+        "value": "0.57 \\pm 0.09",
+        "mean": 0.5689873000000001,
+        "std": 0.09331734287585561,
+        "max": 0.746835,
+        "min": 0.367089,
+        "count": 20
+    },
+    "eval_set_one2n_accu": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9889570552147239,
+        "std": 0.04813508035811785,
+        "max": 1.0,
+        "min": 0.7791411042944786,
+        "count": 20
+    },
+    "eval_set_one2one_accu": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9889570552147239,
+        "std": 0.04813508035811785,
+        "max": 1.0,
+        "min": 0.7791411042944786,
+        "count": 20
+    },
+    "eval_set_one2n_accu_cycle": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9892638036809815,
+        "std": 0.046797994792614594,
+        "max": 1.0,
+        "min": 0.7852760736196319,
+        "count": 20
+    },
+    "eval_set_one2one_accu_cycle": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9892638036809815,
+        "std": 0.046797994792614594,
+        "max": 1.0,
+        "min": 0.7852760736196319,
+        "count": 20
+    },
+    "eval_set_emb_select_accu": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9886503067484662,
+        "std": 0.04947216592362116,
+        "max": 1.0,
+        "min": 0.7730061349693251,
+        "count": 20
+    },
+    "eval_set_emb_select_accu_cycle": {
+        "value": "0.99 \\pm 0.05",
+        "mean": 0.9892638036809815,
+        "std": 0.046797994792614594,
+        "max": 1.0,
+        "min": 0.7852760736196319,
+        "count": 20
+    },
+    "eval_set_emb_self_consistency": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 0.9996932515337423,
+        "std": 0.001337085565503266,
+        "max": 1.0,
+        "min": 0.9938650306748467,
+        "count": 20
+    },
+    "eval_set_emb_label_consistency": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 20
+    },
+    "eval_set_z_c_recognition_rate": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 0.9996932515337423,
+        "std": 0.001337085565503266,
+        "max": 1.0,
+        "min": 0.9938650306748467,
+        "count": 20
+    },
+    "eval_set_z_c_cycle_recognition_rate": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 20
+    },
+    "emb_matching_rate_one2n": {
+        "value": "1.0 \\pm 0.01",
+        "mean": 0.9976190476190476,
+        "std": 0.010378330817953998,
+        "max": 1.0,
+        "min": 0.9523809523809523,
+        "count": 20
+    },
+    "emb_matching_rate_one2one": {
+        "value": "1.0 \\pm 0.01",
+        "mean": 0.9976190476190476,
+        "std": 0.010378330817953998,
+        "max": 1.0,
+        "min": 0.9523809523809523,
+        "count": 20
+    },
+    "orderliness": {
+        "value": "1.0 \\pm 0.01",
+        "mean": 0.9974999999999999,
+        "std": 0.010897247358851692,
+        "max": 1.0,
+        "min": 0.95,
+        "count": 20
+    },
+    "train_interpolate_modedict": {
+        "value": "0.97 \\pm 0.04",
+        "mean": 0.968095238095238,
+        "std": 0.044290834317442566,
+        "max": 1.0,
+        "min": 0.819047619047619,
+        "count": 20
+    },
+    "train_interpolate_cycle_modedict": {
+        "value": "0.98 \\pm 0.04",
+        "mean": 0.9766666666666668,
+        "std": 0.03943765710822513,
+        "max": 1.0,
+        "min": 0.8285714285714286,
+        "count": 20
+    },
+    "train_interpolate_selection": {
+        "value": "0.99 \\pm 0.04",
+        "mean": 0.9880952380952381,
+        "std": 0.04182622510550006,
+        "max": 1.0,
+        "min": 0.8095238095238095,
+        "count": 20
+    },
+    "train_interpolate_cycle_selection": {
+        "value": "0.98 \\pm 0.04",
+        "mean": 0.9842857142857143,
+        "std": 0.03617480863868324,
+        "max": 1.0,
+        "min": 0.8380952380952381,
+        "count": 20
+    }
+}
