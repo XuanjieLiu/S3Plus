@@ -18,10 +18,11 @@ DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
 
-NUM_RAN = (1, 20)
+NUM_RAN = (0, 20)
 SINGLE_STYLE_DATA_ROOT_PLUS = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_MOD = f'dataset/single_style_pairs_mod({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_DIVISION = f'dataset/single_style_pairs_division({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_MUL_LAST_DIGIT = f'dataset/single_style_pairs_mul_last_digit({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_MARKERS = ['o']
 SINGLE_COLOR = ['blue']
 
@@ -118,6 +119,9 @@ def comp_mod(a, b):
 
 def comp_division(a, b):
     return int(a / b)
+
+def comp_mul_last_digit(a, b):
+    return (a * b) % 10
 
 
 def gen_pairs_list(min_number, max_number, pair_func):
@@ -357,6 +361,11 @@ def mod_pairs(a):
     for i in range(min_div_num, max_div_num):
         yield a, i
 
+def mul_last_digit_pairs(min_number, max_number):
+    def func(a):
+        for b in range(min_number, max_number + 1):
+                yield a, b
+    return func
 
 def make_dataset_single_style_plus():
     data_root = SINGLE_STYLE_DATA_ROOT_PLUS
@@ -552,6 +561,23 @@ def make_dataset_single_style_plus_random_one_shot_triple():
     render_dataset(test_set_1, test_root_1, comp_plus)
     render_dataset(test_set_2, test_root_2, comp_plus)
 
+
+def make_dataset_single_style_mul_last_digit():
+    data_root = SINGLE_STYLE_DATA_ROOT_MUL_LAST_DIGIT
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        3,
+        0.16,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        mul_last_digit_pairs(NUM_RAN[0], NUM_RAN[1]),
+    )
+    render_dataset(train_set, train_root, comp_mul_last_digit)
+    render_dataset(test_set, test_root, comp_mul_last_digit)
 
 if __name__ == "__main__":
     # make_dataset_single_style_plus_one_double_set()
