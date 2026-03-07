@@ -584,4 +584,5 @@ if __name__ == "__main__":
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
     # make_dataset_single_style_plus_random_one_shot_triple()
-    make_dataset_plus_arabic()
+    # make_dataset_plus_arabic()
+    make_dataset_single_style_mul_last_digit()
