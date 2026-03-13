@@ -1,0 +1,62 @@
+{
+    "ckpts": [
+        "exp_1: checkpoint_46000.pt"
+    ],
+    "eval_set_one2n_accu": [
+        "exp_1: 0.607"
+    ],
+    "eval_set_one2one_accu": [
+        "exp_1: 0.186"
+    ],
+    "eval_set_one2n_accu_cycle": [
+        "exp_1: 0.667"
+    ],
+    "eval_set_one2one_accu_cycle": [
+        "exp_1: 0.217"
+    ],
+    "eval_set_emb_self_consistency": [
+        "exp_1: 0.72"
+    ],
+    "eval_set_emb_label_consistency": [
+        "exp_1: 0.646"
+    ],
+    "eval_set_z_c_recognition_rate": [
+        "exp_1: 0.675"
+    ],
+    "eval_set_z_c_cycle_recognition_rate": [
+        "exp_1: 0.796"
+    ],
+    "train_set_one2n_accu": [
+        "exp_1: 0.956"
+    ],
+    "train_set_one2one_accu": [
+        "exp_1: 0.338"
+    ],
+    "train_set_one2n_accu_cycle": [
+        "exp_1: 0.941"
+    ],
+    "train_set_one2one_accu_cycle": [
+        "exp_1: 0.314"
+    ],
+    "train_set_emb_self_consistency": [
+        "exp_1: 0.941"
+    ],
+    "train_set_emb_label_consistency": [
+        "exp_1: 0.922"
+    ],
+    "train_set_z_c_recognition_rate": [
+        "exp_1: 0.956"
+    ],
+    "train_set_z_c_cycle_recognition_rate": [
+        "exp_1: 0.941"
+    ],
+    "emb_matching_rate_one2n": [
+        "exp_1: 1.0"
+    ],
+    "emb_matching_rate_one2one": [
+        "exp_1: 0.349"
+    ],
+    "orderliness": [
+        "exp_1: 0.475"
+    ]
+}

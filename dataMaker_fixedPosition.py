@@ -11,7 +11,8 @@ import os
 NUMBERS = range(0, 21)
 TRAIN_MARKERS = ['s', 'o', 'v', 'd']
 NEW_MARKERS = ['^', 'X', 'p', 'D']
-# MARKERS = ['o']
+SINGLE_MARKER = ['o']
+SINGLE_COLOR = ['blue']
 DATA_ROOT = 'dataset'
 
 TRAIN_COLORS = ['purple', 'salmon',  'olive', 'blue']
@@ -98,5 +99,5 @@ if __name__ == "__main__":
     # arabic_colorful_data_colors = ['blue']
     # make_arabic_num_dataset(arabic_colorful_data_path, NUMBERS, arabic_colorful_data_colors)
 
-    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-multiStyle'
-    make_dataset_1(data_path, NUMBERS, TRAIN_MARKERS, TRAIN_COLORS)
+    data_path = f'{DATA_ROOT}/(0,20)-FixedPos-mul_add_mix'
+    make_dataset_1(data_path, NUMBERS, SINGLE_MARKER, SINGLE_COLOR)
