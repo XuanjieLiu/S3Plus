@@ -27,7 +27,7 @@ CONFIG = {
     },
     'operator': {
         'unit': 1024,
-        'n_hidden_layers': 3,
+        'n_hidden_layers': 6,
     },
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
@@ -49,6 +49,6 @@ CONFIG = {
     'batch_size': 256,
     'is_symm': True,
     'is_assoc': False,
-    'symm_loss_scalar': 0.01,
+    'symm_loss_scalar': 1.,
     'eqLoss_scalar': 0.05,
 }

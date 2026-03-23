@@ -49,6 +49,6 @@ CONFIG = {
     'batch_size': 256,
     'is_symm': True,
     'is_assoc': False,
-    'symm_loss_scalar': 0.01,
+    'symm_loss_scalar': 1.,
     'eqLoss_scalar': 0.05,
 }

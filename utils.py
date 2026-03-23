@@ -2,7 +2,8 @@ from typing import List, Callable, Any
 import torch
 from torch.utils.data import ConcatDataset, DataLoader
 from dataloader import SingleImgDataset
-from dataloader_plus import MultiImgDataset, make_dataset_trans
+from dataloader_plus import MultiImgDataset
+from VQ.common_func import make_dataset_trans
 
 
 
@@ -52,6 +53,7 @@ def init_dataloaders(config):
             )
         plus_train_loader = DataLoader(train_dataset, **loader_config)
         plus_eval_loader = DataLoader(eval_dataset, **loader_config)
+        print(f"Random split with ratio {train_ratio}, train size: {len(train_dataset)}, eval size: {len(eval_dataset)}")
     else:
         print("Using predefined datasets")
         plus_train_set = make_dataset(config['train_data_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
