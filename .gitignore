@@ -22,4 +22,4 @@ slurm_*.err
 /LM_align/synthData/**/*.json
 new_icon_train/
 new_icon_val/
-
+__pycache__

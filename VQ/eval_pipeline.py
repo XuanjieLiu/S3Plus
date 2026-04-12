@@ -100,7 +100,7 @@ EVAL_TERMS = [
 
 
 def make_data_loader(sub_cfg: Dict[str, Any],
-                     dataset_cls: Callable[..., Any]) -> DataLoader:
+                     dataset_cls: Callable[..., Any], shuffle: bool = False) -> DataLoader:
     aug_t = sub_cfg.get('augment_times', 1)
     path_list = sub_cfg['eval_set_path_list']
     is_blur = sub_cfg.get('is_blur', False)
@@ -109,7 +109,7 @@ def make_data_loader(sub_cfg: Dict[str, Any],
     # 如果有多个 set_path, 创建多个 dataset 并合并
     datasets = ConcatDataset([dataset_cls(path, augment_times=aug_t, transform=trans)
                               for path in path_list])
-    data_loader = DataLoader(datasets, batch_size=128, shuffle=False)
+    data_loader = DataLoader(datasets, batch_size=128, shuffle=shuffle)
     return data_loader
 
 
