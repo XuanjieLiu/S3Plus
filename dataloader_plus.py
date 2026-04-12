@@ -59,7 +59,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
         for name in img_list:
             img = Image.open(os.path.join(data_path, name)).convert('RGB')
             # Do not touch CUDA in DataLoader worker subprocesses.
-            img_tensor = transforms.ToTensor()(img)
+            img_tensor = transforms.ToTensor()(img).to(DEVICE)
             if apply_transform and self.transform is not None:
                 img_tensor = self.transform(img_tensor)
             img_tensors.append(img_tensor)
