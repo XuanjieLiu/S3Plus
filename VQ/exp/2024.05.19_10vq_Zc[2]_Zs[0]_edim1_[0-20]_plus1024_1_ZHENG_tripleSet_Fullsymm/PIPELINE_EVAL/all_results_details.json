@@ -134,7 +134,7 @@
     "eval_set_emb_select_accu": [
         "exp_1: 1.0",
         "exp_2: 1.0",
-        "exp_3: 0.773",
+        "exp_3: 0.779",
         "exp_4: 1.0",
         "exp_5: 1.0",
         "exp_6: 1.0",
@@ -376,7 +376,7 @@
     "train_interpolate_selection": [
         "exp_1: 1.0",
         "exp_2: 1.0",
-        "exp_3: 0.81",
+        "exp_3: 0.819",
         "exp_4: 1.0",
         "exp_5: 1.0",
         "exp_6: 1.0",
@@ -398,7 +398,7 @@
     "train_interpolate_cycle_selection": [
         "exp_1: 0.971",
         "exp_2: 1.0",
-        "exp_3: 0.838",
+        "exp_3: 0.829",
         "exp_4: 1.0",
         "exp_5: 1.0",
         "exp_6: 1.0",

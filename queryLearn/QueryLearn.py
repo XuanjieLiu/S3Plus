@@ -105,6 +105,8 @@ class QueryLearn:
         self.num_labels = None
         self._num_label_to_index = None
         self.mean_mse = nn.MSELoss(reduction='mean')
+        self.sanity_check = config.get('sanity_check', False)
+        print('Sanity check mode...')
 
     def _resolve_paths(self):
         if not self._exp_dir:
@@ -182,6 +184,15 @@ class QueryLearn:
             e_q_loss += e_q_loss_abc_2
         return assoc_plus_loss + self.eqLoss_scalar * e_q_loss
 
+    def _sanity_check_oper_loss(self, per_loss_1, per_loss_2, label_a, label_b, label_c):
+        is_add = torch.tensor(
+            [a + b == c for a, b, c in zip(label_a, label_b, label_c)],
+            device=per_loss_1.device,
+            dtype=torch.bool,
+        )
+        per_loss = torch.where(is_add, per_loss_1, per_loss_2)
+        return per_loss.mean()
+
     def one_epoch(self, epoch, data_loader, optimizer=None, stage=STAGE_TRAIN, loss_counter: LossCounter=None):
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
@@ -206,8 +217,12 @@ class QueryLearn:
             # Per-sample MSE to ec, then choose the smaller one as loss
             per_loss_1 = (e_q_out_1 - ec).pow(2).mean(dim=-1) + eq_loss_1 * self.eqLoss_scalar
             per_loss_2 = (e_q_out_2 - ec).pow(2).mean(dim=-1) + eq_loss_2 * self.eqLoss_scalar
-            per_loss = torch.minimum(per_loss_1, per_loss_2)
-            oper_loss = per_loss.mean()
+
+            if self.sanity_check:
+                oper_loss = self._sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c)
+            else:
+                per_loss = torch.minimum(per_loss_1, per_loss_2)
+                oper_loss = per_loss.mean()
 
             # symm loss
             q1_symm_loss = self.symm_loss(*self.regul_sample(e_content), q0)
