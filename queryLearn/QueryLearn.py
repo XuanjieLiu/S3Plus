@@ -47,7 +47,7 @@ def load_VQSPS_loader(config):
 
 
 class OperNet(nn.Module):
-    def __init__(self, in_dim, out_dim, n_hidden_layers, unit, vq_layer: MultiVectorQuantizer):
+    def __init__(self, in_dim, out_dim, n_hidden_layers, unit, vq_layer: MultiVectorQuantizer, train_vq: bool = False):
         super().__init__()
         layers = [nn.Linear(in_dim, unit), nn.ReLU()]
         for _ in range(n_hidden_layers - 1):
@@ -55,8 +55,13 @@ class OperNet(nn.Module):
         layers.append(nn.Linear(unit, out_dim))
         self.net = nn.Sequential(*layers)
         self.vq_layer = vq_layer
+        self.train_vq = train_vq
+        self._set_vq_trainable(train_vq)
+
+    def _set_vq_trainable(self, train_vq: bool):
+        self.train_vq = train_vq
         for p in self.vq_layer.parameters():
-            p.requires_grad = False
+            p.requires_grad = train_vq
 
     def forward(self, x):
         z_oper = self.net(x)
@@ -65,7 +70,10 @@ class OperNet(nn.Module):
 
     def train(self, mode: bool = True):
         super().train(mode)
-        self.vq_layer.eval()
+        if self.train_vq:
+            self.vq_layer.train(mode)
+        else:
+            self.vq_layer.eval()
         return self
 
 
@@ -76,6 +84,8 @@ class QueryLearn:
         self._exp_dir = config.get('_exp_dir', None)
         self._resolve_paths()
         self.sps_model, sps_config = load_VQSPS_loader(config)
+        self.train_sps = config.get('train_sps', False)
+        self._set_sps_trainable(self.train_sps)
         # self.query_mapping = init_query_mapping(config['query_learner']).to(DEVICE)
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
         # self.queries = nn.Parameter(torch.randn(config['query_learner']['n_query'], config['query_learner']['in_dim']))
@@ -85,7 +95,8 @@ class QueryLearn:
             out_dim=self.sps_model.latent_code_1,
             n_hidden_layers=config['operator']['n_hidden_layers'],
             unit=config['operator']['unit'],
-            vq_layer=self.sps_model.model.vq_layer
+            vq_layer=self.sps_model.model.vq_layer,
+            train_vq=self.train_sps,
         ).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -148,6 +159,14 @@ class QueryLearn:
                 label_to_index[lab] = i
         self._num_label_to_index = label_to_index
 
+    def _set_sps_trainable(self, train_sps: bool):
+        for p in self.sps_model.model.parameters():
+            p.requires_grad = train_sps
+        if train_sps:
+            self.sps_model.model.train()
+        else:
+            self.sps_model.model.eval()
+
     def comb_q_z(self, ea, eb, q):
         if q.dim() == 1:
             q = q.unsqueeze(0).expand(ea.size(0), -1)
@@ -194,6 +213,11 @@ class QueryLearn:
         return per_loss.mean()
 
     def one_epoch(self, epoch, data_loader, optimizer=None, stage=STAGE_TRAIN, loss_counter: LossCounter=None):
+        is_train_stage = optimizer is not None and stage == STAGE_TRAIN
+        if self.train_sps:
+            self.sps_model.model.train(is_train_stage)
+        else:
+            self.sps_model.model.eval()
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
                 optimizer.zero_grad()
@@ -256,6 +280,8 @@ class QueryLearn:
             ckpt = torch.load(self.model_path, map_location=DEVICE)
             if isinstance(ckpt, dict) and 'oper_net_state_dict' in ckpt:
                 self.oper_net.load_state_dict(ckpt['oper_net_state_dict'])
+                if self.train_sps and 'sps_model_state_dict' in ckpt:
+                    self.sps_model.model.load_state_dict(ckpt['sps_model_state_dict'])
             else:
                 self.oper_net.load_state_dict(ckpt)
             print(f"Model is loaded from {self.model_path}")
@@ -267,6 +293,8 @@ class QueryLearn:
             'oper_net_state_dict': self.oper_net.state_dict(),
             'epoch': epoch,
         }
+        if self.train_sps:
+            ckpt['sps_model_state_dict'] = self.sps_model.model.state_dict()
         torch.save(ckpt, path)
 
     def train(self):
@@ -275,7 +303,10 @@ class QueryLearn:
         self.oper_net.train()
         train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.train_record_path)
         eval_loss_counter = LossCounter(EVAL_TERMS, record_path=self.eval_record_path)
-        optimizer = optim.Adam(self.oper_net.net.parameters(), lr=self.config['learning_rate'])
+        optim_params = list(self.oper_net.net.parameters())
+        if self.train_sps:
+            optim_params.extend(self.sps_model.model.parameters())
+        optimizer = optim.Adam(optim_params, lr=self.config['learning_rate'])
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         self._resume_model()
         for epoch in range(start_epoch, self.max_iter_num):

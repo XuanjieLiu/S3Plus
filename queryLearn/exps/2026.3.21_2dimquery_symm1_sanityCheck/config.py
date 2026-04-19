@@ -47,6 +47,7 @@ CONFIG = {
     'log_interval': 500,
     'eval_interval': 2000,
     'batch_size': 256,
+    'train_sps': False,
     'is_symm': True,
     'is_assoc': False,
     'symm_loss_scalar': 1.,
