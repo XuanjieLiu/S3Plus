@@ -59,7 +59,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
         for name in img_list:
             img = Image.open(os.path.join(data_path, name)).convert('RGB')
             # Do not touch CUDA in DataLoader worker subprocesses.
-            img_tensor = transforms.ToTensor()(img)
+            img_tensor = transforms.ToTensor()(img).to(DEVICE)
             if apply_transform and self.transform is not None:
                 img_tensor = self.transform(img_tensor)
             img_tensors.append(img_tensor)
@@ -68,7 +68,7 @@ class MultiImgDataset(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = MultiImgDataset("dataset/PlusPair-(1,8)-FixedPos/train")
+    dataset = MultiImgDataset("dataset/single_style_pairs_mul_mod21(0,20)/train")
     loader = DataLoader(dataset, batch_size=32, shuffle=True)
     aaa = []
     for batch_ndx, sample in enumerate(loader):

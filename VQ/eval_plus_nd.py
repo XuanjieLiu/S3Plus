@@ -45,7 +45,8 @@ class PlusInfo:
         :param label_c: the label of the plus operation result, which is a + b
         """
         self.emb_idx = emb_idx
-        self.label_c = label_c if label_c is not None else (label_a + label_b)
+        # self.label_c = label_c if label_c is not None else (label_a + label_b)
+        self.label_c = label_c
         self.cycle_emb_idx = cycle_emb_idx
         self.emb_value = emb_value
         self.cycle_emb_value = cycle_emb_value
@@ -334,7 +335,7 @@ class VQvaePlusEval:
                 enc_z_list.append(EncInfo(label_c[i], idx_z_c[i], zc[i], zc_s[i]))
                 plus_z_list.append(PlusInfo(
                     label_a[i], label_b[i], idx_plus_c[i], idx_plus_c_cycle[i],
-                    plus_c[i], plus_c_cycle[i], za_s[i], plus_c_cycle_style[i]
+                    plus_c[i], plus_c_cycle[i], za_s[i], plus_c_cycle_style[i], label_c[i]
                 ))
             all_enc_z.extend(enc_z_list)
             all_plus_z.extend(plus_z_list)

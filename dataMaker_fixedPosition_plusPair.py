@@ -18,10 +18,11 @@ DATA_ROOT = 'dataset'
 DATA_PATH = f'{DATA_ROOT}/PlusPair-({NUMBERS[0]},{NUMBERS[-1]})-FixedPos'
 COLORS_TRAIN = ['purple', 'salmon', 'olive', 'blue']
 
-NUM_RAN = (1, 20)
-SINGLE_STYLE_DATA_ROOT_PLUS = f'dataset/single_style_pairs({NUM_RAN[0]},{NUM_RAN[1]})'
+NUM_RAN = (0, 20)
+SINGLE_STYLE_DATA_ROOT_PLUS = f'dataset/single_style_pairs_add({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_MOD = f'dataset/single_style_pairs_mod({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_STYLE_DATA_ROOT_DIVISION = f'dataset/single_style_pairs_division({NUM_RAN[0]},{NUM_RAN[1]})'
+SINGLE_STYLE_DATA_ROOT_MUL_MOD21 = f'dataset/single_style_pairs_mul_mod21({NUM_RAN[0]},{NUM_RAN[1]})'
 SINGLE_MARKERS = ['o']
 SINGLE_COLOR = ['blue']
 
@@ -118,6 +119,9 @@ def comp_mod(a, b):
 
 def comp_division(a, b):
     return int(a / b)
+
+def comp_mul_mod21(a, b):
+    return (a * b) % 21
 
 
 def gen_pairs_list(min_number, max_number, pair_func):
@@ -289,13 +293,15 @@ def make_train_test_datapair_division(min_number, max_number, sample_rate, marke
     return train_set, test_set
 
 
-def render_dataset(data_list: List[PairData], data_root: str, compositional_func):
+def render_dataset(data_list: List[PairData], data_root: str, compositional_func, note: str = None):
     for data in tqdm(data_list, desc=data_root):
         a = data.a
         b = data.b
         color = data.color
         marker = data.marker
         data_name = f'{a}-{b}-{MARK_NAME_SPACE[marker]}-{color}'
+        if note:
+            data_name += f'-{note}'
         data_path = os.path.join(data_root, data_name)
         os.makedirs(data_path, exist_ok=True)
         draw_data(a, b, marker, color, data_path, compositional_func)
@@ -357,8 +363,13 @@ def mod_pairs(a):
     for i in range(min_div_num, max_div_num):
         yield a, i
 
+def mul_pairs(min_number, max_number):
+    def func(a):
+        for b in range(min_number, max_number + 1):
+                yield a, b
+    return func
 
-def make_dataset_single_style_plus():
+def make_dataset_single_style_plus(note:str = None):
     data_root = SINGLE_STYLE_DATA_ROOT_PLUS
     os.makedirs(data_root, exist_ok=True)
     train_root = os.path.join(data_root, 'train')
@@ -367,13 +378,13 @@ def make_dataset_single_style_plus():
         NUM_RAN[0],
         NUM_RAN[1],
         3,
-        0.33,
+        0.24,
         SINGLE_MARKERS,
         SINGLE_COLOR,
         sum_pairs(NUM_RAN[0]),
     )
-    render_dataset(train_set, train_root, comp_plus)
-    render_dataset(test_set, test_root, comp_plus)
+    render_dataset(train_set, train_root, comp_plus, note=note)
+    render_dataset(test_set, test_root, comp_plus, note=note)
 
 
 def make_dataset_single_style_minus():
@@ -553,9 +564,28 @@ def make_dataset_single_style_plus_random_one_shot_triple():
     render_dataset(test_set_2, test_root_2, comp_plus)
 
 
+def make_dataset_single_style_mul_mod21():
+    data_root = SINGLE_STYLE_DATA_ROOT_MUL_MOD21
+    os.makedirs(data_root, exist_ok=True)
+    train_root = os.path.join(data_root, 'train')
+    test_root = os.path.join(data_root, 'test')
+    train_set, test_set = make_train_test_datapair_maxN(
+        NUM_RAN[0],
+        NUM_RAN[1],
+        3,
+        0.22,
+        SINGLE_MARKERS,
+        SINGLE_COLOR,
+        mul_pairs(NUM_RAN[0], NUM_RAN[1]),
+    )
+    render_dataset(train_set, train_root, comp_mul_mod21, note='mul')
+    render_dataset(test_set, test_root, comp_mul_mod21, note='mul')
+
 if __name__ == "__main__":
     # make_dataset_single_style_plus_one_double_set()
     # make_dataset_multi_style_plus()
     # make_train_dataset_n2(NUMBERS, MARKERS, DATA_PATH)
     # make_dataset_single_style_plus_random_one_shot_triple()
-    make_dataset_plus_arabic()
+    # make_dataset_plus_arabic()
+    make_dataset_single_style_mul_mod21()
+    # make_dataset_single_style_plus('add')

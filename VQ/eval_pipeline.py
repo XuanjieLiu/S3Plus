@@ -53,16 +53,16 @@ EXP_NAME_LIST = [
     # "2025.06.18_100vq_Zc[1]_Zs[0]_edim2_[0-20]_plus1024_1_tripleSet_Nothing_trainAll_OnlineBlur",
 
     # # Main experiments, multi style colourful points
-    # "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
-    # "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
-    # "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
-    # "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Fullsymm",
+    "2025.05.15_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing",
+    "2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_Nothing_trainAll",
+    "2025.06.10_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyle_PureVQ",
     #
     # Main experiments, multi style mahjong
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
-    "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_nothing",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_PureVQ",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_symm",
+    # "2025.06.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_multiStyleMahjong_trainAll",
     #
     # # Main experiments, single style blue points
     # "2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm",
@@ -77,16 +77,16 @@ EXP_NAME_LIST = [
     # "2025.07.02_20vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_SingleStyleMahjong_trainAll",
 
     # # single style ZHENG
-    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Fullsymm",
-    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing",
-    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing_trainAll",
-    # "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_PureVQ",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Fullsymm",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_Nothing_trainAll",
+    "2024.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_ZHENG_tripleSet_PureVQ",
 
     # # single style EUTally
-    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
-    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
-    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing_trainAll",
-    # "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
+    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Fullsymm",
+    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing",
+    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_Nothing_trainAll",
+    "2024.05.22_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_EUTally_tripleSet_PureVQ",
 
 
 ]
@@ -100,7 +100,7 @@ EVAL_TERMS = [
 
 
 def make_data_loader(sub_cfg: Dict[str, Any],
-                     dataset_cls: Callable[..., Any]) -> DataLoader:
+                     dataset_cls: Callable[..., Any], shuffle: bool = False) -> DataLoader:
     aug_t = sub_cfg.get('augment_times', 1)
     path_list = sub_cfg['eval_set_path_list']
     is_blur = sub_cfg.get('is_blur', False)
@@ -109,7 +109,7 @@ def make_data_loader(sub_cfg: Dict[str, Any],
     # 如果有多个 set_path, 创建多个 dataset 并合并
     datasets = ConcatDataset([dataset_cls(path, augment_times=aug_t, transform=trans)
                               for path in path_list])
-    data_loader = DataLoader(datasets, batch_size=128, shuffle=False)
+    data_loader = DataLoader(datasets, batch_size=128, shuffle=shuffle)
     return data_loader
 
 

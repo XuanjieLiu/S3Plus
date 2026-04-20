@@ -34,6 +34,11 @@ EMOJI_MAP = {
     "robot": "🤖",
     "unicorn": "🦄",
     "ship": "🚢",
+    "snowflake": "❄️",
+    "sun": "☀️",
+    "moon": "🌙",
+    "cloud": "☁️",
+    "snowman": "⛄",
 }
 EMOJI_COLOR_MAP = {
     "apple": "red",
