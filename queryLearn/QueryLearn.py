@@ -82,16 +82,15 @@ class QueryLearn:
     def __init__(self, config, model_path=None, loaded_model: VQVAE = None):
         self.config = config
         self._exp_dir = config.get('_exp_dir', None)
-        self._resolve_paths()
         self.sps_model, sps_config = load_VQSPS_loader(config)
         self.train_sps = config.get('train_sps', False)
         self._set_sps_trainable(self.train_sps)
         # self.query_mapping = init_query_mapping(config['query_learner']).to(DEVICE)
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
         # self.queries = nn.Parameter(torch.randn(config['query_learner']['n_query'], config['query_learner']['in_dim']))
-        self.queries = [torch.tensor([0., 1.]).to(DEVICE), torch.tensor([1., 0.]).to(DEVICE)]
+        self.queries = [torch.tensor([1., 0., 0, 0, 0, 0, 0 ,0]).to(DEVICE), torch.tensor([0., 1., 0, 0, 0, 0, 0 ,0]).to(DEVICE)]
         self.oper_net = OperNet(
-            in_dim=self.sps_model.latent_code_1 * 2 + 2,
+            in_dim=self.sps_model.latent_code_1 * 2 + self.queries[0].shape[0],
             out_dim=self.sps_model.latent_code_1,
             n_hidden_layers=config['operator']['n_hidden_layers'],
             unit=config['operator']['unit'],
@@ -118,28 +117,6 @@ class QueryLearn:
         self.mean_mse = nn.MSELoss(reduction='mean')
         self.sanity_check = config.get('sanity_check', False)
         print('Sanity check mode...')
-
-    def _resolve_paths(self):
-        if not self._exp_dir:
-            return
-        def _join_if_rel(p):
-            if p is None:
-                return p
-            if os.path.isabs(p):
-                return p
-            return os.path.join(self._exp_dir, p)
-        self.config['train_result_path'] = _join_if_rel(self.config.get('train_result_path'))
-        self.config['eval_result_path'] = _join_if_rel(self.config.get('eval_result_path'))
-
-        train_record = self.config.get('train_record_path')
-        eval_record = self.config.get('eval_record_path')
-        if train_record is not None and not os.path.isabs(train_record):
-            train_record = os.path.join(self.config['train_result_path'], os.path.basename(train_record))
-        if eval_record is not None and not os.path.isabs(eval_record):
-            eval_record = os.path.join(self.config['eval_result_path'], os.path.basename(eval_record))
-        self.config['train_record_path'] = train_record
-        self.config['eval_record_path'] = eval_record
-        self.config['model_path'] = _join_if_rel(self.config.get('model_path'))
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
