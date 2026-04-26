@@ -34,11 +34,7 @@ if __name__ == '__main__':
             os.chdir(sub_exp_path)
             t_config.CONFIG['sub_exp_id'] = exp_num
             t_config.CONFIG['_exp_dir'] = exp_path
-            t_config.CONFIG['train_result_path'] = t_config.CONFIG.get('train_result_path', 'TrainingResults')
-            t_config.CONFIG['eval_result_path'] = t_config.CONFIG.get('eval_result_path', 'EvalResults')
-            t_config.CONFIG['train_record_path'] = os.path.join(t_config.CONFIG['train_result_path'], 'Train_record.txt')
-            t_config.CONFIG['eval_record_path'] = os.path.join(t_config.CONFIG['eval_result_path'], 'Eval_record.txt')
             t_config.CONFIG['model_path'] = t_config.CONFIG.get('model_path', 'curr_model.pt')
             trainer = QueryLearn(t_config.CONFIG)
-            trainer.train()
             os.chdir(exp_path)
+            trainer.train()
