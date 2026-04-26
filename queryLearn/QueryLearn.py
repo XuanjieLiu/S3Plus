@@ -33,6 +33,7 @@ EVAL_TERMS = [
     'mul_acc',
     'add_total',
     'mul_total',
+    'q_l2_dist',
 ]
 
 
@@ -269,6 +270,7 @@ class QueryLearn:
                 ec_epoch,
             )
             if loss_counter is not None:
+                q_l2_dist = torch.norm(self.queries[0] - self.queries[1], p=2).item()
                 loss_counter.add_values([
                     sum(epoch_oper_losses) / len(epoch_oper_losses),
                     sum(epoch_symm_losses) / len(epoch_symm_losses),
@@ -281,10 +283,11 @@ class QueryLearn:
                     accu['mul_acc'],
                     accu['add_total'],
                     accu['mul_total'],
+                    q_l2_dist,
                 ])
             if save_query_vis:
                 if query_vis_dir is None:
-                    query_vis_dir = self.eval_result_path if stage == STAGE_VAL else self.train_record_path
+                    query_vis_dir = self.eval_result_path if stage == STAGE_VAL else self.train_result_path
                 stage_name = 'eval' if stage == STAGE_VAL else stage
                 q1_correct = self._query_target_correct(epoch_label_c, q_out_1_epoch)
                 q2_correct = self._query_target_correct(epoch_label_c, q_out_2_epoch)
@@ -349,8 +352,8 @@ class QueryLearn:
                 optimizer,
                 stage=STAGE_TRAIN,
                 loss_counter=train_loss_counter,
-                save_query_vis=is_log_epoch,
-                query_vis_dir=record_dir(self.train_record_path),
+                save_query_vis=epoch % self.eval_interval == 0,
+                query_vis_dir=self.train_result_path,
             )
 
             if is_log_epoch:
