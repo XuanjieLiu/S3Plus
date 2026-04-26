@@ -27,6 +27,7 @@ CONFIG = {
         'out_dim': 8,  # 示例输出维度
     },
     'query_dim': 8,
+    'query_vis_format': 'png',
     'operator': {
         'unit': 1024,
         'n_hidden_layers': 3,

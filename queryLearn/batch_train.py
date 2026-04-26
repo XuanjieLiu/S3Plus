@@ -33,8 +33,8 @@ if __name__ == '__main__':
             print(f'Sub-Exp path: {sub_exp_path}')
             os.chdir(sub_exp_path)
             t_config.CONFIG['sub_exp_id'] = exp_num
-            t_config.CONFIG['_exp_dir'] = exp_path
+            t_config.CONFIG['_exp_dir'] = sub_exp_path
             t_config.CONFIG['model_path'] = t_config.CONFIG.get('model_path', 'curr_model.pt')
             trainer = QueryLearn(t_config.CONFIG)
-            os.chdir(exp_path)
             trainer.train()
+            os.chdir(exp_path)
