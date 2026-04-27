@@ -9,12 +9,13 @@ def record_dir(record_path):
 def operation_cells(label_a, label_b, label_c, q_correct):
     cells = {}
     for a, b in zip(label_a, label_b):
-        cells.setdefault((a, b), {'add': False, 'mul': False})
+        cells.setdefault((a, b), {'seen': True, 'add': False, 'mul': False})
 
     for i, (a, b, c) in enumerate(zip(label_a, label_b, label_c)):
-        if not q_correct[i].item():
+        is_correct = q_correct[i].item() if hasattr(q_correct[i], 'item') else q_correct[i]
+        if not is_correct:
             continue
-        cell = cells.setdefault((a, b), {'add': False, 'mul': False})
+        cell = cells.setdefault((a, b), {'seen': True, 'add': False, 'mul': False})
         if c == a + b:
             cell['add'] = True
         if c == (a * b) % 21:
@@ -23,29 +24,32 @@ def operation_cells(label_a, label_b, label_c, q_correct):
 
 
 def operation_cell_text(cell):
+    if not cell['seen']:
+        return '/'
     if cell['add'] and cell['mul']:
         return '+/*m'
     if cell['add']:
         return '+'
     if cell['mul']:
         return '*m'
-    return '?'
+    return '×'
 
 
 def operation_table_grid(rows, cols, cells):
     text_grid = []
     color_grid = []
     color_idx = {
-        '?': 0,
-        '+': 1,
-        '*m': 2,
-        '+/*m': 3,
+        '/': 0,
+        '×': 1,
+        '+': 2,
+        '*m': 3,
+        '+/*m': 4,
     }
     for row in rows:
         text_row = []
         color_row = []
         for col in cols:
-            text = operation_cell_text(cells.get((row, col), {'add': False, 'mul': False}))
+            text = operation_cell_text(cells.get((row, col), {'seen': False, 'add': False, 'mul': False}))
             text_row.append(text)
             color_row.append(color_idx[text])
         text_grid.append(text_row)
@@ -63,8 +67,8 @@ def save_operation_table_plot(output_path, query_name, stage, epoch, rows, cols,
     fig_w = max(6, 0.42 * len(cols) + 1.2)
     fig_h = max(5, 0.34 * len(rows) + 1.2)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=180)
-    cmap = ListedColormap(['#f4f5f7', '#dff3e6', '#dfe9fb', '#eadff7'])
-    ax.imshow(color_grid, cmap=cmap, vmin=0, vmax=3, aspect='auto')
+    cmap = ListedColormap(['#ffffff', '#fde2e2', '#dff3e6', '#dfe9fb', '#eadff7'])
+    ax.imshow(color_grid, cmap=cmap, vmin=0, vmax=4, aspect='auto')
     ax.set_title(f'{query_name} {stage} epoch {epoch} add_acc={add_acc:.2f} mul_acc={mul_acc:.2f}', pad=12)
     ax.set_xticks(range(len(cols)))
     ax.set_yticks(range(len(rows)))
@@ -77,7 +81,8 @@ def save_operation_table_plot(output_path, query_name, stage, epoch, rows, cols,
     ax.grid(which='minor', color='#d8dee8', linewidth=0.6)
     ax.tick_params(which='minor', bottom=False, left=False)
     text_colors = {
-        '?': '#777777',
+        '/': '#bbbbbb',
+        'x': '#c62828',
         '+': '#176b35',
         '*m': '#1b4f9c',
         '+/*m': '#63308f',
