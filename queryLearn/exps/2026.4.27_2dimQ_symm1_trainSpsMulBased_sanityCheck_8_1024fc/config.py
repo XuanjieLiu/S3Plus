@@ -17,21 +17,21 @@ BLUR_CONFIG = {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
 }
 AUGMENT_TIMES = 16
 CONFIG = {
-    'num_sub_exp': 2,
+    'num_sub_exp': 1,
     'VQSPS': {
         'EXP_NAME': '2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6',
         'CHECK_POINT_NAME': '1/checkpoint_44000.pt',
     },
     'train_sps': True,
     'query_learner': {
-        'in_dim': 8,  # 示例输入维度
-        'out_dim': 8,  # 示例输出维度
+        'in_dim': 2,  # 示例输入维度
+        'out_dim': 2,  # 示例输出维度
     },
-    'query_dim': 8,
+    'query_dim': 2,
     'query_vis_format': 'png',
     'operator': {
         'unit': 1024,
-        'n_hidden_layers': 3,
+        'n_hidden_layers': 8,
     },
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
@@ -53,7 +53,7 @@ CONFIG = {
     'batch_size': 256,
     'is_symm': True,
     'is_assoc': False,
-    'symm_loss_scalar': 0.1,
+    'symm_loss_scalar': 1,
     'eqLoss_scalar': 0.05,
-    'sanity_check': False,
+    'sanity_check': True,
 }

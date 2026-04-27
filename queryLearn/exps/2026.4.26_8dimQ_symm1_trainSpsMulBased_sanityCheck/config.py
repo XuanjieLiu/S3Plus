@@ -55,5 +55,5 @@ CONFIG = {
     'is_assoc': False,
     'symm_loss_scalar': 0.1,
     'eqLoss_scalar': 0.05,
-    'sanity_check': False,
+    'sanity_check': True,
 }
