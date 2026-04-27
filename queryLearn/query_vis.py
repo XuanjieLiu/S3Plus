@@ -32,7 +32,7 @@ def operation_cell_text(cell):
         return '+'
     if cell['mul']:
         return '*m'
-    return '×'
+    return 'x'
 
 
 def operation_table_grid(rows, cols, cells):
@@ -40,7 +40,7 @@ def operation_table_grid(rows, cols, cells):
     color_grid = []
     color_idx = {
         '/': 0,
-        '×': 1,
+        'x': 1,
         '+': 2,
         '*m': 3,
         '+/*m': 4,
