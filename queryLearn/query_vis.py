@@ -23,16 +23,17 @@ def operation_cells(label_a, label_b, label_c, q_correct):
     return cells
 
 
-def operation_cell_text(cell):
+def operation_cell_text(a, b, cell):
     if not cell['seen']:
         return '/'
-    if cell['add'] and cell['mul']:
+    is_add_mul_same = (a + b) == ((a * b) % 21)
+    if cell['add'] and cell['mul'] and is_add_mul_same:
         return '+/*m'
     if cell['add']:
         return '+'
     if cell['mul']:
         return '*m'
-    return 'x'
+    return '×'
 
 
 def operation_table_grid(rows, cols, cells):
@@ -40,7 +41,7 @@ def operation_table_grid(rows, cols, cells):
     color_grid = []
     color_idx = {
         '/': 0,
-        'x': 1,
+        '×': 1,
         '+': 2,
         '*m': 3,
         '+/*m': 4,
@@ -49,7 +50,7 @@ def operation_table_grid(rows, cols, cells):
         text_row = []
         color_row = []
         for col in cols:
-            text = operation_cell_text(cells.get((row, col), {'seen': False, 'add': False, 'mul': False}))
+            text = operation_cell_text(row, col, cells.get((row, col), {'seen': False, 'add': False, 'mul': False}))
             text_row.append(text)
             color_row.append(color_idx[text])
         text_grid.append(text_row)
@@ -82,7 +83,7 @@ def save_operation_table_plot(output_path, query_name, stage, epoch, rows, cols,
     ax.tick_params(which='minor', bottom=False, left=False)
     text_colors = {
         '/': '#bbbbbb',
-        'x': '#c62828',
+        '×': '#c62828',
         '+': '#176b35',
         '*m': '#1b4f9c',
         '+/*m': '#63308f',
