@@ -4,15 +4,18 @@ import torch.nn as nn
 import os
 import sys
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
-from VQ.VQVAE import VQVAE, MultiVectorQuantizer, make_multi_layers, split_into_three
+from VQ.VQVAE import VQVAE, MultiVectorQuantizer, split_into_three
 from VQ.common_func import load_config_from_exp_name
 from VQ.eval_common import CommonEvaler
 from shared import DEVICE
 from utils import init_dataloaders
 from loss_counter import LossCounter
 from VQ.common_func import parse_label
-from VQ.simple_FC import SimpleFC
 from dataloader import load_enc_eval_data
+try:
+    from queryLearn.query_vis import record_dir, save_query_operation_tables
+except ImportError:
+    from query_vis import record_dir, save_query_operation_tables
 
 
 VQSPS_EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp/')
@@ -30,13 +33,8 @@ EVAL_TERMS = [
     'mul_acc',
     'add_total',
     'mul_total',
+    'q_l2_dist',
 ]
-
-
-def init_query_mapping(query_learner_config):
-    in_dim = query_learner_config['in_dim']
-    out_dim = query_learner_config['out_dim']
-    return nn.Linear(in_dim, out_dim)
 
 
 def load_VQSPS_loader(config):
@@ -44,6 +42,29 @@ def load_VQSPS_loader(config):
     vqsps_config = load_config_from_exp_name(vqsps_exp_name)
     model_path = os.path.join(VQSPS_EXP_ROOT, vqsps_exp_name, config['VQSPS']['CHECK_POINT_NAME'])
     return CommonEvaler(vqsps_config, model_path), vqsps_config
+
+
+def comb_q_z(ea, eb, q):
+    if q.dim() == 1:
+        q = q.unsqueeze(0).expand(ea.size(0), -1)
+    return torch.cat([ea, eb, q], dim=-1)
+
+
+def regul_sample(z_all_content):
+    idx_1 = torch.randperm(z_all_content.size(0))
+    z_perm = z_all_content[idx_1, ...]
+    z_a, z_b, z_c = split_into_three(z_perm)
+    return z_a, z_b, z_c
+
+
+def sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c):
+    is_add = torch.tensor(
+        [a + b == c for a, b, c in zip(label_a, label_b, label_c)],
+        device=per_loss_1.device,
+        dtype=torch.bool,
+    )
+    per_loss = torch.where(is_add, per_loss_1, per_loss_2)
+    return per_loss.mean()
 
 
 class OperNet(nn.Module):
@@ -83,19 +104,17 @@ class QueryLearn:
         self.config = config
         self._exp_dir = config.get('_exp_dir', None)
         self.sps_model, sps_config = load_VQSPS_loader(config)
-        self.train_sps = config.get('train_sps', False)
-        self._set_sps_trainable(self.train_sps)
-        # self.query_mapping = init_query_mapping(config['query_learner']).to(DEVICE)
+        self._set_sps_trainable()
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
-        # self.queries = nn.Parameter(torch.randn(config['query_learner']['n_query'], config['query_learner']['in_dim']))
-        self.queries = [torch.tensor([1., 0., 0, 0, 0, 0, 0 ,0]).to(DEVICE), torch.tensor([0., 1., 0, 0, 0, 0, 0 ,0]).to(DEVICE)]
+        self.query_dim = config.get('query_dim', config.get('query_learner', {}).get('in_dim', 8))
+        self.queries = nn.Parameter(torch.randn(2, self.query_dim, device=DEVICE))
         self.oper_net = OperNet(
-            in_dim=self.sps_model.latent_code_1 * 2 + self.queries[0].shape[0],
+            in_dim=self.sps_model.latent_code_1 * 2 + self.query_dim,
             out_dim=self.sps_model.latent_code_1,
             n_hidden_layers=config['operator']['n_hidden_layers'],
             unit=config['operator']['unit'],
             vq_layer=self.sps_model.model.vq_layer,
-            train_vq=self.train_sps,
+            train_vq=False,
         ).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -116,6 +135,7 @@ class QueryLearn:
         self._num_label_to_index = None
         self.mean_mse = nn.MSELoss(reduction='mean')
         self.sanity_check = config.get('sanity_check', False)
+        self.query_vis_format = config.get('query_vis_format', 'png').lower().lstrip('.')
         print('Sanity check mode...')
 
     def _ensure_num_z_c(self):
@@ -136,35 +156,21 @@ class QueryLearn:
                 label_to_index[lab] = i
         self._num_label_to_index = label_to_index
 
-    def _set_sps_trainable(self, train_sps: bool):
+    def _set_sps_trainable(self):
         for p in self.sps_model.model.parameters():
-            p.requires_grad = train_sps
-        if train_sps:
-            self.sps_model.model.train()
-        else:
-            self.sps_model.model.eval()
+            p.requires_grad = False
+        self.sps_model.model.eval()
 
-    def comb_q_z(self, ea, eb, q):
-        if q.dim() == 1:
-            q = q.unsqueeze(0).expand(ea.size(0), -1)
-        return torch.cat([ea, eb, q], dim=-1)
-
-    def regul_sample(self, z_all_content):
-        idx_1 = torch.randperm(z_all_content.size(0))
-        z_perm = z_all_content[idx_1, ...]
-        z_a, z_b, z_c = split_into_three(z_perm)
-        return z_a, z_b, z_c
-    
     def symm_loss(self, z_a, z_b, z_c, q):
-        e_ab, e_q_loss_ab, z_ab = self.oper_net(self.comb_q_z(z_a, z_b, q))
-        e_abc_1, e_q_loss_abc_1, z_abc_1 = self.oper_net(self.comb_q_z(e_ab, z_c, q))
+        e_ab, e_q_loss_ab, z_ab = self.oper_net(comb_q_z(z_a, z_b, q))
+        e_abc_1, e_q_loss_abc_1, z_abc_1 = self.oper_net(comb_q_z(e_ab, z_c, q))
         # symm_assoc
-        e_ac, e_q_loss_ac, z_ac = self.oper_net(self.comb_q_z(z_a, z_c, q))
-        e_acb_1, e_q_loss_acb_1, z_acb_1 = self.oper_net(self.comb_q_z(e_ac, z_b, q))
-        e_bac_2, e_q_loss_bac_2, z_bac_2 = self.oper_net(self.comb_q_z(z_b, e_ac, q))
+        e_ac, e_q_loss_ac, z_ac = self.oper_net(comb_q_z(z_a, z_c, q))
+        e_acb_1, e_q_loss_acb_1, z_acb_1 = self.oper_net(comb_q_z(e_ac, z_b, q))
+        e_bac_2, e_q_loss_bac_2, z_bac_2 = self.oper_net(comb_q_z(z_b, e_ac, q))
         # pure_assoc
-        e_bc, e_q_loss_bc, z_bc = self.oper_net(self.comb_q_z(z_b, z_c, q))
-        e_abc_2, e_q_loss_abc_2, z_abc_2 = self.oper_net(self.comb_q_z(z_a, e_bc, q))
+        e_bc, e_q_loss_bc, z_bc = self.oper_net(comb_q_z(z_b, z_c, q))
+        e_abc_2, e_q_loss_abc_2, z_abc_2 = self.oper_net(comb_q_z(z_a, e_bc, q))
         # choose loss
         assoc_plus_loss = torch.zeros(1)[0].to(DEVICE)
         if self.is_symm:
@@ -180,21 +186,25 @@ class QueryLearn:
             e_q_loss += e_q_loss_abc_2
         return assoc_plus_loss + self.eqLoss_scalar * e_q_loss
 
-    def _sanity_check_oper_loss(self, per_loss_1, per_loss_2, label_a, label_b, label_c):
-        is_add = torch.tensor(
-            [a + b == c for a, b, c in zip(label_a, label_b, label_c)],
-            device=per_loss_1.device,
-            dtype=torch.bool,
-        )
-        per_loss = torch.where(is_add, per_loss_1, per_loss_2)
-        return per_loss.mean()
-
-    def one_epoch(self, epoch, data_loader, optimizer=None, stage=STAGE_TRAIN, loss_counter: LossCounter=None):
-        is_train_stage = optimizer is not None and stage == STAGE_TRAIN
-        if self.train_sps:
-            self.sps_model.model.train(is_train_stage)
-        else:
-            self.sps_model.model.eval()
+    def one_epoch(
+            self,
+            epoch,
+            data_loader,
+            optimizer=None,
+            stage=STAGE_TRAIN,
+            loss_counter: LossCounter=None,
+            save_query_vis=False,
+            query_vis_dir=None):
+        self.sps_model.model.eval()
+        epoch_oper_losses = []
+        epoch_symm_losses = []
+        epoch_total_losses = []
+        epoch_label_a = []
+        epoch_label_b = []
+        epoch_label_c = []
+        epoch_q_out_1 = []
+        epoch_q_out_2 = []
+        epoch_ec = []
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
                 optimizer.zero_grad()
@@ -210,8 +220,8 @@ class QueryLearn:
             ea, eb, ec = split_into_three(e_content)
             q0 = self.queries[0]
             q1 = self.queries[1]
-            q_in_1 = self.comb_q_z(ea, eb, q0)
-            q_in_2 = self.comb_q_z(ea, eb, q1)
+            q_in_1 = comb_q_z(ea, eb, q0)
+            q_in_2 = comb_q_z(ea, eb, q1)
             e_q_out_1, eq_loss_1, z_q_out_1 = self.oper_net(q_in_1)
             e_q_out_2, eq_loss_2, z_q_out_2 = self.oper_net(q_in_2)
 
@@ -220,24 +230,51 @@ class QueryLearn:
             per_loss_2 = (e_q_out_2 - ec).pow(2).mean(dim=-1) + eq_loss_2 * self.eqLoss_scalar
 
             if self.sanity_check:
-                oper_loss = self._sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c)
+                oper_loss = sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c)
             else:
                 per_loss = torch.minimum(per_loss_1, per_loss_2)
                 oper_loss = per_loss.mean()
 
             # symm loss
-            q1_symm_loss = self.symm_loss(*self.regul_sample(e_content), q0)
-            q2_symm_loss = self.symm_loss(*self.regul_sample(e_content), q1)
+            q1_symm_loss = self.symm_loss(*regul_sample(e_content), q0)
+            q2_symm_loss = self.symm_loss(*regul_sample(e_content), q1)
             symm_loss = q1_symm_loss + q2_symm_loss
 
             total_loss = oper_loss + symm_loss
 
+            if loss_counter is not None or save_query_vis:
+                epoch_oper_losses.append(oper_loss.item())
+                epoch_symm_losses.append(symm_loss.item())
+                epoch_total_losses.append(total_loss.item())
+                epoch_label_a.extend(label_a)
+                epoch_label_b.extend(label_b)
+                epoch_label_c.extend(label_c)
+                epoch_q_out_1.append(z_q_out_1.detach().cpu())
+                epoch_q_out_2.append(z_q_out_2.detach().cpu())
+                epoch_ec.append(ec.detach().cpu())
+
+            if optimizer is not None:
+                total_loss.backward()
+                optimizer.step()
+
+        if (loss_counter is not None or save_query_vis) and epoch_oper_losses:
+            q_out_1_epoch = torch.cat(epoch_q_out_1, dim=0).to(DEVICE)
+            q_out_2_epoch = torch.cat(epoch_q_out_2, dim=0).to(DEVICE)
+            ec_epoch = torch.cat(epoch_ec, dim=0).to(DEVICE)
+            accu = self._batch_query_accu(
+                epoch_label_a,
+                epoch_label_b,
+                epoch_label_c,
+                q_out_1_epoch,
+                q_out_2_epoch,
+                ec_epoch,
+            )
             if loss_counter is not None:
-                accu = self._batch_query_accu(label_a, label_b, label_c, z_q_out_1, z_q_out_2, ec)
+                q_l2_dist = torch.norm(self.queries[0] - self.queries[1], p=2).item()
                 loss_counter.add_values([
-                    oper_loss.item(),
-                    symm_loss.item(),
-                    total_loss.item(),
+                    sum(epoch_oper_losses) / len(epoch_oper_losses),
+                    sum(epoch_symm_losses) / len(epoch_symm_losses),
+                    sum(epoch_total_losses) / len(epoch_total_losses),
                     accu['add_acc_q0'],
                     accu['add_acc_q1'],
                     accu['mul_acc_q0'],
@@ -246,19 +283,42 @@ class QueryLearn:
                     accu['mul_acc'],
                     accu['add_total'],
                     accu['mul_total'],
+                    q_l2_dist,
                 ])
-
-            if optimizer is not None:
-                total_loss.backward()
-                optimizer.step()
+            if save_query_vis:
+                if query_vis_dir is None:
+                    query_vis_dir = self.eval_result_path if stage == STAGE_VAL else self.train_result_path
+                stage_name = 'eval' if stage == STAGE_VAL else stage
+                q1_correct = self._query_target_correct(epoch_label_c, q_out_1_epoch)
+                q2_correct = self._query_target_correct(epoch_label_c, q_out_2_epoch)
+                query_specs = [
+                    ('q1', q1_correct, accu['add_acc_q0'], accu['mul_acc_q0']),
+                    ('q2', q2_correct, accu['add_acc_q1'], accu['mul_acc_q1']),
+                ]
+                save_query_operation_tables(
+                    query_vis_dir,
+                    stage_name,
+                    epoch,
+                    epoch_label_a,
+                    epoch_label_b,
+                    epoch_label_c,
+                    query_specs,
+                    self.query_vis_format,
+                )
 
     def _resume_model(self):
         if os.path.exists(self.model_path):
             ckpt = torch.load(self.model_path, map_location=DEVICE)
             if isinstance(ckpt, dict) and 'oper_net_state_dict' in ckpt:
                 self.oper_net.load_state_dict(ckpt['oper_net_state_dict'])
-                if self.train_sps and 'sps_model_state_dict' in ckpt:
-                    self.sps_model.model.load_state_dict(ckpt['sps_model_state_dict'])
+                if 'queries' in ckpt:
+                    ckpt_queries = ckpt['queries'].to(DEVICE)
+                    if ckpt_queries.shape != self.queries.shape:
+                        raise ValueError(
+                            f"Checkpoint query shape {tuple(ckpt_queries.shape)} does not match "
+                            f"current query shape {tuple(self.queries.shape)}"
+                        )
+                    self.queries.data.copy_(ckpt_queries)
             else:
                 self.oper_net.load_state_dict(ckpt)
             print(f"Model is loaded from {self.model_path}")
@@ -268,10 +328,9 @@ class QueryLearn:
     def _save_model(self, path, epoch):
         ckpt = {
             'oper_net_state_dict': self.oper_net.state_dict(),
+            'queries': self.queries.detach().cpu(),
             'epoch': epoch,
         }
-        if self.train_sps:
-            ckpt['sps_model_state_dict'] = self.sps_model.model.state_dict()
         torch.save(ckpt, path)
 
     def train(self):
@@ -280,32 +339,65 @@ class QueryLearn:
         self.oper_net.train()
         train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.train_record_path)
         eval_loss_counter = LossCounter(EVAL_TERMS, record_path=self.eval_record_path)
-        optim_params = list(self.oper_net.net.parameters())
-        if self.train_sps:
-            optim_params.extend(self.sps_model.model.parameters())
+        optim_params = list(self.oper_net.net.parameters()) + [self.queries]
         optimizer = optim.Adam(optim_params, lr=self.config['learning_rate'])
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         self._resume_model()
         for epoch in range(start_epoch, self.max_iter_num):
             print(f"Epoch {epoch}")
-            self.one_epoch(epoch, self.train_loader, optimizer, stage=STAGE_TRAIN, loss_counter=train_loss_counter)
+            is_log_epoch = epoch % self.log_interval == 0
+            self.one_epoch(
+                epoch,
+                self.train_loader,
+                optimizer,
+                stage=STAGE_TRAIN,
+                loss_counter=train_loss_counter,
+                save_query_vis=epoch % self.eval_interval == 0,
+                query_vis_dir=self.train_result_path,
+            )
 
-            if epoch % self.log_interval == 0:
+            if is_log_epoch:
                 train_loss_counter.record_and_clear(num=epoch)
 
             if epoch % self.eval_interval == 0:
                 self.oper_net.eval()
                 with torch.no_grad():
-                    self.one_epoch(epoch, self.eval_loader, optimizer=None, stage=STAGE_VAL, loss_counter=eval_loss_counter)
+                    self.one_epoch(
+                        epoch,
+                        self.eval_loader,
+                        optimizer=None,
+                        stage=STAGE_VAL,
+                        loss_counter=eval_loss_counter,
+                        save_query_vis=is_log_epoch,
+                        query_vis_dir=self.eval_result_path,
+                    )
                 eval_loss_counter.record_and_clear(num=epoch)
                 self.oper_net.train()
 
             if epoch % self.checkpoint_interval == 0 and epoch >= self.checkpoint_after:
-                ckpt_dir = self._exp_dir if self._exp_dir else self.train_result_path
+                ckpt_dir = self._exp_dir
                 ckpt_name = os.path.join(ckpt_dir, f'checkpoint_{epoch}.pt')
                 self._save_model(ckpt_name, epoch)
                 self._save_model(self.model_path, epoch)
 
+    def _query_target_correct(self, target_labels, q_out):
+        self._ensure_num_z_c()
+        target_idx = [self._num_label_to_index.get(label, -1) for label in target_labels]
+        target_idx = torch.tensor(target_idx, device=DEVICE)
+        valid_mask = target_idx >= 0
+        correct = torch.zeros(len(target_labels), device=DEVICE, dtype=torch.bool)
+        if not valid_mask.any():
+            return correct
+
+        q_valid = q_out[valid_mask]
+        idx_valid = target_idx[valid_mask]
+        target_z = self.num_z_c[idx_valid]
+        dist_target = (q_valid - target_z).pow(2).sum(dim=-1)
+        dist_all = torch.cdist(q_valid, self.num_z_c, p=2).pow(2)
+        dist_all[torch.arange(dist_all.size(0), device=DEVICE), idx_valid] = float('inf')
+        min_other = dist_all.min(dim=1).values
+        correct[valid_mask] = dist_target < min_other
+        return correct
 
     def _batch_query_accu(self, label_a, label_b, label_c, q_out_1, q_out_2, ec):
         self._ensure_num_z_c()
@@ -413,26 +505,3 @@ class QueryLearn:
             'add_total': add_total,
             'mul_total': mul_total,
         }
-
-
-if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        exp_name = sys.argv[1]
-        exp_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'exps')
-        exp_path = os.path.join(exp_root, exp_name)
-        sys.path.append(exp_path)
-        t_config = __import__('config')
-        from importlib import reload
-        reload(t_config)
-        sys.path.pop()
-        CONFIG = t_config.CONFIG
-        CONFIG['_exp_dir'] = exp_path
-        CONFIG['train_result_path'] = CONFIG.get('train_result_path', 'TrainingResults')
-        CONFIG['eval_result_path'] = CONFIG.get('eval_result_path', 'EvalResults')
-        CONFIG['train_record_path'] = os.path.join(CONFIG['train_result_path'], 'Train_record.txt')
-        CONFIG['eval_record_path'] = os.path.join(CONFIG['eval_result_path'], 'Eval_record.txt')
-        CONFIG['model_path'] = CONFIG.get('model_path', 'curr_model.pt')
-        query_learner = QueryLearn(CONFIG)
-        query_learner.train()
-    else:
-        raise SystemExit("Usage: python QueryLearn.py <EXP_NAME>")
