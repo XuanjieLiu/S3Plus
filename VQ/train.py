@@ -138,7 +138,6 @@ class PlusTrainer:
         self.is_assoc_within_batch = config['is_assoc_within_batch']
         self.is_plot_zc_value = config['is_plot_zc_value']
         self.is_plot_vis_num = config['is_plot_vis_num']
-        self.is_symm_assoc = config['is_symm_assoc']
         self.is_assoc = config.get('is_assoc', False)
         self.is_commutative_all = config['is_commutative_all']
         self.is_full_symm = config['is_full_symm']
