@@ -10,8 +10,7 @@ AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
-    'plus_eval_set_path': EVAL_SET_1,
-    'plus_eval_set_path_2': EVAL_SET_2,
+    'plus_eval_set_path': [EVAL_SET_1, EVAL_SET_2],
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -58,8 +57,7 @@ CONFIG = {
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
     'is_full_symm': False,
-    'is_symm_assoc': False,
-    'is_pure_assoc': False,
+    'is_assoc': False,
     'is_twice_oper': False,
     'img_noise': 0.0,
     'network_config': {
