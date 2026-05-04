@@ -1,0 +1,138 @@
+{
+    "eval_set_one2n_accu": {
+        "value": "0.74 \\pm 0.27",
+        "mean": 0.737116564417178,
+        "std": 0.2679954808921489,
+        "max": 0.9938650306748467,
+        "min": 0.15337423312883436,
+        "count": 20
+    },
+    "eval_set_one2one_accu": {
+        "value": "0.74 \\pm 0.27",
+        "mean": 0.737116564417178,
+        "std": 0.2679954808921489,
+        "max": 0.9938650306748467,
+        "min": 0.15337423312883436,
+        "count": 20
+    },
+    "eval_set_one2n_accu_cycle": {
+        "value": "0.84 \\pm 0.21",
+        "mean": 0.8386503067484664,
+        "std": 0.20839128128811715,
+        "max": 1.0,
+        "min": 0.27607361963190186,
+        "count": 20
+    },
+    "eval_set_one2one_accu_cycle": {
+        "value": "0.84 \\pm 0.21",
+        "mean": 0.8386503067484664,
+        "std": 0.20839128128811715,
+        "max": 1.0,
+        "min": 0.27607361963190186,
+        "count": 20
+    },
+    "eval_set_emb_select_accu": {
+        "value": "0.84 \\pm 0.19",
+        "mean": 0.8383435582822086,
+        "std": 0.19290820607739173,
+        "max": 1.0,
+        "min": 0.2883435582822086,
+        "count": 20
+    },
+    "eval_set_emb_select_accu_cycle": {
+        "value": "0.86 \\pm 0.19",
+        "mean": 0.8567484662576688,
+        "std": 0.18559955306623274,
+        "max": 1.0,
+        "min": 0.31901840490797545,
+        "count": 20
+    },
+    "eval_set_emb_self_consistency": {
+        "value": "0.81 \\pm 0.21",
+        "mean": 0.806441717791411,
+        "std": 0.2146754984828005,
+        "max": 1.0,
+        "min": 0.3006134969325153,
+        "count": 20
+    },
+    "eval_set_emb_label_consistency": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 20
+    },
+    "eval_set_z_c_recognition_rate": {
+        "value": "0.79 \\pm 0.23",
+        "mean": 0.7861963190184048,
+        "std": 0.23166536942087804,
+        "max": 1.0,
+        "min": 0.27607361963190186,
+        "count": 20
+    },
+    "eval_set_z_c_cycle_recognition_rate": {
+        "value": "0.95 \\pm 0.08",
+        "mean": 0.9530674846625768,
+        "std": 0.07531971075327755,
+        "max": 1.0,
+        "min": 0.7730061349693251,
+        "count": 20
+    },
+    "emb_matching_rate_one2n": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 20
+    },
+    "emb_matching_rate_one2one": {
+        "value": "1.0 \\pm 0.0",
+        "mean": 1.0,
+        "std": 0.0,
+        "max": 1.0,
+        "min": 1.0,
+        "count": 20
+    },
+    "orderliness": {
+        "value": "0.94 \\pm 0.08",
+        "mean": 0.93625,
+        "std": 0.08421512631350737,
+        "max": 1.0,
+        "min": 0.7,
+        "count": 20
+    },
+    "train_interpolate_modedict": {
+        "value": "0.74 \\pm 0.25",
+        "mean": 0.7361904761904763,
+        "std": 0.24853493620107348,
+        "max": 0.9904761904761905,
+        "min": 0.14285714285714285,
+        "count": 20
+    },
+    "train_interpolate_cycle_modedict": {
+        "value": "0.84 \\pm 0.19",
+        "mean": 0.8433333333333335,
+        "std": 0.19292415061665155,
+        "max": 1.0,
+        "min": 0.3333333333333333,
+        "count": 20
+    },
+    "train_interpolate_selection": {
+        "value": "0.85 \\pm 0.19",
+        "mean": 0.8480952380952381,
+        "std": 0.18763294606486247,
+        "max": 1.0,
+        "min": 0.3238095238095238,
+        "count": 20
+    },
+    "train_interpolate_cycle_selection": {
+        "value": "0.87 \\pm 0.18",
+        "mean": 0.8652380952380954,
+        "std": 0.17528143873907445,
+        "max": 1.0,
+        "min": 0.4,
+        "count": 20
+    }
+}
