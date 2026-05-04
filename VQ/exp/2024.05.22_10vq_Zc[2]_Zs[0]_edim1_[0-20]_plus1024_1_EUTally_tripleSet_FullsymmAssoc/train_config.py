@@ -1,17 +1,16 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
-EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1"
-EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2"
-TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet/train"
-SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
+EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet_EU_tally/test_1"
+EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet_EU_tally/test_2"
+TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet_EU_tally/train"
+SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle_EU_tally"
 IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
-    'plus_eval_set_path': EVAL_SET_1,
-    'plus_eval_set_path_2': EVAL_SET_2,
+    'plus_eval_set_path': [EVAL_SET_1, EVAL_SET_2],
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -37,28 +36,30 @@ CONFIG = {
     'batch_size': 128,
     'is_commutative_train': False,
     'is_commutative_all': False,
-    'z_plus_loss_scalar': 0.0,
+    'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.0,
+    'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
-    'plus_recon_loss_scalar': 0,
+    'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
     'K': 1024,
     'assoc_aug_range': (-3, 3),
     'commitment_scalar': 0.0025,
     'embedding_scalar': 0.01,
     'isVQStyle': False,
-    'plus_by_embedding': False,
+    'plus_by_embedding': True,
     'plus_by_zcode': False,
-    'VQPlus_eqLoss_scalar': 0.0,
+    'VQPlus_eqLoss_scalar': 0.5,
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
+    'is_assoc_on_e': True,
+    'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_full_symm': False,
-    'is_pure_assoc': False,
+    'is_symm_assoc': True,
+    'is_full_symm': True,
+    'is_pure_assoc': True,
     'is_twice_oper': False,
-    'img_noise': 0.0,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
@@ -75,7 +76,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
-'eval_config': {
+    'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',

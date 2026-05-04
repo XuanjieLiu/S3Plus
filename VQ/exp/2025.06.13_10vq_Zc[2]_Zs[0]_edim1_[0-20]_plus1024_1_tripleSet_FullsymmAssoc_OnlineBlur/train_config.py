@@ -1,17 +1,24 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
+TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet/train"
 EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1"
 EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2"
-TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet/train"
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
-IS_BLUR = False
-AUGMENT_TIMES = 1
+AUGMENT_TIMES = 16
+IS_BLUR = True
+BLUR_CONFIG = {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
+    'kernel_size_choices': (5, 7, 9),
+    'sigma_range': (0.5, 3.0),
+    'p_no_blur': 0.00,
+}
 CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
     'plus_eval_set_path': EVAL_SET_1,
     'plus_eval_set_path_2': EVAL_SET_2,
+    'is_random_split_data': False,  # 是否随机划分数据集. 如果为True, 则eval_data_path, plus_eval_set_path_2会被忽略. 数据从train_data_path中随机划分
+    'train_data_ratio': 0.8,  # 如果is_random_split_data为True, 则表示从train_data_path中随机划分出多少比例的数据作为训练集
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
@@ -37,28 +44,30 @@ CONFIG = {
     'batch_size': 128,
     'is_commutative_train': False,
     'is_commutative_all': False,
-    'z_plus_loss_scalar': 0.0,
+    'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.0,
+    'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
-    'plus_recon_loss_scalar': 0,
+    'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
     'K': 1024,
     'assoc_aug_range': (-3, 3),
     'commitment_scalar': 0.0025,
     'embedding_scalar': 0.01,
     'isVQStyle': False,
-    'plus_by_embedding': False,
+    'plus_by_embedding': True,
     'plus_by_zcode': False,
-    'VQPlus_eqLoss_scalar': 0.0,
+    'VQPlus_eqLoss_scalar': 0.5,
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
+    'is_assoc_on_e': True,
+    'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_full_symm': False,
-    'is_pure_assoc': False,
+    'is_symm_assoc': True,
+    'is_full_symm': True,
+    'is_pure_assoc': True,
     'is_twice_oper': False,
-    'img_noise': 0.0,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
@@ -75,26 +84,26 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
-'eval_config': {
+    'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
+    'blur_config': BLUR_CONFIG,
+    'augment_times': AUGMENT_TIMES,
+    'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',
             'record_name': 'Train_record.txt',
-            'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'],
-            'iter_after': 0.1,
+            'keys': ['plus_z', 'plus_recon', 'loss_oper', 'loss_ED'],
+            'iter_after': 0.5,
         },
         'plus_eval_configs': [
             {
                 'name': 'eval_set',
                 'eval_set_path_list': [
-                    EVAL_SET_1, EVAL_SET_2
+                    EVAL_SET_1,
+                    EVAL_SET_2,
                 ],
-                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -104,12 +113,8 @@ CONFIG = {
                 'eval_set_path_list': [
                     SINGLE_IMG_SET,
                 ],
-                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -120,12 +125,8 @@ CONFIG = {
                 'eval_set_path_list': [
                     SINGLE_IMG_SET,
                 ],
-                'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
+                'is_blur': True,  # 是否在评估时模糊处理图像
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
                 'augment_times': AUGMENT_TIMES,
             },
         ],
@@ -136,13 +137,9 @@ CONFIG = {
                     TRAIN_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
-                'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
-                    'kernel_size_choices': (5, 7, 9),
-                    'sigma_range': (0.5, 3.0),
-                    'p_no_blur': 0.00,
-                },
+                'blur_config': BLUR_CONFIG,  # 模糊处理配置, 如果is_blur为True, 则使用此配置
                 'augment_times': AUGMENT_TIMES,
-                'interpolate_num': 1,
+                'interpolate_num': 10,
             },
         ],
     },

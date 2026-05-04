@@ -1,64 +1,68 @@
 import os
 
 data_root = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../../../dataset')
-EVAL_SET_1 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_1"
-EVAL_SET_2 = f"{data_root}/single_style_pairs(0,20)_tripleSet/test_2"
-TRAIN_SET = f"{data_root}/single_style_pairs(0,20)_tripleSet/train"
-SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-oneStyle"
+EVAL_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/test"
+TRAIN_SET = f"{data_root}/multi_style_(4,4)_realPairs_plus(0,20)/train"
+SINGLE_IMG_SET = f"{data_root}/multi_style_eval_(0,20)_FixedPos_TrainStyle"
 IS_BLUR = False
 AUGMENT_TIMES = 1
 CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
-    'plus_eval_set_path': EVAL_SET_1,
-    'plus_eval_set_path_2': EVAL_SET_2,
+    'plus_eval_set_path': EVAL_SET,
+    'plus_eval_set_path_2': None,
+    'is_random_split_data': False,
+    'is_blur': IS_BLUR,
+    'num_workers': 0,
     'latent_embedding_1': 2,
     'latent_embedding_2': 0,
     'multi_num_embeddings': None,
-    'latent_code_2': 0,
+    'latent_code_2': 4,
     'embedding_dim': 1,
-    'is_plot_zc_value': True,
+    'is_plot_zc_value': False,
     'embeddings_num': 10,
-    'is_plot_vis_num': True,
+    'is_plot_vis_num': False,
     'kld_loss_scalar': 0.0,
-    'checkpoint_interval': 2000,
+    'checkpoint_interval': 500,
     'learning_rate': 1e-4,
     'scheduler_base_num': 0.99999,
-    'max_iter_num': 50001,
+    'max_iter_num': 10001,
     'model_path': 'curr_model.pt',
     'train_result_path': 'TrainingResults/',
     'eval_result_path': 'EvalResults/',
     'train_record_path': "Train_record.txt",
     'eval_record_path': "Eval_record.txt",
     'plus_accu_record_path': "plus_eval.txt",
-    'log_interval': 500,
-    'eval_interval': 2000,
+    'log_interval': 100,
+    'eval_interval': 500,
     'is_save_img': True,
-    'batch_size': 128,
+    'batch_size': 256,
     'is_commutative_train': False,
     'is_commutative_all': False,
-    'z_plus_loss_scalar': 0.0,
+    'z_plus_loss_scalar': 0.02,
     'commutative_z_loss_scalar': 0.0,
-    'associative_z_loss_scalar': 0.0,
+    'associative_z_loss_scalar': 0.02,
     'plus_mse_scalar': -1,
-    'plus_recon_loss_scalar': 0,
+    'plus_recon_loss_scalar': 3,
     'min_loss_scalar': 0.00001,
     'K': 1024,
     'assoc_aug_range': (-3, 3),
     'commitment_scalar': 0.0025,
     'embedding_scalar': 0.01,
     'isVQStyle': False,
-    'plus_by_embedding': False,
+    'plus_by_embedding': True,
     'plus_by_zcode': False,
-    'VQPlus_eqLoss_scalar': 0.0,
+    'VQPlus_eqLoss_scalar': 0.5,
     'is_zc_based_assoc': True,
     'is_rand_z_assoc': False,
+    'is_assoc_on_e': True,
+    'is_assoc_on_z': False,
     'is_assoc_within_batch': True,
     'is_switch_digital': False,
-    'is_full_symm': False,
-    'is_pure_assoc': False,
+    'is_symm_assoc': True,
+    'is_full_symm': True,
+    'is_pure_assoc': True,
     'is_twice_oper': False,
-    'img_noise': 0.0,
     'network_config': {
         'enc_dec': {
             'img_channel': 3,
@@ -75,7 +79,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
-'eval_config': {
+    'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',
@@ -87,7 +91,7 @@ CONFIG = {
             {
                 'name': 'eval_set',
                 'eval_set_path_list': [
-                    EVAL_SET_1, EVAL_SET_2
+                    EVAL_SET,
                 ],
                 'is_blur': IS_BLUR,  # 是否在评估时模糊处理图像
                 'blur_config': {  # 模糊处理配置, 如果is_blur为True, 则使用此配置
@@ -142,7 +146,7 @@ CONFIG = {
                     'p_no_blur': 0.00,
                 },
                 'augment_times': AUGMENT_TIMES,
-                'interpolate_num': 1,
+                'interpolate_num': 10,
             },
         ],
     },
