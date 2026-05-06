@@ -26,8 +26,9 @@ CONFIG = {
     'query_learner': {
         'in_dim': 2,  # 示例输入维度
         'out_dim': 2,  # 示例输出维度
+        'train_queries': False, # 是否训练查询向量
     },
-    'query_dim': 2,
+    'query_dim': 8,
     'query_vis_format': 'png',
     'operator': {
         'unit': 1024,
@@ -40,7 +41,7 @@ CONFIG = {
     'train_data_ratio': 0.8,
     'checkpoint_interval': 2000,
     'checkpoint_after': 28000,
-    'learning_rate': 1e-4,
+    'learning_rate': 1e-3,
     'scheduler_base_num': 0.99999,
     'max_iter_num': 50001,
     'model_path': 'curr_model.pt',
@@ -53,7 +54,7 @@ CONFIG = {
     'batch_size': 256,
     'is_symm': True,
     'is_assoc': False,
-    'symm_loss_scalar': 1.,
+    'symm_loss_scalar': 0.2,
     'eqLoss_scalar': 0.05,
     'sanity_check': True,
 }

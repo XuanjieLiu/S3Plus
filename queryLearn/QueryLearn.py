@@ -107,7 +107,9 @@ class QueryLearn:
         self._set_sps_trainable()
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
         self.query_dim = config.get('query_dim', config.get('query_learner', {}).get('in_dim', 8))
-        self.queries = nn.Parameter(torch.randn(2, self.query_dim, device=DEVICE))
+        self.train_queries = config.get('train_queries', config.get('query_learner', {}).get('train_queries', False))
+        queries = torch.randn(2, self.query_dim, device=DEVICE)
+        self.queries = nn.Parameter(queries) if self.train_queries else queries
         self.oper_net = OperNet(
             in_dim=self.sps_model.latent_code_1 * 2 + self.query_dim,
             out_dim=self.sps_model.latent_code_1,
@@ -318,7 +320,8 @@ class QueryLearn:
                             f"Checkpoint query shape {tuple(ckpt_queries.shape)} does not match "
                             f"current query shape {tuple(self.queries.shape)}"
                         )
-                    self.queries.data.copy_(ckpt_queries)
+                    with torch.no_grad():
+                        self.queries.copy_(ckpt_queries)
             else:
                 self.oper_net.load_state_dict(ckpt)
             print(f"Model is loaded from {self.model_path}")
@@ -339,7 +342,9 @@ class QueryLearn:
         self.oper_net.train()
         train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.train_record_path)
         eval_loss_counter = LossCounter(EVAL_TERMS, record_path=self.eval_record_path)
-        optim_params = list(self.oper_net.net.parameters()) + [self.queries]
+        optim_params = list(self.oper_net.net.parameters())
+        if self.train_queries:
+            optim_params.append(self.queries)
         optimizer = optim.Adam(optim_params, lr=self.config['learning_rate'])
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         self._resume_model()
