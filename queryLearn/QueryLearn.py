@@ -106,8 +106,8 @@ class QueryLearn:
         self.sps_model, sps_config = load_VQSPS_loader(config)
         self._set_sps_trainable()
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
-        self.query_dim = config.get('query_dim', config.get('query_learner', {}).get('in_dim', 8))
-        self.train_queries = config.get('train_queries', config.get('query_learner', {}).get('train_queries', False))
+        self.query_dim = config.get('query_learner', {}).get('in_dim', 8)
+        self.train_queries = config.get('query_learner', {}).get('train_queries', False)
         queries = torch.randn(2, self.query_dim, device=DEVICE)
         self.queries = nn.Parameter(queries) if self.train_queries else queries
         self.oper_net = OperNet(
@@ -175,17 +175,17 @@ class QueryLearn:
         e_abc_2, e_q_loss_abc_2, z_abc_2 = self.oper_net(comb_q_z(z_a, e_bc, q))
         # choose loss
         assoc_plus_loss = torch.zeros(1)[0].to(DEVICE)
+        e_q_loss = torch.zeros(1)[0].to(DEVICE)
         if self.is_symm:
             assoc_plus_loss += self.mean_mse(e_abc_1, e_acb_1) * self.symm_loss_scalar
             assoc_plus_loss += self.mean_mse(e_abc_2, e_bac_2) * self.symm_loss_scalar
-        if self.is_assoc:
-            assoc_plus_loss += self.mean_mse(e_abc_1, e_abc_2) * self.symm_loss_scalar
-        e_q_loss = e_q_loss_ab + e_q_loss_abc_1
-        if self.is_symm:
             e_q_loss += e_q_loss_acb_1
             e_q_loss += e_q_loss_bac_2
         if self.is_assoc:
+            assoc_plus_loss += self.mean_mse(e_abc_1, e_abc_2) * self.symm_loss_scalar
             e_q_loss += e_q_loss_abc_2
+        if self.is_symm or self.is_assoc:   
+            e_q_loss += e_q_loss_ab + e_q_loss_abc_1
         return assoc_plus_loss + self.eqLoss_scalar * e_q_loss
 
     def one_epoch(
@@ -227,9 +227,10 @@ class QueryLearn:
             e_q_out_1, eq_loss_1, z_q_out_1 = self.oper_net(q_in_1)
             e_q_out_2, eq_loss_2, z_q_out_2 = self.oper_net(q_in_2)
 
-            # Per-sample MSE to ec, then choose the smaller one as loss
-            per_loss_1 = (e_q_out_1 - ec).pow(2).mean(dim=-1) + eq_loss_1 * self.eqLoss_scalar
-            per_loss_2 = (e_q_out_2 - ec).pow(2).mean(dim=-1) + eq_loss_2 * self.eqLoss_scalar
+            # Per-sample MSE decides query assignment; VQ loss is batch-level regularization.
+            per_loss_1 = (e_q_out_1 - ec).pow(2).mean(dim=-1)
+            per_loss_2 = (e_q_out_2 - ec).pow(2).mean(dim=-1)
+            query_eq_loss = (eq_loss_1 + eq_loss_2) * self.eqLoss_scalar
 
             if self.sanity_check:
                 oper_loss = sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c)
@@ -242,7 +243,7 @@ class QueryLearn:
             q2_symm_loss = self.symm_loss(*regul_sample(e_content), q1)
             symm_loss = q1_symm_loss + q2_symm_loss
 
-            total_loss = oper_loss + symm_loss
+            total_loss = oper_loss + query_eq_loss + symm_loss
 
             if loss_counter is not None or save_query_vis:
                 epoch_oper_losses.append(oper_loss.item())

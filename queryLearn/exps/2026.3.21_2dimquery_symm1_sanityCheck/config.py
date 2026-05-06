@@ -22,8 +22,9 @@ CONFIG = {
         'CHECK_POINT_NAME': '1/checkpoint_48000.pt',
     },
     'query_learner': {
-        'in_dim': 2,  # 示例输入维度
-        'out_dim': 4,  # 示例输出维度
+        'query_dim': 8,
+        'out_dim': 2,  # 示例输出维度
+        'train_queries': False, # 是否训练查询向量
     },
     'operator': {
         'unit': 1024,

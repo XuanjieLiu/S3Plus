@@ -23,8 +23,9 @@ CONFIG = {
     },
     'train_sps': True,
     'query_learner': {
-        'in_dim': 8,  # 示例输入维度
-        'out_dim': 8,  # 示例输出维度
+        'query_dim': 8,
+        'out_dim': 2,  # 示例输出维度
+        'train_queries': False, # 是否训练查询向量
     },
     'query_dim': 8,
     'query_vis_format': 'png',
