@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box { fill: #f8fafc; stroke: #334155; stroke-width: 2; rx: 10; }
+      .small { fill: #eef2ff; stroke: #4f46e5; stroke-width: 2; rx: 8; }
+      .vq { fill: #ecfdf5; stroke: #047857; stroke-width: 2; rx: 10; }
+      .loss { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; rx: 10; }
+      .text { font-family: Arial, Helvetica, sans-serif; font-size: 18px; fill: #0f172a; }
+      .sub { font-family: Arial, Helvetica, sans-serif; font-size: 14px; fill: #475569; }
+      .formula { font-family: Arial, Helvetica, sans-serif; font-size: 15px; fill: #1e293b; }
+      .arrow { stroke: #334155; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #4f46e5; stroke-width: 2; fill: none; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="40" y="42" class="text" font-weight="700">FiLM-conditioned OperNet in queryLearn</text>
+  <text x="40" y="68" class="sub">A frozen VQ/SPS encoder provides content embeddings. Query q modulates every hidden layer of one shared OperNet.</text>
+
+  <rect x="50" y="135" width="120" height="70" class="box"/>
+  <text x="83" y="165" class="text">image a</text>
+  <text x="93" y="188" class="sub">label a</text>
+
+  <rect x="50" y="245" width="120" height="70" class="box"/>
+  <text x="83" y="275" class="text">image b</text>
+  <text x="93" y="298" class="sub">label b</text>
+
+  <rect x="50" y="355" width="120" height="70" class="box"/>
+  <text x="83" y="385" class="text">image c</text>
+  <text x="88" y="408" class="sub">target c</text>
+
+  <rect x="230" y="135" width="145" height="290" class="vq"/>
+  <text x="258" y="262" class="text">Frozen</text>
+  <text x="255" y="288" class="text">VQ/SPS</text>
+  <text x="260" y="314" class="sub">encoder</text>
+
+  <path d="M170 170 L230 170" class="arrow"/>
+  <path d="M170 280 L230 280" class="arrow"/>
+  <path d="M170 390 L230 390" class="arrow"/>
+
+  <rect x="430" y="130" width="120" height="55" class="box"/>
+  <text x="472" y="163" class="text">e_a</text>
+  <rect x="430" y="235" width="120" height="55" class="box"/>
+  <text x="472" y="268" class="text">e_b</text>
+  <rect x="430" y="365" width="120" height="55" class="box"/>
+  <text x="472" y="398" class="text">e_c</text>
+
+  <path d="M375 170 L430 157" class="arrow"/>
+  <path d="M375 280 L430 262" class="arrow"/>
+  <path d="M375 390 L430 392" class="arrow"/>
+
+  <rect x="610" y="90" width="100" height="55" class="small"/>
+  <text x="648" y="123" class="text">q</text>
+  <text x="630" y="142" class="sub">q0 or q1</text>
+
+  <rect x="610" y="205" width="170" height="70" class="box"/>
+  <text x="650" y="236" class="text">pair input</text>
+  <text x="638" y="258" class="formula">x = [e_a ; e_b]</text>
+
+  <path d="M550 157 L610 225" class="arrow"/>
+  <path d="M550 262 L610 255" class="arrow"/>
+
+  <rect x="840" y="185" width="230" height="120" class="box"/>
+  <text x="890" y="218" class="text">Shared MLP</text>
+  <text x="868" y="245" class="formula">u_l = W_l h_(l-1) + b_l</text>
+  <text x="868" y="272" class="formula">h_l = ReLU(FiLM_l(u_l,q))</text>
+
+  <rect x="850" y="75" width="210" height="75" class="small"/>
+  <text x="890" y="105" class="text">FiLM from q</text>
+  <text x="874" y="130" class="formula">gamma_l, beta_l = A_l q + c_l</text>
+
+  <path d="M710 118 L850 112" class="dash"/>
+  <path d="M955 150 L955 185" class="dash"/>
+  <path d="M780 240 L840 240" class="arrow"/>
+
+  <rect x="900" y="360" width="120" height="60" class="box"/>
+  <text x="928" y="395" class="text">z_pred</text>
+  <path d="M955 305 L960 360" class="arrow"/>
+
+  <rect x="900" y="475" width="120" height="60" class="vq"/>
+  <text x="935" y="510" class="text">VQ</text>
+  <path d="M960 420 L960 475" class="arrow"/>
+
+  <rect x="1060" y="475" width="95" height="60" class="box"/>
+  <text x="1080" y="510" class="text">e_pred</text>
+  <path d="M1020 505 L1060 505" class="arrow"/>
+
+  <rect x="675" y="455" width="150" height="95" class="loss"/>
+  <text x="710" y="490" class="text">target loss</text>
+  <text x="694" y="518" class="formula">MSE(e_pred, e_c)</text>
+
+  <path d="M550 392 L675 488" class="arrow"/>
+  <path d="M1060 520 C970 590 820 585 765 550" class="arrow"/>
+
+  <rect x="610" y="320" width="205" height="75" class="loss"/>
+  <text x="636" y="350" class="text">sanity assignment</text>
+  <text x="628" y="375" class="formula">add: use q0, else: use q1</text>
+</svg>

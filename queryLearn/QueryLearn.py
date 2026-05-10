@@ -67,14 +67,63 @@ def sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c):
     return per_loss.mean()
 
 
+def init_queries(query_config, query_dim):
+    init_values = query_config.get('init_queries', None)
+    if init_values is None:
+        return torch.randn(2, query_dim, device=DEVICE)
+    queries = torch.tensor(init_values, dtype=torch.float32, device=DEVICE)
+    if queries.shape != (2, query_dim):
+        raise ValueError(
+            f"init_queries shape {tuple(queries.shape)} does not match expected {(2, query_dim)}"
+        )
+    return queries
+
+
 class OperNet(nn.Module):
-    def __init__(self, in_dim, out_dim, n_hidden_layers, unit, vq_layer: MultiVectorQuantizer, train_vq: bool = False):
+    def __init__(
+            self,
+            in_dim,
+            out_dim,
+            n_hidden_layers,
+            unit,
+            vq_layer: MultiVectorQuantizer,
+            train_vq: bool = False,
+            condition_mode: str = 'concat',
+            pair_dim: int = None,
+            query_dim: int = None,
+            film_init_identity: bool = True):
         super().__init__()
-        layers = [nn.Linear(in_dim, unit), nn.ReLU()]
-        for _ in range(n_hidden_layers - 1):
-            layers.extend([nn.Linear(unit, unit), nn.ReLU()])
-        layers.append(nn.Linear(unit, out_dim))
-        self.net = nn.Sequential(*layers)
+        self.condition_mode = condition_mode.lower()
+        self.pair_dim = pair_dim
+        self.query_dim = query_dim
+        self.n_hidden_layers = n_hidden_layers
+        if self.condition_mode not in {'concat', 'film'}:
+            raise ValueError(f"Unsupported operator condition_mode: {condition_mode}")
+        if n_hidden_layers < 1:
+            raise ValueError("OperNet expects at least one hidden layer")
+
+        if self.condition_mode == 'concat':
+            layers = [nn.Linear(in_dim, unit), nn.ReLU()]
+            for _ in range(n_hidden_layers - 1):
+                layers.extend([nn.Linear(unit, unit), nn.ReLU()])
+            layers.append(nn.Linear(unit, out_dim))
+            self.net = nn.Sequential(*layers)
+        else:
+            if pair_dim is None or query_dim is None:
+                raise ValueError("FiLM OperNet requires pair_dim and query_dim")
+            self.input_layer = nn.Linear(pair_dim, unit)
+            self.hidden_layers = nn.ModuleList([
+                nn.Linear(unit, unit) for _ in range(n_hidden_layers - 1)
+            ])
+            self.film_layers = nn.ModuleList([
+                nn.Linear(query_dim, unit * 2) for _ in range(n_hidden_layers)
+            ])
+            self.output_layer = nn.Linear(unit, out_dim)
+            if film_init_identity:
+                for layer in self.film_layers:
+                    nn.init.zeros_(layer.weight)
+                    nn.init.zeros_(layer.bias)
+
         self.vq_layer = vq_layer
         self.train_vq = train_vq
         self._set_vq_trainable(train_vq)
@@ -84,8 +133,25 @@ class OperNet(nn.Module):
         for p in self.vq_layer.parameters():
             p.requires_grad = train_vq
 
+    def _film(self, h, q, layer_idx):
+        gamma, beta = self.film_layers[layer_idx](q).chunk(2, dim=-1)
+        return h * (1.0 + gamma) + beta
+
+    def _film_forward(self, x):
+        z_pair = x[..., :self.pair_dim]
+        q = x[..., self.pair_dim:]
+        h = self.input_layer(z_pair)
+        h = torch.relu(self._film(h, q, 0))
+        for idx, layer in enumerate(self.hidden_layers, start=1):
+            h = layer(h)
+            h = torch.relu(self._film(h, q, idx))
+        return self.output_layer(h)
+
     def forward(self, x):
-        z_oper = self.net(x)
+        if self.condition_mode == 'concat':
+            z_oper = self.net(x)
+        else:
+            z_oper = self._film_forward(x)
         e_oper, e_q_loss = self.vq_layer(z_oper)
         return e_oper, e_q_loss, z_oper
 
@@ -104,19 +170,26 @@ class QueryLearn:
         self.config = config
         self._exp_dir = config.get('_exp_dir', None)
         self.sps_model, sps_config = load_VQSPS_loader(config)
-        self._set_sps_trainable()
+        self._set_sps_untrainable()
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
-        self.query_dim = config.get('query_learner', {}).get('in_dim', 8)
-        self.train_queries = config.get('query_learner', {}).get('train_queries', False)
-        queries = torch.randn(2, self.query_dim, device=DEVICE)
+        query_config = config.get('query_learner', {})
+        self.query_dim = query_config.get('query_dim', query_config.get('in_dim', 8))
+        self.train_queries = query_config.get('train_queries', False)
+        queries = init_queries(query_config, self.query_dim)
         self.queries = nn.Parameter(queries) if self.train_queries else queries
+        operator_config = config['operator']
+        operator_condition_mode = operator_config.get('condition_mode', 'concat')
         self.oper_net = OperNet(
             in_dim=self.sps_model.latent_code_1 * 2 + self.query_dim,
             out_dim=self.sps_model.latent_code_1,
-            n_hidden_layers=config['operator']['n_hidden_layers'],
-            unit=config['operator']['unit'],
+            n_hidden_layers=operator_config['n_hidden_layers'],
+            unit=operator_config['unit'],
             vq_layer=self.sps_model.model.vq_layer,
             train_vq=False,
+            condition_mode=operator_condition_mode,
+            pair_dim=self.sps_model.latent_code_1 * 2,
+            query_dim=self.query_dim,
+            film_init_identity=operator_config.get('film_init_identity', True),
         ).to(DEVICE)
         self.train_result_path = config['train_result_path']
         self.eval_result_path = config['eval_result_path']
@@ -138,7 +211,10 @@ class QueryLearn:
         self.mean_mse = nn.MSELoss(reduction='mean')
         self.sanity_check = config.get('sanity_check', False)
         self.query_vis_format = config.get('query_vis_format', 'png').lower().lstrip('.')
-        print('Sanity check mode...')
+        self.grad_clip_norm = config.get('grad_clip_norm', None)
+        print(f"Query dim: {self.query_dim}, OperNet condition mode: {operator_condition_mode}")
+        if self.sanity_check:
+            print('Sanity check mode...')
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
@@ -158,7 +234,7 @@ class QueryLearn:
                 label_to_index[lab] = i
         self._num_label_to_index = label_to_index
 
-    def _set_sps_trainable(self):
+    def _set_sps_untrainable(self):
         for p in self.sps_model.model.parameters():
             p.requires_grad = False
         self.sps_model.model.eval()
@@ -258,6 +334,8 @@ class QueryLearn:
 
             if optimizer is not None:
                 total_loss.backward()
+                if self.grad_clip_norm is not None:
+                    nn.utils.clip_grad_norm_(self.oper_net.parameters(), self.grad_clip_norm)
                 optimizer.step()
 
         if (loss_counter is not None or save_query_vis) and epoch_oper_losses:
@@ -343,10 +421,17 @@ class QueryLearn:
         self.oper_net.train()
         train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.train_record_path)
         eval_loss_counter = LossCounter(EVAL_TERMS, record_path=self.eval_record_path)
-        optim_params = list(self.oper_net.net.parameters())
+        optim_params = [p for p in self.oper_net.parameters() if p.requires_grad]
         if self.train_queries:
             optim_params.append(self.queries)
-        optimizer = optim.Adam(optim_params, lr=self.config['learning_rate'])
+        weight_decay = self.config.get('weight_decay', 0.0)
+        optimizer_name = self.config.get('optimizer', 'adam').lower()
+        if optimizer_name == 'adam':
+            optimizer = optim.Adam(optim_params, lr=self.config['learning_rate'], weight_decay=weight_decay)
+        elif optimizer_name == 'adamw':
+            optimizer = optim.AdamW(optim_params, lr=self.config['learning_rate'], weight_decay=weight_decay)
+        else:
+            raise ValueError(f"Unsupported optimizer: {optimizer_name}")
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         self._resume_model()
         for epoch in range(start_epoch, self.max_iter_num):
