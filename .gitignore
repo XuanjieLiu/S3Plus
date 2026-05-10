@@ -2,7 +2,10 @@
 __pycache__/
 */__pycache__/
 /logs/
+**/logs/
 /wandb/
+**/wandb/
+*.pt
 *.swp
 *.swo
 *.png

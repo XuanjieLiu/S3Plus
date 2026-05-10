@@ -106,13 +106,23 @@ if __name__ == "__main__":
     # ready for testing
     if "Induced" in config["method"]:
         if "downstream" in config:
-            from tester_inducement_downstream import TesterInducedDownstream as Tester
+            from model.inducement.tester_downstream import (
+                TesterInducedDownstream as Tester,
+            )
         elif config.get("probing", 0) == 1:
-            from tester_inducement_probing import TesterInducedProbing as Tester
+            from model.inducement.tester_probing import (
+                TesterInducedProbing as Tester,
+            )
         elif config.get("probing", 0) == 2:
-            from tester_inducement_probing_2 import TesterInducedProbing as Tester
+            from model.inducement.tester_probing_2 import (
+                TesterInducedProbing as Tester,
+            )
         else:
-            from tester_inducement import TesterInduced as Tester
+            from model.inducement.tester import TesterInduced as Tester
+    elif "Transition" in config["method"] and config.get("probing", 0) > 0:
+        from model.transition.tester_probing import (
+            TesterTransitionProbing as Tester,
+        )
     elif "ISymm" in config["method"]:
         from tester import Tester
 

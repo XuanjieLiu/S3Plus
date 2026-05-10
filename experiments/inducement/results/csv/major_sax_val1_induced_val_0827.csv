@@ -1,0 +1,11 @@
+model_id,future_pred_acc_x_0,future_pred_acc_x_1,future_pred_acc_x_2,future_pred_acc_x_3,future_pred_acc_x_4,future_pred_acc_x_5,future_pred_acc_x_6,future_pred_acc_z_0,future_pred_acc_z_1,future_pred_acc_z_2,future_pred_acc_z_3,future_pred_acc_z_4,future_pred_acc_z_5,future_pred_acc_z_6,recon_acc_x
+major_sax_induced_val1_nosymm_k24_normed_0/cp_step5901.pt,0.65,0.59,0.49,0.5,0.53,0.68,0.4,0.96,1.0,1.0,1.0,0.96,0.96,1.0,0.42857142857142855
+major_sax_induced_val1_nosymm_k24_normed_1/cp_step5901.pt,0.86,0.87,0.85,0.81,0.88,0.87,0.86,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8571428571428571
+major_sax_induced_val1_nosymm_k24_normed_2/cp_step5901.pt,0.84,0.83,0.86,0.87,0.82,0.88,0.9,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8571428571428571
+major_sax_induced_val1_nosymm_k24_normed_3/cp_step5901.pt,0.25,0.07,0.0,0.2,0.18,0.27,0.38,0.6,0.48,0.45,0.48,0.45,0.45,0.56,0.30857142857142855
+major_sax_induced_val1_nosymm_k24_normed_4/cp_step5901.pt,0.4,0.4,0.49,0.43,0.38,0.44,0.46,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.42857142857142855
+major_sax_induced_val1_symm0.3k4_k24_normed_0/cp_step5901.pt,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+major_sax_induced_val1_symm0.3k4_k24_normed_1/cp_step5901.pt,0.7,0.59,0.56,0.55,0.58,0.58,0.47,1.0,1.0,0.87,0.72,0.85,1.0,0.87,0.7142857142857143
+major_sax_induced_val1_symm0.3k4_k24_normed_2/cp_step5901.pt,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+major_sax_induced_val1_symm0.3k4_k24_normed_3/cp_step5901.pt,0.81,0.87,0.85,0.95,0.88,0.84,0.8,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8571428571428571
+major_sax_induced_val1_symm0.3k4_k24_normed_4/cp_step5901.pt,0.55,0.58,0.57,0.55,0.59,0.58,0.58,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.5714285714285714

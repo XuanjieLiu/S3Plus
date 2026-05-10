@@ -58,11 +58,13 @@ if __name__ == "__main__":
         from trainer import Trainer
     elif config["method"] == "ISymm_Induced":
         if "downstream" in config and config["downstream"] is not None:
-            from trainer_induced_downstream import TrainerInducedDownstream as Trainer
+            from model.inducement.trainer_downstream import (
+                TrainerInducedDownstream as Trainer,
+            )
         else:
-            from trainer_induced import TrainerInduced as Trainer
+            from model.inducement.trainer import TrainerInduced as Trainer
     elif config["method"] == "ISymm_Transition":
-        from trainer_transition import TrainerTransition as Trainer
+        from model.transition.trainer import TrainerTransition as Trainer
 
     trainer = Trainer(config)
     trainer.prepare_data()
