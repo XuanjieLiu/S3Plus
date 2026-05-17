@@ -2,6 +2,7 @@ import torch
 from torch import optim
 import torch.nn as nn
 import os
+import random
 import sys
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
 from VQ.VQVAE import VQVAE, MultiVectorQuantizer, split_into_three
@@ -25,15 +26,32 @@ EVAL_TERMS = [
     'oper_loss',
     'symm_loss',
     'total_loss',
-    'add_acc_q0',
     'add_acc_q1',
-    'mul_acc_q0',
-    'mul_acc_q1',
+    'add_acc_q2',
+    'mm21_acc_q1',
+    'mm21_acc_q2',
     'add_acc',
-    'mul_acc',
+    'mm21_acc',
     'add_total',
-    'mul_total',
+    'mm21_total',
     'q_l2_dist',
+]
+
+CRITICAL_PAIR_RECORD_COLUMNS = [
+    'epoch',
+    'a',
+    'b',
+    'add_target',
+    'mm21_target',
+    'total_epochs',
+    'q1_exclusive_rate',
+    'q2_exclusive_rate',
+    'split_rate',
+    'tie_or_missing_rate',
+    'q1_exclusive_count',
+    'q2_exclusive_count',
+    'split_count',
+    'tie_or_missing_count',
 ]
 
 
@@ -57,13 +75,13 @@ def regul_sample(z_all_content):
     return z_a, z_b, z_c
 
 
-def sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c):
+def sanity_check_oper_loss(per_loss_q1, per_loss_q2, label_a, label_b, label_c):
     is_add = torch.tensor(
         [a + b == c for a, b, c in zip(label_a, label_b, label_c)],
-        device=per_loss_1.device,
+        device=per_loss_q1.device,
         dtype=torch.bool,
     )
-    per_loss = torch.where(is_add, per_loss_1, per_loss_2)
+    per_loss = torch.where(is_add, per_loss_q1, per_loss_q2)
     return per_loss.mean()
 
 
@@ -195,6 +213,7 @@ class QueryLearn:
         self.eval_result_path = config['eval_result_path']
         self.train_record_path = config['train_record_path']
         self.eval_record_path = config['eval_record_path']
+        self.critical_pair_record_path = config.get('critical_pair_record_path', 'CriticalPairStats_record.csv')
         self.log_interval = config['log_interval']
         self.eval_interval = config['eval_interval']
         self.checkpoint_interval = config['checkpoint_interval']
@@ -212,9 +231,174 @@ class QueryLearn:
         self.sanity_check = config.get('sanity_check', False)
         self.query_vis_format = config.get('query_vis_format', 'png').lower().lstrip('.')
         self.grad_clip_norm = config.get('grad_clip_norm', None)
+        self.critical_pairs = self._find_train_critical_pairs()
+        self.critical_pair_interval_stats = self._init_critical_pair_interval_stats()
+        self._ensure_critical_pair_record_header()
         print(f"Query dim: {self.query_dim}, OperNet condition mode: {operator_condition_mode}")
+        print(f"Critical train pairs: {len(self.critical_pairs)}")
         if self.sanity_check:
             print('Sanity check mode...')
+
+    def _find_train_critical_pairs(self):
+        pair_ops = {}
+        torch_rng_state = torch.random.get_rng_state()
+        cuda_rng_states = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+        python_rng_state = random.getstate()
+        try:
+            for batch_ndx, sample in enumerate(self.train_loader):
+                _, labels = sample
+                label_a = [parse_label(x) for x in labels[0]]
+                label_b = [parse_label(x) for x in labels[1]]
+                label_c = [parse_label(x) for x in labels[2]]
+                for a, b, c in zip(label_a, label_b, label_c):
+                    add_target = a + b
+                    mm21_target = (a * b) % 21
+                    if add_target == mm21_target:
+                        continue
+                    pair = (a, b)
+                    pair_ops.setdefault(pair, set())
+                    if c == add_target:
+                        pair_ops[pair].add('add')
+                    if c == mm21_target:
+                        pair_ops[pair].add('mm21')
+        finally:
+            torch.random.set_rng_state(torch_rng_state)
+            if cuda_rng_states is not None:
+                torch.cuda.set_rng_state_all(cuda_rng_states)
+            random.setstate(python_rng_state)
+
+        critical_pairs = {}
+        for pair, ops in pair_ops.items():
+            if {'add', 'mm21'}.issubset(ops):
+                a, b = pair
+                critical_pairs[pair] = {
+                    'add_target': a + b,
+                    'mm21_target': (a * b) % 21,
+                }
+        return critical_pairs
+
+    def _init_critical_pair_interval_stats(self):
+        return {
+            pair: {
+                'total_epochs': 0,
+                'q1_exclusive': 0,
+                'q2_exclusive': 0,
+                'split': 0,
+                'tie_or_missing': 0,
+            }
+            for pair in self.critical_pairs
+        }
+
+    def _ensure_critical_pair_record_header(self):
+        if os.path.exists(self.critical_pair_record_path) and os.path.getsize(self.critical_pair_record_path) > 0:
+            return
+        with open(self.critical_pair_record_path, 'w', encoding='utf-8') as f:
+            f.write(','.join(CRITICAL_PAIR_RECORD_COLUMNS) + '\n')
+
+    def _new_critical_pair_epoch_stats(self):
+        return {
+            pair: {
+                'add': {'q1': 0, 'q2': 0, 'tie': 0},
+                'mm21': {'q1': 0, 'q2': 0, 'tie': 0},
+            }
+            for pair in self.critical_pairs
+        }
+
+    def _update_critical_pair_epoch_stats(
+            self,
+            epoch_stats,
+            per_loss_q1,
+            per_loss_q2,
+            label_a,
+            label_b,
+            label_c,
+            tie_eps=1e-8):
+        if not epoch_stats:
+            return
+        q1_losses = per_loss_q1.detach().cpu().tolist()
+        q2_losses = per_loss_q2.detach().cpu().tolist()
+        for a, b, c, q1_loss, q2_loss in zip(label_a, label_b, label_c, q1_losses, q2_losses):
+            pair = (a, b)
+            pair_info = self.critical_pairs.get(pair)
+            if pair_info is None:
+                continue
+            if c == pair_info['add_target']:
+                op = 'add'
+            elif c == pair_info['mm21_target']:
+                op = 'mm21'
+            else:
+                continue
+
+            if q1_loss < q2_loss - tie_eps:
+                winner = 'q1'
+            elif q2_loss < q1_loss - tie_eps:
+                winner = 'q2'
+            else:
+                winner = 'tie'
+            epoch_stats[pair][op][winner] += 1
+
+    @staticmethod
+    def _majority_query_winner(winner_counts):
+        if sum(winner_counts.values()) == 0:
+            return None
+        q1_count = winner_counts['q1']
+        q2_count = winner_counts['q2']
+        tie_count = winner_counts['tie']
+        if q1_count > q2_count and q1_count > tie_count:
+            return 'q1'
+        if q2_count > q1_count and q2_count > tie_count:
+            return 'q2'
+        return 'tie'
+
+    def _accumulate_critical_pair_epoch_stats(self, epoch_stats):
+        for pair, pair_epoch_stats in epoch_stats.items():
+            interval_stats = self.critical_pair_interval_stats[pair]
+            interval_stats['total_epochs'] += 1
+            add_winner = self._majority_query_winner(pair_epoch_stats['add'])
+            mm21_winner = self._majority_query_winner(pair_epoch_stats['mm21'])
+            if add_winner is None or mm21_winner is None or add_winner == 'tie' or mm21_winner == 'tie':
+                interval_stats['tie_or_missing'] += 1
+            elif add_winner == 'q1' and mm21_winner == 'q1':
+                interval_stats['q1_exclusive'] += 1
+            elif add_winner == 'q2' and mm21_winner == 'q2':
+                interval_stats['q2_exclusive'] += 1
+            else:
+                interval_stats['split'] += 1
+
+    def _record_critical_pair_interval(self, epoch):
+        self._ensure_critical_pair_record_header()
+        rows = []
+        for pair in sorted(self.critical_pairs):
+            stats = self.critical_pair_interval_stats[pair]
+            total_epochs = stats['total_epochs']
+            if total_epochs == 0:
+                continue
+            pair_info = self.critical_pairs[pair]
+
+            def rate(key):
+                return stats[key] / total_epochs
+
+            rows.append([
+                epoch,
+                pair[0],
+                pair[1],
+                pair_info['add_target'],
+                pair_info['mm21_target'],
+                total_epochs,
+                round(rate('q1_exclusive'), 6),
+                round(rate('q2_exclusive'), 6),
+                round(rate('split'), 6),
+                round(rate('tie_or_missing'), 6),
+                stats['q1_exclusive'],
+                stats['q2_exclusive'],
+                stats['split'],
+                stats['tie_or_missing'],
+            ])
+        if rows:
+            with open(self.critical_pair_record_path, 'a', encoding='utf-8') as f:
+                for row in rows:
+                    f.write(','.join(str(item) for item in row) + '\n')
+        self.critical_pair_interval_stats = self._init_critical_pair_interval_stats()
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
@@ -280,9 +464,14 @@ class QueryLearn:
         epoch_label_a = []
         epoch_label_b = []
         epoch_label_c = []
-        epoch_q_out_1 = []
-        epoch_q_out_2 = []
+        epoch_q1_out = []
+        epoch_q2_out = []
         epoch_ec = []
+        critical_pair_epoch_stats = (
+            self._new_critical_pair_epoch_stats()
+            if stage == STAGE_TRAIN and self.critical_pairs
+            else None
+        )
         for batch_ndx, sample in enumerate(data_loader):
             if optimizer is not None:
                 optimizer.zero_grad()
@@ -296,27 +485,36 @@ class QueryLearn:
             label_b = [parse_label(x) for x in labels[1]]
             label_c = [parse_label(x) for x in labels[2]]
             ea, eb, ec = split_into_three(e_content)
-            q0 = self.queries[0]
-            q1 = self.queries[1]
-            q_in_1 = comb_q_z(ea, eb, q0)
-            q_in_2 = comb_q_z(ea, eb, q1)
-            e_q_out_1, eq_loss_1, z_q_out_1 = self.oper_net(q_in_1)
-            e_q_out_2, eq_loss_2, z_q_out_2 = self.oper_net(q_in_2)
+            q1 = self.queries[0]
+            q2 = self.queries[1]
+            q1_in = comb_q_z(ea, eb, q1)
+            q2_in = comb_q_z(ea, eb, q2)
+            e_q1_out, eq_loss_q1, z_q1_out = self.oper_net(q1_in)
+            e_q2_out, eq_loss_q2, z_q2_out = self.oper_net(q2_in)
 
             # Per-sample MSE decides query assignment; VQ loss is batch-level regularization.
-            per_loss_1 = (e_q_out_1 - ec).pow(2).mean(dim=-1)
-            per_loss_2 = (e_q_out_2 - ec).pow(2).mean(dim=-1)
-            query_eq_loss = (eq_loss_1 + eq_loss_2) * self.eqLoss_scalar
+            per_loss_q1 = (e_q1_out - ec).pow(2).mean(dim=-1)
+            per_loss_q2 = (e_q2_out - ec).pow(2).mean(dim=-1)
+            query_eq_loss = (eq_loss_q1 + eq_loss_q2) * self.eqLoss_scalar
+            if critical_pair_epoch_stats is not None:
+                self._update_critical_pair_epoch_stats(
+                    critical_pair_epoch_stats,
+                    per_loss_q1,
+                    per_loss_q2,
+                    label_a,
+                    label_b,
+                    label_c,
+                )
 
             if self.sanity_check:
-                oper_loss = sanity_check_oper_loss(per_loss_1, per_loss_2, label_a, label_b, label_c)
+                oper_loss = sanity_check_oper_loss(per_loss_q1, per_loss_q2, label_a, label_b, label_c)
             else:
-                per_loss = torch.minimum(per_loss_1, per_loss_2)
+                per_loss = torch.minimum(per_loss_q1, per_loss_q2)
                 oper_loss = per_loss.mean()
 
             # symm loss
-            q1_symm_loss = self.symm_loss(*regul_sample(e_content), q0)
-            q2_symm_loss = self.symm_loss(*regul_sample(e_content), q1)
+            q1_symm_loss = self.symm_loss(*regul_sample(e_content), q1)
+            q2_symm_loss = self.symm_loss(*regul_sample(e_content), q2)
             symm_loss = q1_symm_loss + q2_symm_loss
 
             total_loss = oper_loss + query_eq_loss + symm_loss
@@ -328,8 +526,8 @@ class QueryLearn:
                 epoch_label_a.extend(label_a)
                 epoch_label_b.extend(label_b)
                 epoch_label_c.extend(label_c)
-                epoch_q_out_1.append(z_q_out_1.detach().cpu())
-                epoch_q_out_2.append(z_q_out_2.detach().cpu())
+                epoch_q1_out.append(z_q1_out.detach().cpu())
+                epoch_q2_out.append(z_q2_out.detach().cpu())
                 epoch_ec.append(ec.detach().cpu())
 
             if optimizer is not None:
@@ -338,16 +536,19 @@ class QueryLearn:
                     nn.utils.clip_grad_norm_(self.oper_net.parameters(), self.grad_clip_norm)
                 optimizer.step()
 
+        if critical_pair_epoch_stats is not None:
+            self._accumulate_critical_pair_epoch_stats(critical_pair_epoch_stats)
+
         if (loss_counter is not None or save_query_vis) and epoch_oper_losses:
-            q_out_1_epoch = torch.cat(epoch_q_out_1, dim=0).to(DEVICE)
-            q_out_2_epoch = torch.cat(epoch_q_out_2, dim=0).to(DEVICE)
+            q1_out_epoch = torch.cat(epoch_q1_out, dim=0).to(DEVICE)
+            q2_out_epoch = torch.cat(epoch_q2_out, dim=0).to(DEVICE)
             ec_epoch = torch.cat(epoch_ec, dim=0).to(DEVICE)
             accu = self._batch_query_accu(
                 epoch_label_a,
                 epoch_label_b,
                 epoch_label_c,
-                q_out_1_epoch,
-                q_out_2_epoch,
+                q1_out_epoch,
+                q2_out_epoch,
                 ec_epoch,
             )
             if loss_counter is not None:
@@ -356,26 +557,22 @@ class QueryLearn:
                     sum(epoch_oper_losses) / len(epoch_oper_losses),
                     sum(epoch_symm_losses) / len(epoch_symm_losses),
                     sum(epoch_total_losses) / len(epoch_total_losses),
-                    accu['add_acc_q0'],
                     accu['add_acc_q1'],
-                    accu['mul_acc_q0'],
-                    accu['mul_acc_q1'],
+                    accu['add_acc_q2'],
+                    accu['mm21_acc_q1'],
+                    accu['mm21_acc_q2'],
                     accu['add_acc'],
-                    accu['mul_acc'],
+                    accu['mm21_acc'],
                     accu['add_total'],
-                    accu['mul_total'],
+                    accu['mm21_total'],
                     q_l2_dist,
                 ])
             if save_query_vis:
                 if query_vis_dir is None:
                     query_vis_dir = self.eval_result_path if stage == STAGE_VAL else self.train_result_path
                 stage_name = 'eval' if stage == STAGE_VAL else stage
-                q1_correct = self._query_target_correct(epoch_label_c, q_out_1_epoch)
-                q2_correct = self._query_target_correct(epoch_label_c, q_out_2_epoch)
-                query_specs = [
-                    ('q1', q1_correct, accu['add_acc_q0'], accu['mul_acc_q0']),
-                    ('q2', q2_correct, accu['add_acc_q1'], accu['mul_acc_q1']),
-                ]
+                q1_correct = self._query_target_correct(epoch_label_c, q1_out_epoch)
+                q2_correct = self._query_target_correct(epoch_label_c, q2_out_epoch)
                 save_query_operation_tables(
                     query_vis_dir,
                     stage_name,
@@ -383,7 +580,8 @@ class QueryLearn:
                     epoch_label_a,
                     epoch_label_b,
                     epoch_label_c,
-                    query_specs,
+                    q1_correct,
+                    q2_correct,
                     self.query_vis_format,
                 )
 
@@ -448,6 +646,7 @@ class QueryLearn:
             )
 
             if is_log_epoch:
+                self._record_critical_pair_interval(epoch)
                 train_loss_counter.record_and_clear(num=epoch)
 
             if epoch % self.eval_interval == 0:
@@ -490,14 +689,14 @@ class QueryLearn:
         correct[valid_mask] = dist_target < min_other
         return correct
 
-    def _batch_query_accu(self, label_a, label_b, label_c, q_out_1, q_out_2, ec):
+    def _batch_query_accu(self, label_a, label_b, label_c, q1_out, q2_out, ec):
         self._ensure_num_z_c()
         label_c_idx = []
         valid_mask = []
         for a, b, c in zip(label_a, label_b, label_c):
             is_add = (c == a + b)
-            is_mul = (c == (a * b) % 21)
-            if is_add and is_mul:
+            is_mm21 = (c == (a * b) % 21)
+            if is_add and is_mm21:
                 valid_mask.append(0)
                 label_c_idx.append(-1)
                 continue
@@ -509,29 +708,29 @@ class QueryLearn:
         valid_mask = valid_mask & (label_c_idx >= 0)
 
         add_total = 0
-        add_correct_q0 = 0
         add_correct_q1 = 0
+        add_correct_q2 = 0
         add_correct = 0
-        mul_total = 0
-        mul_correct_q0 = 0
-        mul_correct_q1 = 0
-        mul_correct = 0
+        mm21_total = 0
+        mm21_correct_q1 = 0
+        mm21_correct_q2 = 0
+        mm21_correct = 0
 
         if not valid_mask.any():
             return {
-                'add_acc_q0': 0.0,
                 'add_acc_q1': 0.0,
-                'mul_acc_q0': 0.0,
-                'mul_acc_q1': 0.0,
+                'add_acc_q2': 0.0,
+                'mm21_acc_q1': 0.0,
+                'mm21_acc_q2': 0.0,
                 'add_acc': 0.0,
-                'mul_acc': 0.0,
+                'mm21_acc': 0.0,
                 'add_total': 0,
-                'mul_total': 0,
+                'mm21_total': 0,
             }
 
         ec_valid = ec[valid_mask]
-        q1_valid = q_out_1[valid_mask]
-        q2_valid = q_out_2[valid_mask]
+        q1_valid = q1_out[valid_mask]
+        q2_valid = q2_out[valid_mask]
         idx_valid = label_c_idx[valid_mask]
         valid_positions = valid_mask.nonzero(as_tuple=False).flatten().tolist()
         pos_to_valid = {pos: j for j, pos in enumerate(valid_positions)}
@@ -555,10 +754,10 @@ class QueryLearn:
 
         for i, (a, b, c) in enumerate(zip(label_a, label_b, label_c)):
             is_add = (c == a + b)
-            is_mul = (c == (a * b) % 21)
-            if is_add and is_mul:
+            is_mm21 = (c == (a * b) % 21)
+            if is_add and is_mm21:
                 continue
-            if not is_add and not is_mul:
+            if not is_add and not is_mm21:
                 continue
             if i not in pos_to_valid:
                 continue
@@ -566,33 +765,33 @@ class QueryLearn:
             if is_add:
                 add_total += 1
                 if correct_q1[j].item():
-                    add_correct_q0 += 1
-                if correct_q2[j].item():
                     add_correct_q1 += 1
+                if correct_q2[j].item():
+                    add_correct_q2 += 1
                 if correct_q1[j].item() or correct_q2[j].item():
                     add_correct += 1
-            elif is_mul:
-                mul_total += 1
+            elif is_mm21:
+                mm21_total += 1
                 if correct_q1[j].item():
-                    mul_correct_q0 += 1
+                    mm21_correct_q1 += 1
                 if correct_q2[j].item():
-                    mul_correct_q1 += 1
+                    mm21_correct_q2 += 1
                 if correct_q1[j].item() or correct_q2[j].item():
-                    mul_correct += 1
+                    mm21_correct += 1
 
-        add_acc_q0 = add_correct_q0 / add_total if add_total > 0 else 0.0
         add_acc_q1 = add_correct_q1 / add_total if add_total > 0 else 0.0
-        mul_acc_q0 = mul_correct_q0 / mul_total if mul_total > 0 else 0.0
-        mul_acc_q1 = mul_correct_q1 / mul_total if mul_total > 0 else 0.0
+        add_acc_q2 = add_correct_q2 / add_total if add_total > 0 else 0.0
+        mm21_acc_q1 = mm21_correct_q1 / mm21_total if mm21_total > 0 else 0.0
+        mm21_acc_q2 = mm21_correct_q2 / mm21_total if mm21_total > 0 else 0.0
         add_acc = add_correct / add_total if add_total > 0 else 0.0
-        mul_acc = mul_correct / mul_total if mul_total > 0 else 0.0
+        mm21_acc = mm21_correct / mm21_total if mm21_total > 0 else 0.0
         return {
-            'add_acc_q0': add_acc_q0,
             'add_acc_q1': add_acc_q1,
-            'mul_acc_q0': mul_acc_q0,
-            'mul_acc_q1': mul_acc_q1,
+            'add_acc_q2': add_acc_q2,
+            'mm21_acc_q1': mm21_acc_q1,
+            'mm21_acc_q2': mm21_acc_q2,
             'add_acc': add_acc,
-            'mul_acc': mul_acc,
+            'mm21_acc': mm21_acc,
             'add_total': add_total,
-            'mul_total': mul_total,
+            'mm21_total': mm21_total,
         }

@@ -1,5 +1,25 @@
 # queryLearn 实验记录
 
+## 通用 diagnostics
+
+从 2026-05-14 起，训练会额外写出关键 pair 的 winner-take-all assignment diagnostics。训练 loss 不变；这些字段只用于观察 `sanity_check=False` 时，同一个 `(a,b)` 同时存在 add target 和 mm21 target 时，q1/q2 是否发生单 query 独占。
+
+输出文件：
+
+```text
+CriticalPairStats_record.csv
+```
+
+含义：
+
+- 启动训练后先扫描 train loader，找出关键 pair：同一个 `(a,b)` 在训练集中同时出现 add 样本 `(a,b,a+b)` 和 mm21 样本 `(a,b,(a*b)%21)`。
+- 只统计训练集，不统计 eval。
+- 每个 epoch 中，对每个关键 pair 分别看 add 样本和 mm21 样本由 q1 还是 q2 的 loss 更小。
+- 如果 add 和 mm21 都由 q1 赢，记一次 `q1_exclusive`；如果都由 q2 赢，记一次 `q2_exclusive`。
+- 如果 add/mm21 分别由不同 query 赢，记一次 `split`，这是符合预期的分化信号。
+- 如果缺少某个 operation、两个 query 打平、或 operation 内 winner 无法唯一判定，记一次 `tie_or_missing`。
+- 每个 `log_interval` 写一次 CSV，每行是一个关键 pair 在该 interval 内跨多个 epoch 的独占率和计数。
+
 ## 2026-05-10 - FiLM sanity check from mul-based SPS
 
 实验名：
@@ -17,8 +37,8 @@ S3Plus/queryLearn/exps/2026.5.10_film_2dimQ_sanityCheck_fromMulBasedSps_fc_5_102
 目的：
 
 - 先不解决 query 自发分化问题。
-- 在 `sanity_check=True` 下强制 q0 负责 add，q1 负责 non-add/mul_mod21。
-- 验证 FiLM-conditioned shared `OperNet` 是否能同时表示 add 和 mul_mod21 两条计算路径。
+- 在 `sanity_check=True` 下强制 q1 负责 add，q2 负责 non-add/mm21。
+- 验证 FiLM-conditioned shared `OperNet` 是否能同时表示 add 和 mm21 两条计算路径。
 
 关键配置：
 
@@ -48,9 +68,9 @@ exit
 
 重点看：
 
-- `Eval_record.txt` 中 `add_acc_q0` 是否上升。
-- `Eval_record.txt` 中 `mul_acc_q1` 是否上升。
-- `add_acc` 和 `mul_acc` 是否能同时达到比 concat-query baseline 更好的水平。
+- `Eval_record.txt` 中 `add_acc_q1` 是否上升。
+- `Eval_record.txt` 中 `mm21_acc_q2` 是否上升。
+- `add_acc` 和 `mm21_acc` 是否能同时达到比 concat-query baseline 更好的水平。
 - `EvalResults/query_operation_*` 表格里，q1/q2 是否形成稳定的 add / `*m` 区域。
 
 相关分析报告：
@@ -65,7 +85,7 @@ S3Plus/queryLearn/experiment_analysis/compare_sanity_check_2026-05-10.html
 
 - `query_learner.query_dim` 现在已被 `QueryLearn.py` 正确读取；旧字段 `in_dim` 仍作为 fallback。
 - `train_sps` 配置目前不控制 SPS 是否训练；`QueryLearn` 会冻结加载的 SPS/VQ 模型。
-- 当前 sanity check 分配逻辑是 `a + b == c` 走 q0，否则走 q1。mul 数据集中若某些样本也满足 add，会被当作 add/ambiguous 处理。
+- 当前 sanity check 分配逻辑是 `a + b == c` 走 q1，否则走 q2。mm21 数据集中若某些样本也满足 add，会被当作 add/ambiguous 处理。
 
 结果简析：
 
@@ -125,6 +145,6 @@ exit
 重点看：
 
 - 10k-30k 区间 eval 是否比上一轮更平滑。
-- `add_acc_q0` 和 `mul_acc_q1` 是否能同时维持高值，而不是一个上升时另一个掉。
+- `add_acc_q1` 和 `mm21_acc_q2` 是否能同时维持高值，而不是一个上升时另一个掉。
 - `oper_loss` 后期是否仍明显上升。
 - 如果最佳点仍集中在前 15k，下一步可以考虑早停或显式选择 best checkpoint。

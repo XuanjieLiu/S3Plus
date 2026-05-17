@@ -23,8 +23,8 @@ exit
 
 当前阶段优先级：
 
-1. 在 `sanity_check=True` 下，先验证 q0/q1 被标签指定时，同一个 `OperNet` 能同时学会 add 和 mul_mod21。
-2. 如果 sanity check 成功，再研究无监督情形下 q0/q1 是否能自己分化出 add 和 mul 的语义。
+1. 在 `sanity_check=True` 下，先验证 q1/q2 被标签指定时，同一个 `OperNet` 能同时学会 add 和 mm21。
+2. 如果 sanity check 成功，再研究无监督情形下 q1/q2 是否能自己分化出 add 和 mm21 的语义。
 
 ## 关键入口
 
