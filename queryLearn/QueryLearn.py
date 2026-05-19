@@ -2,10 +2,9 @@ import torch
 from torch import optim
 import torch.nn as nn
 import os
-import random
 import sys
 sys.path.append('{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../'))
-from VQ.VQVAE import VQVAE, MultiVectorQuantizer, split_into_three
+from VQ.VQVAE import VQVAE, split_into_three
 from VQ.common_func import load_config_from_exp_name
 from VQ.eval_common import CommonEvaler
 from shared import DEVICE
@@ -13,6 +12,9 @@ from utils import init_dataloaders
 from loss_counter import LossCounter
 from VQ.common_func import parse_label
 from dataloader import load_enc_eval_data
+from queryLearn.opernet import OperNet, comb_q_z
+from queryLearn.training_helpers import init_queries, regul_sample, sanity_check_oper_loss
+from queryLearn.pair_diagnostics import PairDiagnosticsRecorder
 try:
     from queryLearn.query_vis import record_dir, save_query_operation_tables
 except ImportError:
@@ -37,150 +39,12 @@ EVAL_TERMS = [
     'q_l2_dist',
 ]
 
-CRITICAL_PAIR_RECORD_COLUMNS = [
-    'epoch',
-    'a',
-    'b',
-    'add_target',
-    'mm21_target',
-    'total_epochs',
-    'q1_exclusive_rate',
-    'q2_exclusive_rate',
-    'split_rate',
-    'tie_or_missing_rate',
-    'q1_exclusive_count',
-    'q2_exclusive_count',
-    'split_count',
-    'tie_or_missing_count',
-]
-
 
 def load_VQSPS_loader(config):
     vqsps_exp_name = config['VQSPS']['EXP_NAME']
     vqsps_config = load_config_from_exp_name(vqsps_exp_name)
     model_path = os.path.join(VQSPS_EXP_ROOT, vqsps_exp_name, config['VQSPS']['CHECK_POINT_NAME'])
     return CommonEvaler(vqsps_config, model_path), vqsps_config
-
-
-def comb_q_z(ea, eb, q):
-    if q.dim() == 1:
-        q = q.unsqueeze(0).expand(ea.size(0), -1)
-    return torch.cat([ea, eb, q], dim=-1)
-
-
-def regul_sample(z_all_content):
-    idx_1 = torch.randperm(z_all_content.size(0))
-    z_perm = z_all_content[idx_1, ...]
-    z_a, z_b, z_c = split_into_three(z_perm)
-    return z_a, z_b, z_c
-
-
-def sanity_check_oper_loss(per_loss_q1, per_loss_q2, label_a, label_b, label_c):
-    is_add = torch.tensor(
-        [a + b == c for a, b, c in zip(label_a, label_b, label_c)],
-        device=per_loss_q1.device,
-        dtype=torch.bool,
-    )
-    per_loss = torch.where(is_add, per_loss_q1, per_loss_q2)
-    return per_loss.mean()
-
-
-def init_queries(query_config, query_dim):
-    init_values = query_config.get('init_queries', None)
-    if init_values is None:
-        return torch.randn(2, query_dim, device=DEVICE)
-    queries = torch.tensor(init_values, dtype=torch.float32, device=DEVICE)
-    if queries.shape != (2, query_dim):
-        raise ValueError(
-            f"init_queries shape {tuple(queries.shape)} does not match expected {(2, query_dim)}"
-        )
-    return queries
-
-
-class OperNet(nn.Module):
-    def __init__(
-            self,
-            in_dim,
-            out_dim,
-            n_hidden_layers,
-            unit,
-            vq_layer: MultiVectorQuantizer,
-            train_vq: bool = False,
-            condition_mode: str = 'concat',
-            pair_dim: int = None,
-            query_dim: int = None,
-            film_init_identity: bool = True):
-        super().__init__()
-        self.condition_mode = condition_mode.lower()
-        self.pair_dim = pair_dim
-        self.query_dim = query_dim
-        self.n_hidden_layers = n_hidden_layers
-        if self.condition_mode not in {'concat', 'film'}:
-            raise ValueError(f"Unsupported operator condition_mode: {condition_mode}")
-        if n_hidden_layers < 1:
-            raise ValueError("OperNet expects at least one hidden layer")
-
-        if self.condition_mode == 'concat':
-            layers = [nn.Linear(in_dim, unit), nn.ReLU()]
-            for _ in range(n_hidden_layers - 1):
-                layers.extend([nn.Linear(unit, unit), nn.ReLU()])
-            layers.append(nn.Linear(unit, out_dim))
-            self.net = nn.Sequential(*layers)
-        else:
-            if pair_dim is None or query_dim is None:
-                raise ValueError("FiLM OperNet requires pair_dim and query_dim")
-            self.input_layer = nn.Linear(pair_dim, unit)
-            self.hidden_layers = nn.ModuleList([
-                nn.Linear(unit, unit) for _ in range(n_hidden_layers - 1)
-            ])
-            self.film_layers = nn.ModuleList([
-                nn.Linear(query_dim, unit * 2) for _ in range(n_hidden_layers)
-            ])
-            self.output_layer = nn.Linear(unit, out_dim)
-            if film_init_identity:
-                for layer in self.film_layers:
-                    nn.init.zeros_(layer.weight)
-                    nn.init.zeros_(layer.bias)
-
-        self.vq_layer = vq_layer
-        self.train_vq = train_vq
-        self._set_vq_trainable(train_vq)
-
-    def _set_vq_trainable(self, train_vq: bool):
-        self.train_vq = train_vq
-        for p in self.vq_layer.parameters():
-            p.requires_grad = train_vq
-
-    def _film(self, h, q, layer_idx):
-        gamma, beta = self.film_layers[layer_idx](q).chunk(2, dim=-1)
-        return h * (1.0 + gamma) + beta
-
-    def _film_forward(self, x):
-        z_pair = x[..., :self.pair_dim]
-        q = x[..., self.pair_dim:]
-        h = self.input_layer(z_pair)
-        h = torch.relu(self._film(h, q, 0))
-        for idx, layer in enumerate(self.hidden_layers, start=1):
-            h = layer(h)
-            h = torch.relu(self._film(h, q, idx))
-        return self.output_layer(h)
-
-    def forward(self, x):
-        if self.condition_mode == 'concat':
-            z_oper = self.net(x)
-        else:
-            z_oper = self._film_forward(x)
-        e_oper, e_q_loss = self.vq_layer(z_oper)
-        return e_oper, e_q_loss, z_oper
-
-    def train(self, mode: bool = True):
-        super().train(mode)
-        if self.train_vq:
-            self.vq_layer.train(mode)
-        else:
-            self.vq_layer.eval()
-        return self
-
 
 
 class QueryLearn:
@@ -214,6 +78,7 @@ class QueryLearn:
         self.train_record_path = config['train_record_path']
         self.eval_record_path = config['eval_record_path']
         self.critical_pair_record_path = config.get('critical_pair_record_path', 'CriticalPairStats_record.csv')
+        self.pair_risk_record_path = config.get('pair_risk_record_path', 'PairRiskStats_record.csv')
         self.log_interval = config['log_interval']
         self.eval_interval = config['eval_interval']
         self.checkpoint_interval = config['checkpoint_interval']
@@ -231,174 +96,15 @@ class QueryLearn:
         self.sanity_check = config.get('sanity_check', False)
         self.query_vis_format = config.get('query_vis_format', 'png').lower().lstrip('.')
         self.grad_clip_norm = config.get('grad_clip_norm', None)
-        self.critical_pairs = self._find_train_critical_pairs()
-        self.critical_pair_interval_stats = self._init_critical_pair_interval_stats()
-        self._ensure_critical_pair_record_header()
+        self.pair_diagnostics = PairDiagnosticsRecorder(
+            self.train_loader.dataset,
+            self.critical_pair_record_path,
+            self.pair_risk_record_path,
+        )
         print(f"Query dim: {self.query_dim}, OperNet condition mode: {operator_condition_mode}")
-        print(f"Critical train pairs: {len(self.critical_pairs)}")
+        print(self.pair_diagnostics.summary_text())
         if self.sanity_check:
             print('Sanity check mode...')
-
-    def _find_train_critical_pairs(self):
-        pair_ops = {}
-        torch_rng_state = torch.random.get_rng_state()
-        cuda_rng_states = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
-        python_rng_state = random.getstate()
-        try:
-            for batch_ndx, sample in enumerate(self.train_loader):
-                _, labels = sample
-                label_a = [parse_label(x) for x in labels[0]]
-                label_b = [parse_label(x) for x in labels[1]]
-                label_c = [parse_label(x) for x in labels[2]]
-                for a, b, c in zip(label_a, label_b, label_c):
-                    add_target = a + b
-                    mm21_target = (a * b) % 21
-                    if add_target == mm21_target:
-                        continue
-                    pair = (a, b)
-                    pair_ops.setdefault(pair, set())
-                    if c == add_target:
-                        pair_ops[pair].add('add')
-                    if c == mm21_target:
-                        pair_ops[pair].add('mm21')
-        finally:
-            torch.random.set_rng_state(torch_rng_state)
-            if cuda_rng_states is not None:
-                torch.cuda.set_rng_state_all(cuda_rng_states)
-            random.setstate(python_rng_state)
-
-        critical_pairs = {}
-        for pair, ops in pair_ops.items():
-            if {'add', 'mm21'}.issubset(ops):
-                a, b = pair
-                critical_pairs[pair] = {
-                    'add_target': a + b,
-                    'mm21_target': (a * b) % 21,
-                }
-        return critical_pairs
-
-    def _init_critical_pair_interval_stats(self):
-        return {
-            pair: {
-                'total_epochs': 0,
-                'q1_exclusive': 0,
-                'q2_exclusive': 0,
-                'split': 0,
-                'tie_or_missing': 0,
-            }
-            for pair in self.critical_pairs
-        }
-
-    def _ensure_critical_pair_record_header(self):
-        if os.path.exists(self.critical_pair_record_path) and os.path.getsize(self.critical_pair_record_path) > 0:
-            return
-        with open(self.critical_pair_record_path, 'w', encoding='utf-8') as f:
-            f.write(','.join(CRITICAL_PAIR_RECORD_COLUMNS) + '\n')
-
-    def _new_critical_pair_epoch_stats(self):
-        return {
-            pair: {
-                'add': {'q1': 0, 'q2': 0, 'tie': 0},
-                'mm21': {'q1': 0, 'q2': 0, 'tie': 0},
-            }
-            for pair in self.critical_pairs
-        }
-
-    def _update_critical_pair_epoch_stats(
-            self,
-            epoch_stats,
-            per_loss_q1,
-            per_loss_q2,
-            label_a,
-            label_b,
-            label_c,
-            tie_eps=1e-8):
-        if not epoch_stats:
-            return
-        q1_losses = per_loss_q1.detach().cpu().tolist()
-        q2_losses = per_loss_q2.detach().cpu().tolist()
-        for a, b, c, q1_loss, q2_loss in zip(label_a, label_b, label_c, q1_losses, q2_losses):
-            pair = (a, b)
-            pair_info = self.critical_pairs.get(pair)
-            if pair_info is None:
-                continue
-            if c == pair_info['add_target']:
-                op = 'add'
-            elif c == pair_info['mm21_target']:
-                op = 'mm21'
-            else:
-                continue
-
-            if q1_loss < q2_loss - tie_eps:
-                winner = 'q1'
-            elif q2_loss < q1_loss - tie_eps:
-                winner = 'q2'
-            else:
-                winner = 'tie'
-            epoch_stats[pair][op][winner] += 1
-
-    @staticmethod
-    def _majority_query_winner(winner_counts):
-        if sum(winner_counts.values()) == 0:
-            return None
-        q1_count = winner_counts['q1']
-        q2_count = winner_counts['q2']
-        tie_count = winner_counts['tie']
-        if q1_count > q2_count and q1_count > tie_count:
-            return 'q1'
-        if q2_count > q1_count and q2_count > tie_count:
-            return 'q2'
-        return 'tie'
-
-    def _accumulate_critical_pair_epoch_stats(self, epoch_stats):
-        for pair, pair_epoch_stats in epoch_stats.items():
-            interval_stats = self.critical_pair_interval_stats[pair]
-            interval_stats['total_epochs'] += 1
-            add_winner = self._majority_query_winner(pair_epoch_stats['add'])
-            mm21_winner = self._majority_query_winner(pair_epoch_stats['mm21'])
-            if add_winner is None or mm21_winner is None or add_winner == 'tie' or mm21_winner == 'tie':
-                interval_stats['tie_or_missing'] += 1
-            elif add_winner == 'q1' and mm21_winner == 'q1':
-                interval_stats['q1_exclusive'] += 1
-            elif add_winner == 'q2' and mm21_winner == 'q2':
-                interval_stats['q2_exclusive'] += 1
-            else:
-                interval_stats['split'] += 1
-
-    def _record_critical_pair_interval(self, epoch):
-        self._ensure_critical_pair_record_header()
-        rows = []
-        for pair in sorted(self.critical_pairs):
-            stats = self.critical_pair_interval_stats[pair]
-            total_epochs = stats['total_epochs']
-            if total_epochs == 0:
-                continue
-            pair_info = self.critical_pairs[pair]
-
-            def rate(key):
-                return stats[key] / total_epochs
-
-            rows.append([
-                epoch,
-                pair[0],
-                pair[1],
-                pair_info['add_target'],
-                pair_info['mm21_target'],
-                total_epochs,
-                round(rate('q1_exclusive'), 6),
-                round(rate('q2_exclusive'), 6),
-                round(rate('split'), 6),
-                round(rate('tie_or_missing'), 6),
-                stats['q1_exclusive'],
-                stats['q2_exclusive'],
-                stats['split'],
-                stats['tie_or_missing'],
-            ])
-        if rows:
-            with open(self.critical_pair_record_path, 'a', encoding='utf-8') as f:
-                for row in rows:
-                    f.write(','.join(str(item) for item in row) + '\n')
-        self.critical_pair_interval_stats = self._init_critical_pair_interval_stats()
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
@@ -444,7 +150,7 @@ class QueryLearn:
         if self.is_assoc:
             assoc_plus_loss += self.mean_mse(e_abc_1, e_abc_2) * self.symm_loss_scalar
             e_q_loss += e_q_loss_abc_2
-        if self.is_symm or self.is_assoc:   
+        if self.is_symm or self.is_assoc:
             e_q_loss += e_q_loss_ab + e_q_loss_abc_1
         return assoc_plus_loss + self.eqLoss_scalar * e_q_loss
 
@@ -467,9 +173,9 @@ class QueryLearn:
         epoch_q1_out = []
         epoch_q2_out = []
         epoch_ec = []
-        critical_pair_epoch_stats = (
-            self._new_critical_pair_epoch_stats()
-            if stage == STAGE_TRAIN and self.critical_pairs
+        pair_diagnostic_epoch_stats = (
+            self.pair_diagnostics.new_epoch_stats()
+            if stage == STAGE_TRAIN
             else None
         )
         for batch_ndx, sample in enumerate(data_loader):
@@ -496,15 +202,14 @@ class QueryLearn:
             per_loss_q1 = (e_q1_out - ec).pow(2).mean(dim=-1)
             per_loss_q2 = (e_q2_out - ec).pow(2).mean(dim=-1)
             query_eq_loss = (eq_loss_q1 + eq_loss_q2) * self.eqLoss_scalar
-            if critical_pair_epoch_stats is not None:
-                self._update_critical_pair_epoch_stats(
-                    critical_pair_epoch_stats,
-                    per_loss_q1,
-                    per_loss_q2,
-                    label_a,
-                    label_b,
-                    label_c,
-                )
+            self.pair_diagnostics.update_epoch_stats(
+                pair_diagnostic_epoch_stats,
+                per_loss_q1,
+                per_loss_q2,
+                label_a,
+                label_b,
+                label_c,
+            )
 
             if self.sanity_check:
                 oper_loss = sanity_check_oper_loss(per_loss_q1, per_loss_q2, label_a, label_b, label_c)
@@ -536,8 +241,7 @@ class QueryLearn:
                     nn.utils.clip_grad_norm_(self.oper_net.parameters(), self.grad_clip_norm)
                 optimizer.step()
 
-        if critical_pair_epoch_stats is not None:
-            self._accumulate_critical_pair_epoch_stats(critical_pair_epoch_stats)
+        self.pair_diagnostics.accumulate_epoch_stats(pair_diagnostic_epoch_stats)
 
         if (loss_counter is not None or save_query_vis) and epoch_oper_losses:
             q1_out_epoch = torch.cat(epoch_q1_out, dim=0).to(DEVICE)
@@ -646,7 +350,7 @@ class QueryLearn:
             )
 
             if is_log_epoch:
-                self._record_critical_pair_interval(epoch)
+                self.pair_diagnostics.record_interval(epoch)
                 train_loss_counter.record_and_clear(num=epoch)
 
             if epoch % self.eval_interval == 0:

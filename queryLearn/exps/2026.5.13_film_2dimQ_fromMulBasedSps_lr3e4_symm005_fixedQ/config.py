@@ -10,12 +10,7 @@ TRAIN_SET = [
 ]
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-mul_add_mix"
 IS_BLUR = False
-BLUR_CONFIG = {
-    'kernel_size_choices': (5, 7, 9),
-    'sigma_range': (0.5, 3.0),
-    'p_no_blur': 0.00,
-}
-AUGMENT_TIMES = 16
+
 CONFIG = {
     'num_sub_exp': 3,
     'VQSPS': {

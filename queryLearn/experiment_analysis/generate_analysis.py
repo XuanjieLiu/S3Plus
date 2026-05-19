@@ -300,6 +300,21 @@ def parse_critical_pair_arg(value):
     }
 
 
+def parse_pair_risk_arg(value):
+    parts = value.split("|")
+    if len(parts) != 4:
+        raise argparse.ArgumentTypeError(
+            "--pair-risk must be 'short|experiment_dir_name|sub_exp_id|Display label'"
+        )
+    short, exp_name, sub_exp_id, label = parts
+    return {
+        "short": short.strip(),
+        "exp_name": exp_name.strip(),
+        "sub_exp_id": sub_exp_id.strip(),
+        "label": label.strip(),
+    }
+
+
 def _parse_critical_pair_row(row):
     int_keys = (
         "epoch",
@@ -320,6 +335,49 @@ def _parse_critical_pair_row(row):
         "tie_or_missing_rate",
     )
     parsed = {}
+    for key in int_keys:
+        parsed[key] = int(row[key])
+    for key in float_keys:
+        parsed[key] = float(row[key])
+    return parsed
+
+
+def _parse_pair_risk_row(row):
+    int_keys = (
+        "epoch",
+        "a",
+        "b",
+        "add_target",
+        "mm21_target",
+        "total_epochs",
+        "q1_only_count",
+        "q2_only_count",
+        "mixed_count",
+        "tie_or_missing_count",
+        "q1_exclusive_count",
+        "q2_exclusive_count",
+        "split_count",
+        "mixed_or_missing_count",
+    )
+    float_keys = (
+        "risk_score",
+        "q1_only_rate",
+        "q2_only_rate",
+        "mixed_rate",
+        "tie_or_missing_rate",
+        "competition_rate",
+        "q1_exclusive_rate",
+        "q2_exclusive_rate",
+        "split_rate",
+        "mixed_or_missing_rate",
+        "dominance_rate",
+    )
+    parsed = {
+        "pair_type": row["pair_type"],
+        "present_ops": row["present_ops"],
+        "target_op": row["target_op"],
+        "dominant_query": row["dominant_query"],
+    }
     for key in int_keys:
         parsed[key] = int(row[key])
     for key in float_keys:
@@ -356,6 +414,73 @@ def _critical_pair_item(a, b, add_target, mm21_target, total_epochs, q1_count, q
         "tie_or_missing_count": tie_or_missing_count,
         "dominant": _dominant_query(q1_rate, q2_rate),
         "dominant_rate": max(q1_rate, q2_rate),
+    }
+
+
+def _single_pair_risk_item(row_or_acc):
+    total_epochs = row_or_acc["total_epochs"]
+    q1_only_count = row_or_acc["q1_only_count"]
+    q2_only_count = row_or_acc["q2_only_count"]
+    mixed_count = row_or_acc["mixed_count"]
+    tie_or_missing_count = row_or_acc["tie_or_missing_count"]
+    q1_rate = 0.0 if total_epochs == 0 else q1_only_count / total_epochs
+    q2_rate = 0.0 if total_epochs == 0 else q2_only_count / total_epochs
+    mixed_rate = 0.0 if total_epochs == 0 else mixed_count / total_epochs
+    tie_rate = 0.0 if total_epochs == 0 else tie_or_missing_count / total_epochs
+    competition_rate = mixed_rate + min(q1_rate, q2_rate)
+    return {
+        "a": row_or_acc["a"],
+        "b": row_or_acc["b"],
+        "pair_type": row_or_acc["pair_type"],
+        "target_op": row_or_acc["target_op"],
+        "present_ops": row_or_acc["present_ops"],
+        "add_target": row_or_acc["add_target"],
+        "mm21_target": row_or_acc["mm21_target"],
+        "total_epochs": total_epochs,
+        "risk_score": competition_rate,
+        "q1_only_rate": q1_rate,
+        "q2_only_rate": q2_rate,
+        "mixed_rate": mixed_rate,
+        "tie_or_missing_rate": tie_rate,
+        "q1_only_count": q1_only_count,
+        "q2_only_count": q2_only_count,
+        "mixed_count": mixed_count,
+        "tie_or_missing_count": tie_or_missing_count,
+        "dominant_query": _dominant_query(q1_rate, q2_rate),
+        "competition_rate": competition_rate,
+    }
+
+
+def _dual_pair_risk_item(row_or_acc):
+    total_epochs = row_or_acc["total_epochs"]
+    q1_count = row_or_acc["q1_exclusive_count"]
+    q2_count = row_or_acc["q2_exclusive_count"]
+    split_count = row_or_acc["split_count"]
+    mixed_or_missing_count = row_or_acc["mixed_or_missing_count"]
+    q1_rate = 0.0 if total_epochs == 0 else q1_count / total_epochs
+    q2_rate = 0.0 if total_epochs == 0 else q2_count / total_epochs
+    split_rate = 0.0 if total_epochs == 0 else split_count / total_epochs
+    mixed_or_missing_rate = 0.0 if total_epochs == 0 else mixed_or_missing_count / total_epochs
+    dominance_rate = q1_rate + q2_rate
+    return {
+        "a": row_or_acc["a"],
+        "b": row_or_acc["b"],
+        "pair_type": row_or_acc["pair_type"],
+        "present_ops": row_or_acc["present_ops"],
+        "add_target": row_or_acc["add_target"],
+        "mm21_target": row_or_acc["mm21_target"],
+        "total_epochs": total_epochs,
+        "risk_score": dominance_rate,
+        "q1_exclusive_rate": q1_rate,
+        "q2_exclusive_rate": q2_rate,
+        "split_rate": split_rate,
+        "mixed_or_missing_rate": mixed_or_missing_rate,
+        "q1_exclusive_count": q1_count,
+        "q2_exclusive_count": q2_count,
+        "split_count": split_count,
+        "mixed_or_missing_count": mixed_or_missing_count,
+        "dominant_query": _dominant_query(q1_rate, q2_rate),
+        "dominance_rate": dominance_rate,
     }
 
 
@@ -437,6 +562,94 @@ def build_critical_pair_report(spec, top_n=20):
         "last_epoch": last_epoch,
         "top_all": aggregate_items[:top_n],
         "top_last": last_items[:top_n],
+    }
+
+
+def build_pair_risk_report(spec, top_n=20):
+    csv_path = EXPS_DIR / spec["exp_name"] / str(spec["sub_exp_id"]) / "PairRiskStats_record.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Pair risk CSV not found: {csv_path}")
+
+    rows = []
+    with csv_path.open("r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows.append(_parse_pair_risk_row(row))
+    if not rows:
+        raise ValueError(f"Pair risk CSV is empty: {csv_path}")
+
+    by_pair = {}
+    count_keys = (
+        "q1_only_count",
+        "q2_only_count",
+        "mixed_count",
+        "tie_or_missing_count",
+        "q1_exclusive_count",
+        "q2_exclusive_count",
+        "split_count",
+        "mixed_or_missing_count",
+    )
+    for row in rows:
+        key = (row["a"], row["b"], row["pair_type"], row["target_op"])
+        acc = by_pair.setdefault(
+            key,
+            {
+                "a": row["a"],
+                "b": row["b"],
+                "pair_type": row["pair_type"],
+                "present_ops": row["present_ops"],
+                "target_op": row["target_op"],
+                "add_target": row["add_target"],
+                "mm21_target": row["mm21_target"],
+                "total_epochs": 0,
+                **{count_key: 0 for count_key in count_keys},
+            },
+        )
+        acc["total_epochs"] += row["total_epochs"]
+        for count_key in count_keys:
+            acc[count_key] += row[count_key]
+
+    single_items = [
+        _single_pair_risk_item(acc)
+        for acc in by_pair.values()
+        if acc["pair_type"] in {"single_add", "single_mm21"}
+    ]
+    dual_items = [
+        _dual_pair_risk_item(acc)
+        for acc in by_pair.values()
+        if acc["pair_type"] == "dual_distinct"
+    ]
+    single_items.sort(key=lambda item: item["risk_score"], reverse=True)
+    dual_items.sort(key=lambda item: item["risk_score"], reverse=True)
+
+    last_epoch = max(row["epoch"] for row in rows)
+    last_single_items = [
+        _single_pair_risk_item(row)
+        for row in rows
+        if row["epoch"] == last_epoch and row["pair_type"] in {"single_add", "single_mm21"}
+    ]
+    last_dual_items = [
+        _dual_pair_risk_item(row)
+        for row in rows
+        if row["epoch"] == last_epoch and row["pair_type"] == "dual_distinct"
+    ]
+    last_single_items.sort(key=lambda item: item["risk_score"], reverse=True)
+    last_dual_items.sort(key=lambda item: item["risk_score"], reverse=True)
+
+    return {
+        "short": spec["short"],
+        "label": spec["label"],
+        "exp_name": spec["exp_name"],
+        "sub_exp_id": str(spec["sub_exp_id"]),
+        "source": str(Path("exps") / spec["exp_name"] / str(spec["sub_exp_id"]) / "PairRiskStats_record.csv"),
+        "pair_count": len(by_pair),
+        "single_pair_count": len(single_items),
+        "dual_pair_count": len(dual_items),
+        "row_count": len(rows),
+        "last_epoch": last_epoch,
+        "top_single_all": single_items[:top_n],
+        "top_single_last": last_single_items[:top_n],
+        "top_dual_all": dual_items[:top_n],
+        "top_dual_last": last_dual_items[:top_n],
     }
 
 
@@ -1055,8 +1268,16 @@ renderAll();
 """
 
 
-def render_repeated_index(title, report_name, experiments, selector_key, analysis_text="", critical_pair_reports=None):
+def render_repeated_index(
+        title,
+        report_name,
+        experiments,
+        selector_key,
+        analysis_text="",
+        critical_pair_reports=None,
+        pair_risk_reports=None):
     critical_pair_reports = critical_pair_reports or []
+    pair_risk_reports = pair_risk_reports or []
     payload = json.dumps(
         {
             "title": title,
@@ -1064,6 +1285,7 @@ def render_repeated_index(title, report_name, experiments, selector_key, analysi
             "selectorKey": selector_key,
             "experiments": experiments,
             "criticalPairReports": critical_pair_reports,
+            "pairRiskReports": pair_risk_reports,
         },
         ensure_ascii=False,
     )
@@ -1168,6 +1390,12 @@ def render_repeated_index(title, report_name, experiments, selector_key, analysi
   <section id="criticalPairSection" class="chart-panel">
     <p class="muted">只分析训练集上同时存在 add target 和 mm21 target 的关键 (a,b) pair。dominant rate 表示同一个 query 同时赢走 add/mm21 两个 target 的比例。</p>
     <div id="criticalPairReports"></div>
+  </section>
+
+  <h2 id="pairRiskTitle">Pair Risk Diagnostics</h2>
+  <section id="pairRiskSection" class="chart-panel">
+    <p class="muted">同时分析 single-op pair 的 query 竞争风险，以及 dual-op pair 的同 query 独占风险。special ambiguous pair 不进入风险表。</p>
+    <div id="pairRiskReports"></div>
   </section>
 
   <h2>Data-Pair Visualization</h2>
@@ -1472,6 +1700,71 @@ function renderCriticalPairs() {
     </div>
   </article>`).join("");
 }
+function pairRiskSingleRows(items) {
+  return items.map(item => `<tr>
+    <td>(${item.a}, ${item.b})</td>
+    <td>${escapeHtml(item.pair_type)}<br><span class="muted">target=${escapeHtml(item.target_op)}</span></td>
+    <td>add=${item.add_target}<br>mm21=${item.mm21_target}</td>
+    <td>${pct(item.risk_score)}</td>
+    <td><span class="${dominantClass({dominant: item.dominant_query})}">${escapeHtml(item.dominant_query)}</span></td>
+    <td>${pct(item.q1_only_rate)}<br><span class="muted">${item.q1_only_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.q2_only_rate)}<br><span class="muted">${item.q2_only_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.mixed_rate)}<br><span class="muted">${item.mixed_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.tie_or_missing_rate)}<br><span class="muted">${item.tie_or_missing_count}/${item.total_epochs}</span></td>
+  </tr>`).join("");
+}
+function pairRiskDualRows(items) {
+  return items.map(item => `<tr>
+    <td>(${item.a}, ${item.b})</td>
+    <td>add=${item.add_target}<br>mm21=${item.mm21_target}</td>
+    <td>${pct(item.risk_score)}</td>
+    <td><span class="${dominantClass({dominant: item.dominant_query})}">${escapeHtml(item.dominant_query)}</span></td>
+    <td>${pct(item.q1_exclusive_rate)}<br><span class="muted">${item.q1_exclusive_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.q2_exclusive_rate)}<br><span class="muted">${item.q2_exclusive_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.split_rate)}<br><span class="muted">${item.split_count}/${item.total_epochs}</span></td>
+    <td>${pct(item.mixed_or_missing_rate)}<br><span class="muted">${item.mixed_or_missing_count}/${item.total_epochs}</span></td>
+  </tr>`).join("");
+}
+function pairRiskSingleTable(title, items) {
+  return `<div>
+    <h3>${escapeHtml(title)}</h3>
+    <table>
+      <thead><tr><th>pair</th><th>type</th><th>targets</th><th>risk</th><th>dominant</th><th>q1 only</th><th>q2 only</th><th>mixed</th><th>tie/missing</th></tr></thead>
+      <tbody>${pairRiskSingleRows(items)}</tbody>
+    </table>
+  </div>`;
+}
+function pairRiskDualTable(title, items) {
+  return `<div>
+    <h3>${escapeHtml(title)}</h3>
+    <table>
+      <thead><tr><th>pair</th><th>targets</th><th>risk</th><th>dominant</th><th>q1 exclusive</th><th>q2 exclusive</th><th>split</th><th>mixed/missing</th></tr></thead>
+      <tbody>${pairRiskDualRows(items)}</tbody>
+    </table>
+  </div>`;
+}
+function renderPairRisks() {
+  const reports = REPORT.pairRiskReports || [];
+  const section = document.getElementById("pairRiskSection");
+  const title = document.getElementById("pairRiskTitle");
+  if (!reports.length) {
+    section.style.display = "none";
+    title.style.display = "none";
+    return;
+  }
+  section.style.display = "";
+  title.style.display = "";
+  document.getElementById("pairRiskReports").innerHTML = reports.map(report => `<article class="critical-report">
+    <h3>${escapeHtml(report.label)}</h3>
+    <div class="muted">source=${escapeHtml(report.source)}; pairs=${report.pair_count}; single=${report.single_pair_count}; dual=${report.dual_pair_count}; rows=${report.row_count}; last epoch=${report.last_epoch}</div>
+    <div class="critical-grid">
+      ${pairRiskSingleTable("Single-op competition risk over all intervals", report.top_single_all)}
+      ${pairRiskSingleTable("Single-op competition risk in last interval", report.top_single_last)}
+      ${pairRiskDualTable("Dual-op same-query dominance over all intervals", report.top_dual_all)}
+      ${pairRiskDualTable("Dual-op same-query dominance in last interval", report.top_dual_last)}
+    </div>
+  </article>`).join("");
+}
 function renderImages() {
   const root = document.getElementById("imageRuns");
   root.innerHTML = experiments.map(exp => `<article class="run-card">
@@ -1529,6 +1822,7 @@ function renderAll() {
   drawQueryWiseBars();
   renderSubexpTable();
   renderCriticalPairs();
+  renderPairRisks();
   renderImages();
 }
 document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
@@ -1611,6 +1905,12 @@ def main():
         help="Repeatable. Format: 'short|experiment_dir_name|sub_exp_id|Display label'",
     )
     parser.add_argument(
+        "--pair-risk",
+        action="append",
+        type=parse_pair_risk_arg,
+        help="Repeatable. Format: 'short|experiment_dir_name|sub_exp_id|Display label'",
+    )
+    parser.add_argument(
         "--critical-pair-top-n",
         type=int,
         default=20,
@@ -1641,6 +1941,10 @@ def main():
             build_critical_pair_report(spec, top_n=args.critical_pair_top_n)
             for spec in (args.critical_pair or [])
         ]
+        pair_risk_reports = [
+            build_pair_risk_report(spec, top_n=args.critical_pair_top_n)
+            for spec in (args.pair_risk or [])
+        ]
         index_html = render_repeated_index(
             args.title,
             args.report_name,
@@ -1648,6 +1952,7 @@ def main():
             args.selector_key,
             analysis_text,
             critical_pair_reports,
+            pair_risk_reports,
         )
     (out_dir / "index.html").write_text(index_html, encoding="utf-8")
     (ANALYSIS_DIR / f"{args.report_name}.html").write_text(render_redirect(args.report_name), encoding="utf-8")
@@ -1662,6 +1967,11 @@ def main():
     for report in (critical_pair_reports if "critical_pair_reports" in locals() else []):
         print(
             f"{report['short']}: critical_pairs={report['critical_pair_count']}, "
+            f"last_epoch={report['last_epoch']}"
+        )
+    for report in (pair_risk_reports if "pair_risk_reports" in locals() else []):
+        print(
+            f"{report['short']}: pair_risks={report['pair_count']}, "
             f"last_epoch={report['last_epoch']}"
         )
 

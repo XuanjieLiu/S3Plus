@@ -97,6 +97,8 @@ L_total = L_pred
 
 ## 简图
 
+![OpVQ structure](opvq_structure.svg)
+
 ```text
           ea ----\
                   \

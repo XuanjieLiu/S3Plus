@@ -121,6 +121,21 @@ python experiment_analysis/generate_analysis.py \
 - 报告应同时展示全训练期聚合统计和最后一个 interval 统计，用来判断独占问题是否持续到训练末期。
 - 这个 section 只用于分析 assignment，不改变 best epoch 选择，也不替代整体 accuracy 和 query-wise accuracy。
 
+## Pair Risk 诊断规则
+
+如果实验目录中存在 `PairRiskStats_record.csv`，可以在 repeated-run 报告中加入 pair risk 分析：
+
+```bash
+python experiment_analysis/generate_analysis.py \
+  --pair-risk "short_name|experiment_dir_name|sub_exp_id|Display label"
+```
+
+- `PairRiskStats_record.csv` 基于实际 train split 建立 pair taxonomy。
+- `single_add` / `single_mm21` 表示训练集中该 `(a,b)` 只出现一种 operation。健康信号是同一个 query 稳定独占；风险分数为 `mixed_rate + min(q1_only_rate, q2_only_rate)`。
+- `dual_distinct` 表示训练集中该 `(a,b)` 同时出现 add 和 mm21，且 target 不同。健康信号是 add/mm21 被不同 query 赢走；风险分数为 `q1_exclusive_rate + q2_exclusive_rate`。
+- `special_ambiguous` 表示 `a + b == (a * b) % 21`，语义不可区分，不进入 pair risk 表。
+- 当前常用配置先混合 add/mm21 数据集再 `random_split`；若开启 `augment_times`，split 单位是增强后的虚拟样本 index，而不是唯一 pair。
+
 ## Data-Pair 可视化规则
 
 data-pair 可视化使用每个实验 best epoch 对应的图片：

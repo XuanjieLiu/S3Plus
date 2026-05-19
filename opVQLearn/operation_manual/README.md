@@ -40,6 +40,24 @@ python batch_train.py 2026.5.16_opvq_2code_fromMulBasedSps_lr3e4_balance
 exit
 ```
 
+## 当前推荐下一轮实验
+
+```text
+2026.5.17_opvq_2code_fromMulBasedSps_lr3e4_balance_symm001_noSpsVqSymm
+```
+
+运行：
+
+```bash
+salloc -N 1 --gres=gpu:1 --mem=32G
+conda activate xuanjie
+cd /home/xuanjie.liu/Projects/S3Plus/opVQLearn
+python batch_train.py 2026.5.17_opvq_2code_fromMulBasedSps_lr3e4_balance_symm001_noSpsVqSymm
+exit
+```
+
+这个 setup 用来验证 `2026.5.16_opvq_2code_fromMulBasedSps_lr3e4_balance` 后期数值爆炸是否来自过强的 symm regularization。它保留 balance loss，把 `symm.loss_scalar` 从 `0.05` 降到 `0.01`，并关闭 symm 路径里的 SPS VQ loss。
+
 ## 首个实验
 
 ```text

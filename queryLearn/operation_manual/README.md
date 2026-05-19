@@ -29,10 +29,29 @@ exit
 ## 关键入口
 
 - 训练入口：`S3Plus/queryLearn/batch_train.py`
-- 模型/训练逻辑：`S3Plus/queryLearn/QueryLearn.py`
+- 训练主流程：`S3Plus/queryLearn/QueryLearn.py`
+- OperNet 结构：`S3Plus/queryLearn/opernet.py`
+- 训练辅助函数：`S3Plus/queryLearn/training_helpers.py`
+- Pair taxonomy / risk 诊断：`S3Plus/queryLearn/pair_diagnostics.py`
 - 实验配置：`S3Plus/queryLearn/exps/<EXP_NAME>/config.py`
 - query 可视化：`S3Plus/queryLearn/query_vis.py`
 - 模型结构说明：`S3Plus/queryLearn/model_structure/`
+
+## 数据 split 和 pair 诊断
+
+当前常用实验会把 `train_data_path` 中的 add train/test 和 mm21 train/test 先合成一个 `ConcatDataset`，再对这个混合后的 dataset 做 `random_split`。因为 `augment_times` 会扩展 dataset length，split 单位是增强后的虚拟样本 index，不是唯一 `(a,b,op)` pair。
+
+训练启动时 `QueryLearn` 会基于实际 train split 建立 pair taxonomy：
+
+- `single_add`：训练集中这个 `(a,b)` 只出现 add。
+- `single_mm21`：训练集中这个 `(a,b)` 只出现 mm21。
+- `dual_distinct`：训练集中这个 `(a,b)` 同时出现 add 和 mm21，且两个 target 不同。
+- `special_ambiguous`：`a + b == (a * b) % 21`，add/mm21 语义不可区分，不进入风险排序。
+
+诊断文件：
+
+- `CriticalPairStats_record.csv`：旧语义，只覆盖 `dual_distinct`，用于分析同一个 query 同时赢走 add/mm21 的情况。
+- `PairRiskStats_record.csv`：新语义，同时覆盖 `single_add` / `single_mm21` 的 query 竞争风险，以及 `dual_distinct` 的同 query 独占风险。
 
 ## 运行模板
 
