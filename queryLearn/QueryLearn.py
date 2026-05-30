@@ -15,6 +15,10 @@ from dataloader import load_enc_eval_data
 from queryLearn.opernet import OperNet, comb_q_z
 from queryLearn.training_helpers import init_queries, regul_sample, sanity_check_oper_loss
 from queryLearn.pair_diagnostics import PairDiagnosticsRecorder
+from queryLearn.label_codebook import (
+    DEFAULT_LABEL_CODEBOOK_CODES,
+    load_label_codebook,
+)
 try:
     from queryLearn.query_vis import record_dir, save_query_operation_tables
 except ImportError:
@@ -54,6 +58,7 @@ class QueryLearn:
         self.sps_model, sps_config = load_VQSPS_loader(config)
         self._set_sps_untrainable()
         self.train_loader, self.eval_loader, self.single_img_eval_loader = init_dataloaders(config)
+        self.use_eval_set = self.eval_loader is not None
         query_config = config.get('query_learner', {})
         self.query_dim = query_config.get('query_dim', query_config.get('in_dim', 8))
         self.train_queries = query_config.get('train_queries', False)
@@ -61,12 +66,25 @@ class QueryLearn:
         self.queries = nn.Parameter(queries) if self.train_queries else queries
         operator_config = config['operator']
         operator_condition_mode = operator_config.get('condition_mode', 'concat')
+        self.use_label_codebook = operator_config.get('use_label_codebook', False)
+        self.label_codebook = None
+        vq_layer = self.sps_model.model.vq_layer
+        if self.use_label_codebook:
+            label_codes = operator_config.get('label_codebook_codes', DEFAULT_LABEL_CODEBOOK_CODES)
+            fail_fast = operator_config.get('label_codebook_fail_fast', True)
+            self.label_codebook = load_label_codebook(
+                self.single_img_eval_loader,
+                self.sps_model,
+                codes=label_codes,
+                fail_fast=fail_fast,
+            )
+            vq_layer = self.label_codebook.vq_layer
         self.oper_net = OperNet(
             in_dim=self.sps_model.latent_code_1 * 2 + self.query_dim,
             out_dim=self.sps_model.latent_code_1,
             n_hidden_layers=operator_config['n_hidden_layers'],
             unit=operator_config['unit'],
-            vq_layer=self.sps_model.model.vq_layer,
+            vq_layer=vq_layer,
             train_vq=False,
             condition_mode=operator_condition_mode,
             pair_dim=self.sps_model.latent_code_1 * 2,
@@ -102,12 +120,32 @@ class QueryLearn:
             self.pair_risk_record_path,
         )
         print(f"Query dim: {self.query_dim}, OperNet condition mode: {operator_condition_mode}")
+        if self.use_label_codebook:
+            print(
+                f"Label codebook enabled: codes={self.label_codebook.codes}, "
+                f"num_codes={len(self.label_codebook.codes)}"
+            )
+            mapping = {
+                label: code_idx
+                for label, code_idx in zip(
+                    self.label_codebook.codes,
+                    self.label_codebook.original_code_indices,
+                )
+            }
+            print(f"Label -> original SPS code index: {mapping}")
+        if not self.use_eval_set:
+            print("Pair evaluation is disabled or eval set is empty")
         print(self.pair_diagnostics.summary_text())
         if self.sanity_check:
             print('Sanity check mode...')
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
+            return
+        if self.label_codebook is not None:
+            self.num_z_c = self.label_codebook.num_z_c
+            self.num_labels = self.label_codebook.num_labels
+            self._num_label_to_index = self.label_codebook.label_to_index
             return
         num_z, num_labels = load_enc_eval_data(
             self.single_img_eval_loader,
@@ -277,6 +315,8 @@ class QueryLearn:
                 stage_name = 'eval' if stage == STAGE_VAL else stage
                 q1_correct = self._query_target_correct(epoch_label_c, q1_out_epoch)
                 q2_correct = self._query_target_correct(epoch_label_c, q2_out_epoch)
+                q1_target_dist = (q1_out_epoch - ec_epoch).pow(2).sum(dim=-1)
+                q2_target_dist = (q2_out_epoch - ec_epoch).pow(2).sum(dim=-1)
                 save_query_operation_tables(
                     query_vis_dir,
                     stage_name,
@@ -286,6 +326,8 @@ class QueryLearn:
                     epoch_label_c,
                     q1_correct,
                     q2_correct,
+                    q1_target_dist,
+                    q2_target_dist,
                     self.query_vis_format,
                 )
 
@@ -293,7 +335,7 @@ class QueryLearn:
         if os.path.exists(self.model_path):
             ckpt = torch.load(self.model_path, map_location=DEVICE)
             if isinstance(ckpt, dict) and 'oper_net_state_dict' in ckpt:
-                self.oper_net.load_state_dict(ckpt['oper_net_state_dict'])
+                self._load_oper_net_state_dict(ckpt['oper_net_state_dict'])
                 if 'queries' in ckpt:
                     ckpt_queries = ckpt['queries'].to(DEVICE)
                     if ckpt_queries.shape != self.queries.shape:
@@ -304,10 +346,30 @@ class QueryLearn:
                     with torch.no_grad():
                         self.queries.copy_(ckpt_queries)
             else:
-                self.oper_net.load_state_dict(ckpt)
+                self._load_oper_net_state_dict(ckpt)
             print(f"Model is loaded from {self.model_path}")
         else:
             print("No checkpoint found, training from scratch")
+
+    def _load_oper_net_state_dict(self, state_dict):
+        if self.label_codebook is None:
+            self.oper_net.load_state_dict(state_dict)
+            return
+
+        filtered_state_dict = {
+            key: value
+            for key, value in state_dict.items()
+            if not key.startswith('vq_layer.')
+        }
+        missing, unexpected = self.oper_net.load_state_dict(filtered_state_dict, strict=False)
+        unexpected = [key for key in unexpected if not key.startswith('vq_layer.')]
+        missing = [key for key in missing if not key.startswith('vq_layer.')]
+        if unexpected or missing:
+            raise ValueError(
+                "Checkpoint is incompatible with current label-codebook OperNet. "
+                f"missing={missing}, unexpected={unexpected}"
+            )
+        print("Skipped checkpoint vq_layer weights because label codebook is rebuilt from labels")
 
     def _save_model(self, path, epoch):
         ckpt = {
@@ -353,7 +415,7 @@ class QueryLearn:
                 self.pair_diagnostics.record_interval(epoch)
                 train_loss_counter.record_and_clear(num=epoch)
 
-            if epoch % self.eval_interval == 0:
+            if self.use_eval_set and epoch % self.eval_interval == 0:
                 self.oper_net.eval()
                 with torch.no_grad():
                     self.one_epoch(

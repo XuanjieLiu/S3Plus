@@ -10,7 +10,12 @@ TRAIN_SET = [
 ]
 SINGLE_IMG_SET = f"{data_root}/(0,20)-FixedPos-mul_add_mix"
 IS_BLUR = False
-
+BLUR_CONFIG = {
+    'kernel_size_choices': (5, 7, 9),
+    'sigma_range': (0.5, 3.0),
+    'p_no_blur': 0.00,
+}
+AUGMENT_TIMES = 16
 CONFIG = {
     'num_sub_exp': 3,
     'VQSPS': {
@@ -29,7 +34,7 @@ CONFIG = {
     },
     'query_vis_format': 'png',
     'operator': {
-        'condition_mode': 'film',
+        'condition_mode': 'concat',
         'film_init_identity': True,
         'unit': 2048,
         'n_hidden_layers': 5,
@@ -37,10 +42,9 @@ CONFIG = {
     'train_data_path': TRAIN_SET,
     'single_img_eval_set_path': SINGLE_IMG_SET,
     'plus_eval_set_path': EVAL_SET,
-    'use_eval_set': True,
     'is_random_split_data': True,
     'random_split_seed': 20260510,
-    'train_data_ratio': 0.8,
+    'train_data_ratio': 1.0,
     'checkpoint_interval': 2500,
     'checkpoint_after': 5000,
     'learning_rate': 3e-4,
@@ -57,7 +61,7 @@ CONFIG = {
     'log_interval': 500,
     'eval_interval': 2500,
     'batch_size': 256,
-    'is_symm': True,
+    'is_symm': False,
     'is_assoc': False,
     'symm_loss_scalar': 0.05,
     'eqLoss_scalar': 0.05,

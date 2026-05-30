@@ -2,6 +2,15 @@ import os
 
 
 OPERATIONS = ("add", "mm21")
+Q1_BG = "#dbeafe"
+Q2_BG = "#fef3c7"
+TIE_BG = "#f8fafc"
+MISSING_BG = "#ffffff"
+Q1_TEXT = "#1d4ed8"
+Q2_TEXT = "#d97706"
+MISS_TEXT = "#dc2626"
+GRID_LINE = "#d8dee8"
+SPECIAL_BORDER = "#172033"
 
 
 def record_dir(record_path):
@@ -12,6 +21,11 @@ def record_dir(record_path):
 def _is_true(values, idx):
     value = values[idx]
     return bool(value.item()) if hasattr(value, "item") else bool(value)
+
+
+def _to_float(values, idx):
+    value = values[idx]
+    return float(value.item()) if hasattr(value, "item") else float(value)
 
 
 def _is_add(a, b, c):
@@ -34,16 +48,40 @@ def _is_special_pair(a, b):
     return (a + b) == ((a * b) % 21)
 
 
-def operation_cells(label_a, label_b, label_c, q1_correct, q2_correct, operation):
+def distance_winner(q1_dist, q2_dist, tie_eps=1e-8):
+    if q1_dist < q2_dist - tie_eps:
+        return "q1"
+    if q2_dist < q1_dist - tie_eps:
+        return "q2"
+    return "tie"
+
+
+def operation_cells(
+        label_a,
+        label_b,
+        label_c,
+        q1_correct,
+        q2_correct,
+        q1_target_dist,
+        q2_target_dist,
+        operation):
     cells = {}
     for idx, (a, b, c) in enumerate(zip(label_a, label_b, label_c)):
         if not _is_operation_sample(operation, a, b, c):
             continue
+        pair = (a, b)
+        if pair in cells:
+            continue
 
-        cell = cells.setdefault((a, b), {"in_set": False, "q1": False, "q2": False})
-        cell["in_set"] = True
-        cell["q1"] = cell["q1"] or _is_true(q1_correct, idx)
-        cell["q2"] = cell["q2"] or _is_true(q2_correct, idx)
+        q1_dist = _to_float(q1_target_dist, idx)
+        q2_dist = _to_float(q2_target_dist, idx)
+        cells[pair] = {
+            "in_set": True,
+            "q1": _is_true(q1_correct, idx),
+            "q2": _is_true(q2_correct, idx),
+            "winner": distance_winner(q1_dist, q2_dist),
+            "special": _is_special_pair(a, b),
+        }
     return cells
 
 
@@ -51,7 +89,7 @@ def operation_cell_text(cell):
     if not cell["in_set"]:
         return "/"
     if cell["q1"] and cell["q2"]:
-        return "1,2"
+        return "12"
     if cell["q1"]:
         return "1"
     if cell["q2"]:
@@ -59,23 +97,41 @@ def operation_cell_text(cell):
     return "×"
 
 
+def operation_cell_draw_items(cell):
+    text = operation_cell_text(cell)
+    if text == "12":
+        return [
+            {"text": "1", "x_offset": -0.09, "color": Q1_TEXT, "fontsize": 10, "fontweight": "bold"},
+            {"text": "2", "x_offset": 0.09, "color": Q2_TEXT, "fontsize": 10, "fontweight": "bold"},
+        ]
+    if text == "1":
+        return [{"text": "1", "x_offset": 0.0, "color": Q1_TEXT, "fontsize": 10, "fontweight": "bold"}]
+    if text == "2":
+        return [{"text": "2", "x_offset": 0.0, "color": Q2_TEXT, "fontsize": 10, "fontweight": "bold"}]
+    if text == "×":
+        return [{"text": "×", "x_offset": 0.0, "color": MISS_TEXT, "fontsize": 16, "fontweight": "bold"}]
+    return [{"text": "/", "x_offset": 0.0, "color": "#94a3b8", "fontsize": 9, "fontweight": "normal"}]
+
+
 def operation_table_grid(rows, cols, cells):
-    text_grid = []
-    color_grid = []
+    cell_grid = []
+    bg_grid = []
     color_idx = {
-        "default": 0,
-        "special": 1,
+        "missing": 0,
+        "tie": 1,
+        "q1": 2,
+        "q2": 3,
     }
     for row in rows:
-        text_row = []
-        color_row = []
+        cell_row = []
+        bg_row = []
         for col in cols:
-            cell = cells.get((row, col), {"in_set": False, "q1": False, "q2": False})
-            text_row.append(operation_cell_text(cell))
-            color_row.append(color_idx["special" if _is_special_pair(row, col) else "default"])
-        text_grid.append(text_row)
-        color_grid.append(color_row)
-    return text_grid, color_grid
+            cell = cells.get((row, col), {"in_set": False, "q1": False, "q2": False, "winner": "missing"})
+            cell_row.append(cell)
+            bg_row.append(color_idx[cell["winner"] if cell["in_set"] else "missing"])
+        cell_grid.append(cell_row)
+        bg_grid.append(bg_row)
+    return cell_grid, bg_grid
 
 
 def operation_stats(cells):
@@ -95,16 +151,17 @@ def save_operation_table_plot(output_path, operation, stage, epoch, rows, cols, 
     import matplotlib
 
     matplotlib.use("Agg")
+    import matplotlib.patches as patches
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap
 
-    text_grid, color_grid = operation_table_grid(rows, cols, cells)
+    cell_grid, color_grid = operation_table_grid(rows, cols, cells)
     stats = operation_stats(cells)
     fig_w = max(6, 0.42 * len(cols) + 1.2)
     fig_h = max(5, 0.34 * len(rows) + 1.2)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=180)
-    cmap = ListedColormap(["#f8fafc", "#efe5ff"])
-    ax.imshow(color_grid, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    cmap = ListedColormap([MISSING_BG, TIE_BG, Q1_BG, Q2_BG])
+    ax.imshow(color_grid, cmap=cmap, vmin=0, vmax=3, aspect="auto")
     ax.set_title(
         (
             f"{operation} set {stage} epoch {epoch} "
@@ -120,13 +177,33 @@ def save_operation_table_plot(output_path, operation, stage, epoch, rows, cols, 
     ax.set_ylabel("label a")
     ax.set_xticks([x - 0.5 for x in range(1, len(cols))], minor=True)
     ax.set_yticks([y - 0.5 for y in range(1, len(rows))], minor=True)
-    ax.grid(which="minor", color="#d8dee8", linewidth=0.6)
+    ax.grid(which="minor", color=GRID_LINE, linewidth=0.6)
     ax.tick_params(which="minor", bottom=False, left=False)
 
-    for y, text_row in enumerate(text_grid):
-        for x, text in enumerate(text_row):
-            color = "#c62828" if text == "×" else "#172033"
-            ax.text(x, y, text, ha="center", va="center", color=color, fontweight="bold")
+    for y, cell_row in enumerate(cell_grid):
+        for x, cell in enumerate(cell_row):
+            for item in operation_cell_draw_items(cell):
+                ax.text(
+                    x + item["x_offset"],
+                    y,
+                    item["text"],
+                    ha="center",
+                    va="center",
+                    color=item["color"],
+                    fontsize=item["fontsize"],
+                    fontweight=item["fontweight"],
+                )
+            if _is_special_pair(rows[y], cols[x]):
+                ax.add_patch(
+                    patches.Rectangle(
+                        (x - 0.5, y - 0.5),
+                        1,
+                        1,
+                        fill=False,
+                        edgecolor=SPECIAL_BORDER,
+                        linewidth=2.2,
+                    )
+                )
     fig.tight_layout()
     fig.savefig(output_path)
     plt.close(fig)
@@ -141,6 +218,8 @@ def save_query_operation_tables(
         label_c,
         q1_correct,
         q2_correct,
+        q1_target_dist,
+        q2_target_dist,
         file_format):
     file_format = file_format.lower().lstrip(".")
     if file_format not in {"png", "svg"}:
@@ -150,7 +229,16 @@ def save_query_operation_tables(
     rows = sorted(set(label_a))
     cols = sorted(set(label_b))
     for operation in OPERATIONS:
-        cells = operation_cells(label_a, label_b, label_c, q1_correct, q2_correct, operation)
+        cells = operation_cells(
+            label_a,
+            label_b,
+            label_c,
+            q1_correct,
+            q2_correct,
+            q1_target_dist,
+            q2_target_dist,
+            operation,
+        )
         file_name = f"query_operation_{stage}_epoch_{epoch:06d}_{operation}.{file_format}"
         save_operation_table_plot(
             os.path.join(output_dir, file_name),

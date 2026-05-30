@@ -17,6 +17,8 @@ HTML 只引用这个子目录内的相对路径图片。这样整个 `<report_na
 experiment_analysis/<report_name>/assets/<exp_short>/sub<id>/*.png
 ```
 
+多 sub-exp 报告的 query operation 可视化必须按 sub-exp 纵向排列：每个 sub-exp 独占一行；每行只包含该 sub-exp 的 add 和 mm21 两张图；两张图在宽屏下并排展示，在窄屏下自动上下排列；每张图都必须支持点击放大，便于检查单个 pair cell。
+
 ## 生成脚本
 
 默认生成当前 sanity-check 对比报告：
@@ -71,6 +73,14 @@ HTML 顶部首先应展示实验分析正文，而不是画图规则或操作说
 2. 在这些 epoch 中查找对应 `Train_record.txt` 的 `total_loss`。
 3. 选择 `total_loss` 最低的 epoch 作为该实验的 best epoch。
 4. 所有柱状图、summary 表格和 query pairwise 图片都使用同一个 best epoch。
+
+如果 query operation 图片不是每个 saved epoch 都保存，生成脚本会进一步把候选 epoch 限制到同时存在 add/mm21 query operation 图片的 epoch，确保表格和 Data-Pair Visualization 使用同一个 checkpoint。
+
+如果实验没有 `Eval_record.txt`，例如 `train_data_ratio=1.0` 的 full-train 设置，则报告退化为 train-only 模式：
+
+1. 直接在 `Train_record.txt` 的 saved epochs 中选择 `total_loss` 最低、且有 add/mm21 query operation 图片的 epoch。
+2. 页面只显示 Train 视图，不显示 Eval 切换。
+3. 报告必须明确标注这是 train-only 分析，不能解读为泛化表现。
 
 如果某次分析明确要用其他 loss，例如 `oper_loss`，必须在对应 HTML 报告中单独说明。
 
@@ -148,6 +158,7 @@ data-pair 可视化使用每个实验 best epoch 对应的图片：
 - 每一行只展示一个实验；该行内 add set 和 mm21 set 两张图并排展示。
 - 在窄屏幕上，两张图可以自动改为上下排列，避免图片或文字溢出。
 - 每张 data-pair 图片都应支持点击放大。放大视图使用当前报告目录内的相对路径图片，并提供关闭方式，例如点击背景、关闭按钮或 Esc。
+- 多 sub-exp 报告中，先按 experiment 分组；每个 sub-exp 独占一行；每行显示该 sub-exp 的 add set 和 mm21 set 两张 query operation 图片；每张图片都必须支持点击放大。
 - 图中每个格子表示一个 `(label_a, label_b)` datapair 在当前 operation set 中的状态：`/` 表示当前 set 缺失，`1` 表示 q1 做对，`2` 表示 q2 做对，`1,2` 表示两个 query 都做对，红色 `×` 表示两个 query 都没做对。
 - 若某个 pair 同时满足 add 和 mm21，即 `a + b == (a * b) % 21`，该格子使用淡紫色底色；即使它在当前 set 中缺失，也显示紫底 `/`。
 
@@ -158,3 +169,12 @@ train / eval 切换是全局状态，不是每个 section 的局部状态。
 - 页面只放一个全局切换控件。
 - 切换控件应固定在浏览器窗口中，例如右上角，这样滚动到任意位置都能切换 train / eval。
 - 切换只改变展示的数据来源，不改变 best epoch 选择规则。
+
+多实验或多 sub-exp 报告可以叠加一个 sub-exp-wise 视图切换：
+
+- `Overall` 视图只展示统计类内容，例如 aggregate summary、metric curves 和 sub-exp summary table。
+- 具体 sub-exp 视图，例如 `exp1`、`exp2`，必须继续横向对比所有 experiment，不应把 experiment 作为页签拆开。
+- Query-wise Best Epoch Accuracy 不应跨 sub-exp 聚合；只在具体 sub-exp 视图中展示，并横向对比各 experiment 的该 sub-exp。
+- 具体 sub-exp 视图显示该 sub-exp 对应的 Pair Risk Diagnostics 和 Data-Pair Visualization。
+- Pair Risk Diagnostics 和 Data-Pair Visualization 不应在 `Overall` 视图中展开，避免页面过长。
+- Pair Risk Diagnostics 若包含多个 sub-exp，应使用可折叠块；默认先显示摘要，展开后再显示具体 risk pair 表格。

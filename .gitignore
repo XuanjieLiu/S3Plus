@@ -24,3 +24,4 @@ slurm_*.err
 new_icon_train/
 new_icon_val/
 __pycache__
+/queryLearn/exps/**/*.csv

@@ -77,6 +77,12 @@ def parse_record(path):
     return records
 
 
+def parse_optional_record(path):
+    if not path.exists():
+        return []
+    return parse_record(path)
+
+
 def load_config_summary(path):
     spec = importlib.util.spec_from_file_location(f"analysis_config_{path.parent.name}", path)
     module = importlib.util.module_from_spec(spec)
@@ -114,11 +120,13 @@ def harmonic(add_acc, mm21_acc):
     return 0.0 if denom == 0 else 2 * add_acc * mm21_acc / denom
 
 
-def best_epoch(train_records, eval_records, selector_key):
+def best_epoch(train_records, eval_records, selector_key, allowed_epochs=None):
     eval_epochs = {row["epoch"] for row in eval_records}
-    candidates = [row for row in train_records if row["epoch"] in eval_epochs]
+    candidates = [row for row in train_records if row["epoch"] in eval_epochs] if eval_epochs else train_records
+    if allowed_epochs is not None:
+        candidates = [row for row in candidates if row["epoch"] in allowed_epochs]
     if not candidates:
-        raise ValueError("No overlapping epochs between train and eval records")
+        raise ValueError("No train records available for best epoch selection")
     return min(candidates, key=lambda row: row[selector_key])["epoch"]
 
 
@@ -135,7 +143,31 @@ def find_operation_image(exp_dir, stage, epoch, operation, sub_exp_id="1"):
     return matches[0]
 
 
-def copy_operation_images(exp_dir, out_dir, short, epoch, sub_exp_id="1", nested=False):
+def operation_image_epochs(exp_dir, stage, sub_exp_id="1"):
+    result_dir = exp_dir / str(sub_exp_id) / ("TrainingResults" if stage == "train" else "EvalResults")
+    stage_name = "train" if stage == "train" else "eval"
+    per_operation = []
+    for operation in ("add", "mm21"):
+        epochs = set()
+        pattern = f"query_operation_{stage_name}_epoch_*_{operation}.*"
+        for path in result_dir.glob(pattern):
+            match = re.search(r"_epoch_(\d+)_" + re.escape(operation) + r"\.", path.name)
+            if match:
+                epochs.add(int(match.group(1)))
+        per_operation.append(epochs)
+    if not per_operation or not all(per_operation):
+        return set()
+    return set.intersection(*per_operation)
+
+
+def available_operation_image_epochs(exp_dir, stages, sub_exp_id="1"):
+    stage_epochs = [operation_image_epochs(exp_dir, stage, sub_exp_id) for stage in stages]
+    if not stage_epochs or not all(stage_epochs):
+        return set()
+    return set.intersection(*stage_epochs)
+
+
+def copy_operation_images(exp_dir, out_dir, short, epoch, sub_exp_id="1", nested=False, stages=("train", "eval")):
     copied = {"train": [], "eval": []}
     asset_dir = out_dir / "assets" / short
     if nested:
@@ -144,7 +176,7 @@ def copy_operation_images(exp_dir, out_dir, short, epoch, sub_exp_id="1", nested
         shutil.rmtree(asset_dir)
     asset_dir.mkdir(parents=True, exist_ok=True)
 
-    for stage in ("train", "eval"):
+    for stage in stages:
         for operation in ("add", "mm21"):
             src = find_operation_image(exp_dir, stage, epoch, operation, sub_exp_id)
             dest_name = f"{stage}_{operation}{src.suffix.lower()}"
@@ -169,9 +201,11 @@ def build_experiment(spec, out_dir, selector_key):
     exp_dir = EXPS_DIR / spec["exp_name"]
     sub_exp = exp_dir / "1"
     train_records = parse_record(sub_exp / "Train_record.txt")
-    eval_records = parse_record(sub_exp / "Eval_record.txt")
-    epoch = best_epoch(train_records, eval_records, selector_key)
-    images = copy_operation_images(exp_dir, out_dir, spec["short"], epoch)
+    eval_records = parse_optional_record(sub_exp / "Eval_record.txt")
+    stages = ("train", "eval") if eval_records else ("train",)
+    allowed_epochs = available_operation_image_epochs(exp_dir, stages, "1")
+    epoch = best_epoch(train_records, eval_records, selector_key, allowed_epochs or None)
+    images = copy_operation_images(exp_dir, out_dir, spec["short"], epoch, stages=stages)
     config = load_config_summary(exp_dir / "config.py")
     return {
         "short": spec["short"],
@@ -185,6 +219,7 @@ def build_experiment(spec, out_dir, selector_key):
             "train": train_records,
             "eval": eval_records,
         },
+        "available_stages": list(stages),
         "images": images,
     }
 
@@ -214,20 +249,23 @@ def std(values):
 def build_run(exp_dir, out_dir, short, sub_exp_id, selector_key):
     sub_exp = exp_dir / str(sub_exp_id)
     train_records = parse_record(sub_exp / "Train_record.txt")
-    eval_records = parse_record(sub_exp / "Eval_record.txt")
-    epoch = best_epoch(train_records, eval_records, selector_key)
-    images = copy_operation_images(exp_dir, out_dir, short, epoch, sub_exp_id, nested=True)
-    best_eval_h_row = max(eval_records, key=row_harmonic)
+    eval_records = parse_optional_record(sub_exp / "Eval_record.txt")
+    stages = ("train", "eval") if eval_records else ("train",)
+    allowed_epochs = available_operation_image_epochs(exp_dir, stages, sub_exp_id)
+    epoch = best_epoch(train_records, eval_records, selector_key, allowed_epochs or None)
+    images = copy_operation_images(exp_dir, out_dir, short, epoch, sub_exp_id, nested=True, stages=stages)
+    best_eval_h_row = max(eval_records, key=row_harmonic) if eval_records else None
     return {
         "sub_id": str(sub_exp_id),
         "best_epoch": epoch,
         "best_selector": selector_key,
-        "best_eval_h_epoch": best_eval_h_row["epoch"],
-        "best_eval_h": row_harmonic(best_eval_h_row),
+        "best_eval_h_epoch": best_eval_h_row["epoch"] if best_eval_h_row else None,
+        "best_eval_h": row_harmonic(best_eval_h_row) if best_eval_h_row else None,
         "records": {
             "train": train_records,
             "eval": eval_records,
         },
+        "available_stages": list(stages),
         "images": images,
     }
 
@@ -235,6 +273,8 @@ def build_run(exp_dir, out_dir, short, sub_exp_id, selector_key):
 def summarize_runs(runs):
     summary = {}
     for stage in ("train", "eval"):
+        if not any(run["records"][stage] for run in runs):
+            continue
         summary[stage] = {}
         for key in (
                 "add_acc",
@@ -259,6 +299,9 @@ def summarize_runs(runs):
 def build_repeated_experiment(spec, out_dir, selector_key, sub_exp_ids):
     exp_dir = EXPS_DIR / spec["exp_name"]
     runs = [build_run(exp_dir, out_dir, spec["short"], sub_id, selector_key) for sub_id in sub_exp_ids]
+    available_stages = ["train"]
+    if all(run["records"]["eval"] for run in runs):
+        available_stages.append("eval")
     return {
         "short": spec["short"],
         "label": spec["label"],
@@ -267,6 +310,7 @@ def build_repeated_experiment(spec, out_dir, selector_key, sub_exp_ids):
         "setup": load_config_summary(exp_dir / "config.py"),
         "runs": runs,
         "summary": summarize_runs(runs),
+        "available_stages": available_stages,
     }
 
 
@@ -703,16 +747,22 @@ def render_markdownish(text):
 
 
 def build_default_analysis(experiments, selector_key):
+    report_stage = "eval" if all(exp["records"]["eval"] for exp in experiments) else "train"
     rows = []
     for exp in experiments:
-        row = row_at(exp["records"]["eval"], exp["best_epoch"])
+        row = row_at(exp["records"][report_stage], exp["best_epoch"])
         rows.append((exp, row, harmonic(row["add_acc"], row["mm21_acc"])))
     rows.sort(key=lambda item: item[2], reverse=True)
     leader, leader_row, leader_h = rows[0]
+    selection_note = (
+        f"Best epoch is selected by lowest train {selector_key} among epochs visible in Eval_record and query operation images."
+        if report_stage == "eval"
+        else f"No Eval_record is present, so best epoch is selected by lowest train {selector_key} among epochs with query operation images."
+    )
     return (
         "## Key Takeaways\n"
-        f"- Best epoch is selected by lowest train {selector_key} among epochs visible in Eval_record.\n"
-        f"- On eval, {leader['short']} has the highest harmonic mean: H={leader_h:.3f}, "
+        f"- {selection_note}\n"
+        f"- On {report_stage}, {leader['short']} has the highest harmonic mean: H={leader_h:.3f}, "
         f"add={leader_row['add_acc']:.3f}, mm21={leader_row['mm21_acc']:.3f}.\n"
         "- Add a custom --analysis-file when the report needs experiment-specific causal hypotheses and next-step recommendations.\n"
     )
@@ -725,6 +775,7 @@ def render_index(title, report_name, experiments, selector_key, analysis_text=""
             "reportName": report_name,
             "selectorKey": selector_key,
             "experiments": experiments,
+            "availableStages": ["train", "eval"] if all(exp["records"]["eval"] for exp in experiments) else ["train"],
         },
         ensure_ascii=False,
     )
@@ -862,7 +913,7 @@ def render_index(title, report_name, experiments, selector_key, analysis_text=""
   <h2>Report Notes</h2>
   <div class="note">
     <strong>Checkpoint rule</strong>
-    <p>Best epoch is selected from epochs visible in Eval_record by the lowest corresponding Train_record <code>{html.escape(selector_key)}</code>. All best-epoch tables, bars, and query images use that same epoch.</p>
+    <p>{"Best epoch is selected from epochs visible in Eval_record and query operation images by the lowest corresponding Train_record" if all(exp["records"]["eval"] for exp in experiments) else "No Eval_record is present, so best epoch is selected by the lowest Train_record among epochs with query operation images"} <code>{html.escape(selector_key)}</code>. All best-epoch tables, bars, and query images use that same epoch.</p>
   </div>
 </main>
 <div id="lightbox" class="lightbox" aria-hidden="true">
@@ -876,7 +927,8 @@ def render_index(title, report_name, experiments, selector_key, analysis_text=""
 <script>
 const REPORT = {payload};
 const experiments = REPORT.experiments;
-let activeStage = "eval";
+const availableStages = REPORT.availableStages || ["train", "eval"];
+let activeStage = availableStages.includes("eval") ? "eval" : "train";
 
 function harmonic(addAcc, mm21Acc) {{
   const denom = addAcc + mm21Acc;
@@ -921,8 +973,7 @@ function renderStageSwitch() {{
   const el = document.getElementById("stageSwitch");
   el.innerHTML = `
       <span class="stage-label">View</span>
-      <button class="tab-btn ${{activeStage === "train" ? "active" : ""}}" data-stage="train">Train</button>
-      <button class="tab-btn ${{activeStage === "eval" ? "active" : ""}}" data-stage="eval">Eval</button>
+      ${{availableStages.map(stage => `<button class="tab-btn ${{activeStage === stage ? "active" : ""}}" data-stage="${{stage}}">${{stage === "train" ? "Train" : "Eval"}}</button>`).join("")}}
     `;
   el.querySelectorAll(".tab-btn").forEach(btn => {{
     btn.addEventListener("click", () => {{
@@ -1286,12 +1337,18 @@ def render_repeated_index(
             "experiments": experiments,
             "criticalPairReports": critical_pair_reports,
             "pairRiskReports": pair_risk_reports,
+            "availableStages": ["train", "eval"] if all("eval" in exp.get("available_stages", []) for exp in experiments) else ["train"],
         },
         ensure_ascii=False,
     )
     escaped_title = html.escape(title)
     analysis_source = analysis_text.strip() or build_default_repeated_analysis(experiments, selector_key)
     analysis_html = render_markdownish(analysis_source)
+    checkpoint_note = (
+        f"Each sub-exp selects the epoch visible in Eval_record and query operation images with the lowest corresponding Train_record <code>{html.escape(selector_key)}</code>. Aggregate means/stds are computed over the selected sub-exp checkpoints."
+        if all("eval" in exp.get("available_stages", []) for exp in experiments)
+        else f"No Eval_record is present for this report, so each sub-exp selects the epoch with the lowest Train_record <code>{html.escape(selector_key)}</code> among epochs with query operation images. Aggregate means/stds are computed over the selected train checkpoints."
+    )
     template = """<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -1318,7 +1375,8 @@ def render_repeated_index(
     .analysis-panel h3 { margin:18px 0 8px; font-size:17px; }
     .analysis-panel h3:first-child { margin-top:0; }
     .analysis-panel ul { margin:8px 0 0; padding-left:22px; }
-    .stage-switch { position:fixed; top:16px; right:18px; z-index:900; display:flex; align-items:center; gap:8px; padding:8px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.94); box-shadow:0 8px 24px rgba(15,23,42,.12); backdrop-filter:blur(8px); }
+    .stage-switch { position:fixed; top:16px; right:18px; z-index:900; display:flex; align-items:center; gap:12px; padding:8px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.94); box-shadow:0 8px 24px rgba(15,23,42,.12); backdrop-filter:blur(8px); }
+    .switch-group { display:flex; align-items:center; gap:7px; }
     .stage-label { color:var(--muted); font-size:13px; padding:0 4px; }
     .tab-btn { border:1px solid var(--line); background:#f8fafc; color:#334155; border-radius:7px; padding:7px 12px; font-size:14px; cursor:pointer; }
     .tab-btn.active { background:#172033; color:#fff; border-color:#172033; }
@@ -1335,12 +1393,16 @@ def render_repeated_index(
     .metric { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px; }
     .metric strong { display:block; font-size:22px; margin-top:5px; }
     .critical-report { border:1px solid var(--line); border-radius:8px; padding:14px; background:#fff; margin-top:12px; }
+    details.critical-report > summary { cursor:pointer; font-weight:700; color:#334155; }
+    details.critical-report[open] > summary { margin-bottom:8px; }
     .critical-grid { display:grid; grid-template-columns:1fr; gap:16px; margin-top:10px; }
     .dominant-q1 { color:#2563eb; font-weight:700; }
     .dominant-q2 { color:#dc2626; font-weight:700; }
     .dominant-tie { color:#64748b; font-weight:700; }
     .run-list { display:grid; grid-template-columns:1fr; gap:16px; margin-top:12px; }
     .subrun-grid { display:grid; grid-template-columns:1fr; gap:12px; margin-top:10px; }
+    .image-row { border:1px solid var(--line); border-radius:8px; padding:14px; background:#fff; }
+    .image-row-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
     .image-pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
     figure { margin:0; }
     figcaption { color:var(--muted); font-size:12px; margin-top:5px; text-align:center; }
@@ -1352,7 +1414,7 @@ def render_repeated_index(
     .lightbox img { max-width:100%; max-height:86vh; display:block; margin:0 auto; background:#fff; border-radius:8px; }
     .lightbox-caption { color:#e2e8f0; text-align:center; margin-top:10px; font-size:14px; }
     .lightbox-close { position:fixed; top:18px; right:22px; border:1px solid rgba(255,255,255,.5); color:#fff; background:rgba(15,23,42,.4); border-radius:7px; padding:7px 11px; cursor:pointer; font-size:14px; }
-    @media (max-width:900px) { main { padding:86px 16px 44px; } .summary-grid, .metric-row, .image-pair { grid-template-columns:1fr; } .stage-switch { left:16px; right:16px; justify-content:flex-end; } }
+    @media (max-width:900px) { main { padding:128px 16px 44px; } .summary-grid, .metric-row, .image-pair { grid-template-columns:1fr; } .stage-switch { left:16px; right:16px; justify-content:flex-end; flex-wrap:wrap; } }
   </style>
 </head>
 <body>
@@ -1361,30 +1423,31 @@ def render_repeated_index(
   <h1>__TITLE__</h1>
   <section class="analysis-panel">__ANALYSIS__</section>
 
-  <h2>实验设置</h2>
-  <section class="chart-panel"><table id="setupTable"></table></section>
+  <h2 id="setupTitle">实验设置</h2>
+  <section id="setupSection" class="chart-panel"><table id="setupTable"></table></section>
 
-  <h2>Aggregate Summary</h2>
-  <section class="chart-panel">
+  <h2 id="aggregateTitle">Aggregate Summary</h2>
+  <section id="aggregateSection" class="chart-panel">
     <div id="aggregateCards" class="summary-grid"></div>
     <canvas id="aggregateBars" width="1120" height="340"></canvas>
     <div class="legend" id="aggregateLegend"></div>
   </section>
 
-  <h2>Metric Curves</h2>
-  <section class="chart-panel">
+  <h2 id="metricTitle">Metric Curves</h2>
+  <section id="metricSection" class="chart-panel">
     <canvas id="lineChart" width="1120" height="360"></canvas>
     <div class="legend" id="lineLegend"></div>
   </section>
 
-  <h2>Query-wise Best Epoch Accuracy</h2>
-  <section class="chart-panel">
-    <canvas id="queryWiseBars" width="1120" height="360"></canvas>
+  <h2 id="queryWiseTitle">Query-wise Best Epoch Accuracy</h2>
+  <section id="queryWiseSection" class="chart-panel">
+    <p class="muted">Overall 视图按实验展示 mean +/- sample std；具体实验视图按 sub-exp 展示 q1/q2/overall。</p>
+    <div id="queryWiseTable"></div>
     <div class="legend" id="queryWiseLegend"></div>
   </section>
 
-  <h2>Sub-exp Details</h2>
-  <section class="chart-panel"><table id="subexpTable"></table></section>
+  <h2 id="subexpTitle">Sub-exp Details</h2>
+  <section id="subexpSection" class="chart-panel"><table id="subexpTable"></table></section>
 
   <h2 id="criticalPairTitle">Critical Pair Exclusive-Dominance</h2>
   <section id="criticalPairSection" class="chart-panel">
@@ -1398,16 +1461,16 @@ def render_repeated_index(
     <div id="pairRiskReports"></div>
   </section>
 
-  <h2>Data-Pair Visualization</h2>
-  <section class="chart-panel">
-    <p class="muted">每个 sub-exp 使用按 train total_loss 选出的 best epoch；每张图可点击放大。</p>
+  <h2 id="dataPairTitle">Data-Pair Visualization</h2>
+  <section id="dataPairSection" class="chart-panel">
+    <p class="muted">每个 sub-exp 独占一行；行内并排展示 add 和 mm21 两张 query operation 图，每张图可点击放大。</p>
     <div id="imageRuns" class="run-list"></div>
   </section>
 
   <h2>Report Notes</h2>
   <div class="chart-panel">
     <strong>Checkpoint rule</strong>
-    <p>Each sub-exp selects the epoch visible in Eval_record with the lowest corresponding Train_record <code>__SELECTOR__</code>. Aggregate means/stds are computed over the selected sub-exp checkpoints.</p>
+    <p>__CHECKPOINT_NOTE__</p>
   </div>
 </main>
 <div id="lightbox" class="lightbox" aria-hidden="true">
@@ -1420,7 +1483,9 @@ def render_repeated_index(
 <script>
 const REPORT = __PAYLOAD__;
 const experiments = REPORT.experiments;
-let activeStage = "eval";
+const availableStages = REPORT.availableStages || ["train", "eval"];
+let activeStage = availableStages.includes("eval") ? "eval" : "train";
+let activeSubView = "overall";
 
 function fmt(x) { return Number(x).toFixed(3); }
 function harmonic(addAcc, mm21Acc) {
@@ -1429,11 +1494,21 @@ function harmonic(addAcc, mm21Acc) {
 }
 function rowAt(run, stage, epoch) { return run.records[stage].find(row => row.epoch === epoch); }
 function bestRow(run, stage) { return rowAt(run, stage, run.best_epoch); }
+function subExpIds() {
+  return Array.from(new Set(experiments.flatMap(exp => exp.runs.map(run => run.sub_id)))).sort((a, b) => Number(a) - Number(b));
+}
+function visibleRuns(exp) {
+  return activeSubView === "overall" ? exp.runs : exp.runs.filter(run => run.sub_id === activeSubView);
+}
 function valuesFor(exp, key, stage = activeStage) {
-  return exp.runs.map(run => {
+  return visibleRuns(exp).map(run => {
     const row = bestRow(run, stage);
     return key === "harmonic" ? harmonic(row.add_acc, row.mm21_acc) : row[key];
   });
+}
+function setSectionVisible(titleId, sectionId, visible) {
+  document.getElementById(titleId).style.display = visible ? "" : "none";
+  document.getElementById(sectionId).style.display = visible ? "" : "none";
 }
 function avg(values) { return values.reduce((a, b) => a + b, 0) / values.length; }
 function sampleStd(values) {
@@ -1474,15 +1549,68 @@ function drawAxes(ctx, plot, xTicks, yTicks, xMax = 1) {
     ctx.fillText(String(t / 1000) + "k", x - 10, plot.y + plot.h + 22);
   });
 }
+function drawScaledAxes(ctx, plot, xTicks, yTicks, yMin, yMax, xMax = 1) {
+  ctx.strokeStyle = "#d7deea";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(plot.x, plot.y);
+  ctx.lineTo(plot.x, plot.y + plot.h);
+  ctx.lineTo(plot.x + plot.w, plot.y + plot.h);
+  ctx.stroke();
+  ctx.fillStyle = "#607086";
+  ctx.font = "12px Arial";
+  yTicks.forEach(value => {
+    const frac = (value - yMin) / (yMax - yMin);
+    const y = plot.y + plot.h - frac * plot.h;
+    ctx.strokeStyle = "#eef2f7";
+    ctx.beginPath();
+    ctx.moveTo(plot.x, y);
+    ctx.lineTo(plot.x + plot.w, y);
+    ctx.stroke();
+    ctx.fillText(value.toFixed(2), plot.x - 42, y + 4);
+  });
+  xTicks.forEach(t => {
+    const x = plot.x + (t / xMax) * plot.w;
+    ctx.fillText(String(t / 1000) + "k", x - 10, plot.y + plot.h + 22);
+  });
+}
+function niceMetricRange(rows) {
+  const values = rows
+    .filter(row => row.epoch > 0)
+    .flatMap(row => [row.add_acc, row.mm21_acc])
+    .filter(value => Number.isFinite(value));
+  if (!values.length) return {min: 0, max: 1};
+  let lo = Math.min(...values);
+  let hi = Math.max(...values);
+  const pad = Math.max(0.02, (hi - lo) * 0.12);
+  lo = Math.max(0, Math.floor((lo - pad) * 20) / 20);
+  hi = Math.min(1, Math.ceil((hi + pad) * 20) / 20);
+  if (hi - lo < 0.1) {
+    lo = Math.max(0, hi - 0.1);
+  }
+  return {min: lo, max: hi};
+}
+function yTicksForRange(min, max) {
+  const ticks = [];
+  for (let i = 0; i <= 4; i++) ticks.push(min + (max - min) * i / 4);
+  return ticks;
+}
 function renderStageSwitch() {
   const el = document.getElementById("stageSwitch");
   el.innerHTML = `
-    <span class="stage-label">View</span>
-    <button class="tab-btn ${activeStage === "train" ? "active" : ""}" data-stage="train">Train</button>
-    <button class="tab-btn ${activeStage === "eval" ? "active" : ""}" data-stage="eval">Eval</button>`;
+    <div class="switch-group">
+      <span class="stage-label">Stage</span>
+      ${availableStages.map(stage => `<button class="tab-btn ${activeStage === stage ? "active" : ""}" data-stage="${stage}">${stage === "train" ? "Train" : "Eval"}</button>`).join("")}
+    </div>
+    <div class="switch-group">
+      <span class="stage-label">Sub-exp</span>
+      <button class="tab-btn ${activeSubView === "overall" ? "active" : ""}" data-sub-view="overall">Overall</button>
+      ${subExpIds().map(id => `<button class="tab-btn ${activeSubView === id ? "active" : ""}" data-sub-view="${id}">exp${id}</button>`).join("")}
+    </div>`;
   el.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      activeStage = btn.dataset.stage;
+      if (btn.dataset.stage) activeStage = btn.dataset.stage;
+      if (btn.dataset.subView) activeSubView = btn.dataset.subView;
       renderAll();
     });
   });
@@ -1493,7 +1621,7 @@ function renderSetup() {
     experiments.map(exp => `<tr>
       <td><strong style="color:${exp.color}">${exp.short}</strong><br><span class="muted">${exp.label}</span></td>
       <td>${exp.setup.sps}</td><td>${exp.setup.operator}</td><td>${exp.setup.query}</td><td>${exp.setup.training}</td>
-      <td>${exp.runs.map(run => "sub" + run.sub_id).join(", ")}</td>
+      <td>${visibleRuns(exp).map(run => "sub" + run.sub_id).join(", ")}</td>
     </tr>`).join("") + `</tbody>`;
 }
 function renderAggregateCards() {
@@ -1504,7 +1632,7 @@ function renderAggregateCards() {
     const hVals = valuesFor(exp, "harmonic");
     return `<article class="summary-card">
       <h3 style="color:${exp.color}">${exp.short}</h3>
-      <div class="muted">${activeStage}; mean +/- sample std over ${exp.runs.length} sub-exp checkpoints</div>
+      <div class="muted">${activeStage}; ${activeSubView === "overall" ? `mean +/- sample std over ${exp.runs.length} sub-exp checkpoints` : `selected sub-exp ${activeSubView}`}</div>
       <div class="metric-row">
         <div class="metric">add_acc<strong>${fmt(avg(addVals))}</strong><span class="muted">std ${fmt(sampleStd(addVals))}</span></div>
         <div class="metric">mm21_acc<strong>${fmt(avg(mm21Vals))}</strong><span class="muted">std ${fmt(sampleStd(mm21Vals))}</span></div>
@@ -1527,9 +1655,10 @@ function drawAggregateBars() {
   groups.forEach((group, groupIdx) => {
     const barW = Math.min(58, groupW / 6);
     const gap = 16;
-    const totalW = experiments.length * barW + (experiments.length - 1) * gap;
-    const start = plot.x + groupIdx * groupW + groupW / 2 - totalW / 2;
-    experiments.forEach((exp, expIdx) => {
+      const exps = experiments;
+      const totalW = exps.length * barW + (exps.length - 1) * gap;
+      const start = plot.x + groupIdx * groupW + groupW / 2 - totalW / 2;
+    exps.forEach((exp, expIdx) => {
       const vals = valuesFor(exp, group.key);
       const value = avg(vals);
       const err = sampleStd(vals);
@@ -1564,25 +1693,28 @@ function drawAggregateBars() {
 function drawLineChart() {
   const {ctx, w, h} = setupCanvas(document.getElementById("lineChart"));
   ctx.clearRect(0, 0, w, h);
-  const plot = {x: 56, y: 18, w: w - 250, h: h - 64};
-  const maxEpoch = Math.max(1, ...experiments.flatMap(exp => exp.runs.flatMap(run => run.records[activeStage].map(row => row.epoch))));
+  const exps = experiments;
+  const plot = {x: 64, y: 18, w: w - 250, h: h - 64};
+  const allRows = exps.flatMap(exp => visibleRuns(exp).flatMap(run => run.records[activeStage]));
+  const maxEpoch = Math.max(1, ...allRows.map(row => row.epoch));
+  const yRange = niceMetricRange(allRows);
   const tickStep = maxEpoch <= 20000 ? 5000 : 10000;
   const xTicks = [];
   for (let t = 0; t <= maxEpoch; t += tickStep) xTicks.push(t);
   if (xTicks[xTicks.length - 1] !== maxEpoch) xTicks.push(maxEpoch);
-  drawAxes(ctx, plot, xTicks, [0, .25, .5, .75, 1], maxEpoch);
-  experiments.forEach(exp => {
-    exp.runs.forEach((run, runIdx) => {
+  drawScaledAxes(ctx, plot, xTicks, yTicksForRange(yRange.min, yRange.max), yRange.min, yRange.max, maxEpoch);
+  exps.forEach(exp => {
+    visibleRuns(exp).forEach((run, runIdx) => {
       [["add_acc", []], ["mm21_acc", [7, 5]]].forEach(([key, dash]) => {
         ctx.save();
         ctx.strokeStyle = exp.color;
-        ctx.globalAlpha = .35 + runIdx * .2;
+        ctx.globalAlpha = activeSubView === "overall" ? .35 + runIdx * .2 : .9;
         ctx.lineWidth = 2;
         ctx.setLineDash(dash);
         ctx.beginPath();
         run.records[activeStage].forEach((row, idx) => {
           const x = plot.x + (row.epoch / maxEpoch) * plot.w;
-          const y = plot.y + plot.h - row[key] * plot.h;
+          const y = plot.y + plot.h - ((row[key] - yRange.min) / (yRange.max - yRange.min)) * plot.h;
           if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         });
         ctx.stroke();
@@ -1591,49 +1723,34 @@ function drawLineChart() {
     });
   });
 }
-function drawQueryWiseBars() {
-  const {ctx, w, h} = setupCanvas(document.getElementById("queryWiseBars"));
-  ctx.clearRect(0, 0, w, h);
-  const plot = {x: 64, y: 28, w: w - 108, h: h - 88};
-  drawAxes(ctx, plot, [], [0, .25, .5, .75, 1]);
-  const groups = [
-    {key: "add_acc_q1", label: "add q1", color: "#2563eb"},
-    {key: "add_acc_q2", label: "add q2", color: "#dc2626"},
-    {key: "add_acc", label: "add overall", color: "#111827"},
-    {key: "mm21_acc_q1", label: "mm21 q1", color: "#2563eb"},
-    {key: "mm21_acc_q2", label: "mm21 q2", color: "#dc2626"},
-    {key: "mm21_acc", label: "mm21 overall", color: "#111827"}
-  ];
-  const groupW = plot.w / groups.length;
-  groups.forEach((group, groupIdx) => {
-    const barW = Math.min(42, groupW / 5);
-    const gap = 10;
-    const totalW = experiments.length * barW + (experiments.length - 1) * gap;
-    const start = plot.x + groupIdx * groupW + groupW / 2 - totalW / 2;
-    experiments.forEach((exp, expIdx) => {
-      const vals = valuesFor(exp, group.key);
-      const value = avg(vals);
-      const x = start + expIdx * (barW + gap);
-      const bh = value * plot.h;
-      ctx.fillStyle = group.color;
-      ctx.globalAlpha = expIdx === 0 ? .85 : .55;
-      ctx.fillRect(x, plot.y + plot.h - bh, barW, bh);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = "#172033";
-      ctx.font = "11px Arial";
-      ctx.fillText(fmt(value), x - 2, plot.y + plot.h - bh - 6);
-    });
-    ctx.fillStyle = "#334155";
-    ctx.font = "12px Arial";
-    ctx.save();
-    ctx.translate(plot.x + groupIdx * groupW + groupW / 2 - 4, plot.y + plot.h + 54);
-    ctx.rotate(-Math.PI / 5);
-    ctx.fillText(group.label, 0, 0);
-    ctx.restore();
-  });
+function meanStdText(values) {
+  return `${fmt(avg(values))} +/- ${fmt(sampleStd(values))}`;
+}
+function renderQueryWiseTable() {
+  const root = document.getElementById("queryWiseTable");
+  const cols = ["add_acc_q1", "add_acc_q2", "add_acc", "mm21_acc_q1", "mm21_acc_q2", "mm21_acc"];
+  const show = activeSubView !== "overall";
+  setSectionVisible("queryWiseTitle", "queryWiseSection", show);
+  if (!show) {
+    root.innerHTML = "";
+    return;
+  }
+  root.innerHTML = `<table>
+    <thead><tr><th>experiment</th><th>sub-exp</th><th>add q1</th><th>add q2</th><th>add overall</th><th>mm21 q1</th><th>mm21 q2</th><th>mm21 overall</th></tr></thead>
+    <tbody>${experiments.map(exp => {
+      const run = visibleRuns(exp)[0];
+      const row = bestRow(run, activeStage);
+      return `<tr>
+        <td><strong style="color:${exp.color}">${exp.short}</strong></td>
+        <td>sub${run.sub_id}<br><span class="muted">epoch ${run.best_epoch}</span></td>
+        ${cols.map(key => `<td>${fmt(row[key])}</td>`).join("")}
+      </tr>`;
+    }).join("")}
+    </tbody>
+  </table>`;
 }
 function renderSubexpTable() {
-  const rows = experiments.flatMap(exp => exp.runs.map(run => ({exp, run, row: bestRow(run, activeStage)})));
+  const rows = experiments.flatMap(exp => visibleRuns(exp).map(run => ({exp, run, row: bestRow(run, activeStage)})));
   document.getElementById("subexpTable").innerHTML =
     `<thead><tr><th>experiment</th><th>sub-exp</th><th>best epoch</th><th>${activeStage} overall</th><th>q1</th><th>q2</th><th>best eval-H epoch</th></tr></thead><tbody>` +
     rows.map(({exp, run, row}) => `<tr>
@@ -1643,7 +1760,7 @@ function renderSubexpTable() {
       <td>add=${fmt(row.add_acc)}<br>mm21=${fmt(row.mm21_acc)}<br>H=${fmt(harmonic(row.add_acc, row.mm21_acc))}</td>
       <td>add=${fmt(row.add_acc_q1)}<br>mm21=${fmt(row.mm21_acc_q1)}</td>
       <td>add=${fmt(row.add_acc_q2)}<br>mm21=${fmt(row.mm21_acc_q2)}</td>
-      <td>${run.best_eval_h_epoch}<br><span class="muted">H=${fmt(run.best_eval_h)}</span></td>
+      <td>${run.best_eval_h_epoch == null ? '<span class="muted">train-only</span>' : `${run.best_eval_h_epoch}<br><span class="muted">H=${fmt(run.best_eval_h)}</span>`}</td>
     </tr>`).join("") + `</tbody>`;
 }
 function escapeHtml(value) {
@@ -1681,7 +1798,7 @@ function criticalPairTable(title, items) {
   </div>`;
 }
 function renderCriticalPairs() {
-  const reports = REPORT.criticalPairReports || [];
+  const reports = activeSubView === "overall" ? [] : (REPORT.criticalPairReports || []).filter(report => report.sub_exp_id === activeSubView);
   const section = document.getElementById("criticalPairSection");
   const title = document.getElementById("criticalPairTitle");
   if (!reports.length) {
@@ -1691,14 +1808,14 @@ function renderCriticalPairs() {
   }
   section.style.display = "";
   title.style.display = "";
-  document.getElementById("criticalPairReports").innerHTML = reports.map(report => `<article class="critical-report">
-    <h3>${escapeHtml(report.label)}</h3>
+  document.getElementById("criticalPairReports").innerHTML = reports.map(report => `<details class="critical-report">
+    <summary>${escapeHtml(report.label)} - critical pairs=${report.critical_pair_count}; last epoch=${report.last_epoch}</summary>
     <div class="muted">source=${escapeHtml(report.source)}; critical pairs=${report.critical_pair_count}; rows=${report.row_count}; last epoch=${report.last_epoch}</div>
     <div class="critical-grid">
       ${criticalPairTable("Top dominated pairs over all intervals", report.top_all)}
       ${criticalPairTable("Top dominated pairs in last interval", report.top_last)}
     </div>
-  </article>`).join("");
+  </details>`).join("");
 }
 function pairRiskSingleRows(items) {
   return items.map(item => `<tr>
@@ -1744,7 +1861,7 @@ function pairRiskDualTable(title, items) {
   </div>`;
 }
 function renderPairRisks() {
-  const reports = REPORT.pairRiskReports || [];
+  const reports = activeSubView === "overall" ? [] : (REPORT.pairRiskReports || []).filter(report => report.sub_exp_id === activeSubView);
   const section = document.getElementById("pairRiskSection");
   const title = document.getElementById("pairRiskTitle");
   if (!reports.length) {
@@ -1754,8 +1871,8 @@ function renderPairRisks() {
   }
   section.style.display = "";
   title.style.display = "";
-  document.getElementById("pairRiskReports").innerHTML = reports.map(report => `<article class="critical-report">
-    <h3>${escapeHtml(report.label)}</h3>
+  document.getElementById("pairRiskReports").innerHTML = reports.map(report => `<details class="critical-report">
+    <summary>${escapeHtml(report.label)} - pairs=${report.pair_count}; single=${report.single_pair_count}; dual=${report.dual_pair_count}; last epoch=${report.last_epoch}</summary>
     <div class="muted">source=${escapeHtml(report.source)}; pairs=${report.pair_count}; single=${report.single_pair_count}; dual=${report.dual_pair_count}; rows=${report.row_count}; last epoch=${report.last_epoch}</div>
     <div class="critical-grid">
       ${pairRiskSingleTable("Single-op competition risk over all intervals", report.top_single_all)}
@@ -1763,18 +1880,26 @@ function renderPairRisks() {
       ${pairRiskDualTable("Dual-op same-query dominance over all intervals", report.top_dual_all)}
       ${pairRiskDualTable("Dual-op same-query dominance in last interval", report.top_dual_last)}
     </div>
-  </article>`).join("");
+  </details>`).join("");
 }
 function renderImages() {
   const root = document.getElementById("imageRuns");
+  const show = activeSubView !== "overall";
+  setSectionVisible("dataPairTitle", "dataPairSection", show);
+  if (!show) {
+    root.innerHTML = "";
+    return;
+  }
   root.innerHTML = experiments.map(exp => `<article class="run-card">
     <h3 style="color:${exp.color}">${exp.short}</h3>
-    <div class="subrun-grid">${exp.runs.map(run => {
+    <div class="subrun-grid">${visibleRuns(exp).map(run => {
       const row = bestRow(run, activeStage);
       const imgs = run.images[activeStage];
-      return `<section class="run-card">
-        <strong>sub${run.sub_id}</strong>
-        <span class="muted"> epoch ${run.best_epoch}; ${activeStage} add=${fmt(row.add_acc)}, mm21=${fmt(row.mm21_acc)}, H=${fmt(harmonic(row.add_acc, row.mm21_acc))}</span>
+      return `<section class="image-row">
+        <div class="image-row-head">
+          <strong>sub${run.sub_id}</strong>
+          <span class="muted">epoch ${run.best_epoch}; ${activeStage} add=${fmt(row.add_acc)}, mm21=${fmt(row.mm21_acc)}, H=${fmt(harmonic(row.add_acc, row.mm21_acc))}</span>
+        </div>
         <div class="image-pair">
           <figure><button class="img-btn" type="button" data-full-src="${imgs[0]}" data-caption="${exp.short} sub${run.sub_id} ${activeStage} add set"><img src="${imgs[0]}" alt="${exp.short} sub${run.sub_id} ${activeStage} add set"></button><figcaption>add set</figcaption></figure>
           <figure><button class="img-btn" type="button" data-full-src="${imgs[1]}" data-caption="${exp.short} sub${run.sub_id} ${activeStage} mm21 set"><img src="${imgs[1]}" alt="${exp.short} sub${run.sub_id} ${activeStage} mm21 set"></button><figcaption>mm21 set</figcaption></figure>
@@ -1785,10 +1910,11 @@ function renderImages() {
   bindLightboxButtons();
 }
 function renderLegends() {
-  const expLegend = experiments.map(exp => `<span class="legend-item"><span class="swatch" style="background:${exp.color}"></span>${exp.short}</span>`).join("");
+  const exps = experiments;
+  const expLegend = exps.map(exp => `<span class="legend-item"><span class="swatch" style="background:${exp.color}"></span>${exp.short}</span>`).join("");
   document.getElementById("aggregateLegend").innerHTML = `<span class="legend-title">颜色=实验</span>${expLegend}<span class="legend-title">误差线=sample std</span>`;
   document.getElementById("lineLegend").innerHTML = `<span class="legend-title">颜色=实验</span>${expLegend}<span class="legend-item"><span class="line-sample"></span>add_acc</span><span class="legend-item"><span class="line-sample line-dashed"></span>mm21_acc</span><span class="legend-title">透明度=sub-exp</span>`;
-  document.getElementById("queryWiseLegend").innerHTML = `<span class="legend-title">query-wise bar colors</span><span class="legend-item"><span class="swatch" style="background:#2563eb"></span>q1</span><span class="legend-item"><span class="swatch" style="background:#dc2626"></span>q2</span><span class="legend-item"><span class="swatch" style="background:#111827"></span>overall</span>`;
+  document.getElementById("queryWiseLegend").innerHTML = `<span class="legend-title">表格列名已经标明 q1 / q2 / overall 和 add / mm21</span>`;
 }
 function openLightbox(src, caption) {
   const box = document.getElementById("lightbox");
@@ -1819,7 +1945,7 @@ function renderAll() {
   renderLegends();
   drawAggregateBars();
   drawLineChart();
-  drawQueryWiseBars();
+  renderQueryWiseTable();
   renderSubexpTable();
   renderCriticalPairs();
   renderPairRisks();
@@ -1828,7 +1954,7 @@ function renderAll() {
 document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
 document.getElementById("lightbox").addEventListener("click", event => { if (event.target.id === "lightbox") closeLightbox(); });
 document.addEventListener("keydown", event => { if (event.key === "Escape") closeLightbox(); });
-window.addEventListener("resize", () => { drawAggregateBars(); drawLineChart(); drawQueryWiseBars(); });
+window.addEventListener("resize", () => { drawAggregateBars(); drawLineChart(); });
 renderAll();
 </script>
 </body>
@@ -1839,22 +1965,29 @@ renderAll();
         .replace("__ANALYSIS__", analysis_html)
         .replace("__PAYLOAD__", payload)
         .replace("__SELECTOR__", html.escape(selector_key))
+        .replace("__CHECKPOINT_NOTE__", checkpoint_note)
     )
 
 
 def build_default_repeated_analysis(experiments, selector_key):
+    report_stage = "eval" if all("eval" in exp.get("summary", {}) for exp in experiments) else "train"
     ranked = []
     for exp in experiments:
-        h_mean = exp["summary"]["eval"]["harmonic"]["mean"]
-        add_mean = exp["summary"]["eval"]["add_acc"]["mean"]
-        mm21_mean = exp["summary"]["eval"]["mm21_acc"]["mean"]
+        h_mean = exp["summary"][report_stage]["harmonic"]["mean"]
+        add_mean = exp["summary"][report_stage]["add_acc"]["mean"]
+        mm21_mean = exp["summary"][report_stage]["mm21_acc"]["mean"]
         ranked.append((h_mean, add_mean, mm21_mean, exp))
     ranked.sort(reverse=True, key=lambda item: item[0])
     h_mean, add_mean, mm21_mean, leader = ranked[0]
+    selection_note = (
+        f"Best epoch is selected per sub-exp by lowest train {selector_key} among epochs visible in Eval_record and query operation images."
+        if report_stage == "eval"
+        else f"No Eval_record is present, so best epoch is selected per sub-exp by lowest train {selector_key} among epochs with query operation images."
+    )
     return (
         "## Key Takeaways\n"
-        f"- Best epoch is selected per sub-exp by lowest train {selector_key} among epochs visible in Eval_record.\n"
-        f"- On eval, {leader['short']} has the highest mean harmonic over sub-exps: "
+        f"- {selection_note}\n"
+        f"- On {report_stage}, {leader['short']} has the highest mean harmonic over sub-exps: "
         f"H={h_mean:.3f}, add={add_mean:.3f}, mm21={mm21_mean:.3f}.\n"
         "- This repeated-run report should be read by mean/std first, then by sub-exp details for instability.\n"
     )

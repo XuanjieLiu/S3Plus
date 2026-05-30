@@ -53,6 +53,13 @@ exit
 - `CriticalPairStats_record.csv`：旧语义，只覆盖 `dual_distinct`，用于分析同一个 query 同时赢走 add/mm21 的情况。
 - `PairRiskStats_record.csv`：新语义，同时覆盖 `single_add` / `single_mm21` 的 query 竞争风险，以及 `dual_distinct` 的同 query 独占风险。
 
+## Evaluation 开关
+
+- `use_eval_set` 默认为 `True`。
+- 如果配置里设为 `False`，或 random split 后 eval split 为空，`init_dataloaders()` 会返回 `eval_loader=None`。
+- `QueryLearn.train()` 看到 `eval_loader=None` 会跳过 pair eval，不写新的 `Eval_record.txt` 行。
+- `single_img_eval_set_path` 仍可保留；它用于 query target accuracy 的 embedding lookup，不等价于 pair eval set。
+
 ## 运行模板
 
 ```bash
