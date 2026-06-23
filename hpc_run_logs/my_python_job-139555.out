@@ -1,7 +1,7 @@
 
 ==============NVSMI LOG==============
 
-Timestamp                                 : Sat May 30 12:02:59 2026
+Timestamp                                 : Fri Jun  5 18:32:48 2026
 Driver Version                            : 570.195.03
 CUDA Version                              : 12.8
 
@@ -22,8 +22,8 @@ GPU 00000000:55:00.0
     Driver Model
         Current                           : N/A
         Pending                           : N/A
-    Serial Number                         : 1323925026006
-    GPU UUID                              : GPU-f53dbc9b-cd46-9002-4f8b-d680f5e74e88
+    Serial Number                         : 1323925025593
+    GPU UUID                              : GPU-ab7a1592-7552-8cc4-e37d-5bf593bd0807
     Minor Number                          : 0
     VBIOS Version                         : 95.02.5E.00.06
     MultiGPU Board                        : No
@@ -86,8 +86,8 @@ GPU 00000000:55:00.0
             Firmware                      : N/A
         Replays Since Reset               : 0
         Replay Number Rollovers           : 0
-        Tx Throughput                     : 390 KB/s
-        Rx Throughput                     : 341 KB/s
+        Tx Throughput                     : 439 KB/s
+        Rx Throughput                     : 390 KB/s
         Atomic Caps Outbound              : N/A
         Atomic Caps Inbound               : N/A
     Fan Speed                             : 30 %
@@ -174,7 +174,7 @@ GPU 00000000:55:00.0
             Low                           : 0 bank(s)
             None                          : 0 bank(s)
     Temperature
-        GPU Current Temp                  : 36 C
+        GPU Current Temp                  : 37 C
         GPU T.Limit Temp                  : 50 C
         GPU Shutdown T.Limit Temp         : -7 C
         GPU Slowdown T.Limit Temp         : -2 C
@@ -183,8 +183,8 @@ GPU 00000000:55:00.0
         Memory Current Temp               : N/A
         Memory Max Operating T.Limit Temp : N/A
     GPU Power Readings
-        Average Power Draw                : 16.66 W
-        Instantaneous Power Draw          : 16.71 W
+        Average Power Draw                : 15.57 W
+        Instantaneous Power Draw          : 15.66 W
         Current Power Limit               : 250.00 W
         Requested Power Limit             : 250.00 W
         Default Power Limit               : 250.00 W
@@ -243,7 +243,7 @@ GPU 00000000:55:00.0
     Processes
         GPU instance ID                   : N/A
         Compute instance ID               : N/A
-        Process ID                        : 4985
+        Process ID                        : 5031
             Type                          : G
             Name                          : /usr/lib/xorg/Xorg
             Used GPU Memory               : 20 MiB
@@ -251,19 +251,19 @@ GPU 00000000:55:00.0
         EGM                               : disabled
 
 0
-ws-l5-014
-Experiment names: ['2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain']
-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain
-Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/1
+ws-l5-029
+Experiment names: ['2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain']
+Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/1
 Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/train_config.py
 Model is loaded from /home/xuanjie.liu/Projects/S3Plus/queryLearn/../VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/1/checkpoint_44000.pt
 Using random split data
-data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
 Random split with ratio 1.0, train size: 672, eval size: 0
 No plus eval loader; evaluation on pair dataset will be skipped
-data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
+data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
 Query dim: 2, OperNet condition mode: concat
 Pair evaluation is disabled or eval set is empty
 Train pair taxonomy: single_add=0, single_mm21=210, dual_distinct=226, special_ambiguous=5
@@ -60269,16 +60269,16 @@ Epoch 59997
 Epoch 59998
 Epoch 59999
 Epoch 60000
-Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/2
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/2
 Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/train_config.py
 Model is loaded from /home/xuanjie.liu/Projects/S3Plus/queryLearn/../VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/1/checkpoint_44000.pt
 Using random split data
-data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
 Random split with ratio 1.0, train size: 672, eval size: 0
 No plus eval loader; evaluation on pair dataset will be skipped
-data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
+data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
 Query dim: 2, OperNet condition mode: concat
 Pair evaluation is disabled or eval set is empty
 Train pair taxonomy: single_add=0, single_mm21=210, dual_distinct=226, special_ambiguous=5
@@ -120284,16 +120284,16 @@ Epoch 59997
 Epoch 59998
 Epoch 59999
 Epoch 60000
-Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/3
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/3
 Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/train_config.py
 Model is loaded from /home/xuanjie.liu/Projects/S3Plus/queryLearn/../VQ/exp/2026.04.16_10vq_Zc[2]_Zs[0]_edim4_[0-20]_plus1024_1_mulmod20_Fullsymm_train0.6/1/checkpoint_44000.pt
 Using random split data
-data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+data_path is: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/train', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_add(0,20)/test', '/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/single_style_pairs_mul_mod21(0,20)/test']
 Random split with ratio 1.0, train size: 672, eval size: 0
 No plus eval loader; evaluation on pair dataset will be skipped
-data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
-Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
+data_path is: /home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix
+Making dataset from paths: ['/home/xuanjie.liu/Projects/S3Plus/queryLearn/exps/2026.6.05_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.0005_fixedQ_fullTrain/../../../dataset/(0,20)-FixedPos-mul_add_mix']
 Query dim: 2, OperNet condition mode: concat
 Pair evaluation is disabled or eval set is empty
 Train pair taxonomy: single_add=0, single_mm21=210, dual_distinct=226, special_ambiguous=5
