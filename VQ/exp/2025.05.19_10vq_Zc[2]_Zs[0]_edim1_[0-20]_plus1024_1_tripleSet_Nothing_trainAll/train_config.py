@@ -74,7 +74,7 @@ CONFIG = {
             'n_hidden_layers': 2,
         }
     },
-'eval_config': {
+    'eval_config': {
         'pipeline_result_path': 'PIPELINE_EVAL',
         'optimal_checkpoint_finding_config': {
             'optimal_checkpoint_num': 'find_by_keys',
