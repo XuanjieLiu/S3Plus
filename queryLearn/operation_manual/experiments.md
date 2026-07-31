@@ -148,3 +148,35 @@ exit
 - `add_acc_q1` 和 `mm21_acc_q2` 是否能同时维持高值，而不是一个上升时另一个掉。
 - `oper_loss` 后期是否仍明显上升。
 - 如果最佳点仍集中在前 15k，下一步可以考虑早停或显式选择 best checkpoint。
+
+## 2026-07-30 - Fixed-query Gaussian mixture NLL
+
+实验名：
+
+```text
+2026.07.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain_gmmNLL_var0.04
+```
+
+本实验完整复用
+`2026.5.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain`
+的三次重复设置，只把无监督 operation objective 从 hard-min 换为固定方差、
+等权二分量 Gaussian mixture NLL：
+
+```python
+'operation_loss': {
+    'type': 'gaussian_mixture_nll',
+    'variance': 0.04,
+    'mixture_weights': [0.5, 0.5],
+    'weight': 1.0,
+}
+```
+
+运行命令：
+
+```bash
+sbatch hpc_gpu_py.sbatch queryLearn/batch_train.py 2026.07.30_concat_2dimQ_fromMulBasedSps_lr3e4_symm0.005_fixedQ_fullTrain_gmmNLL_var0.04
+```
+
+重点比较 `hard_min_loss`、add/mm21 accuracy 和 `PairRiskStats_record.csv` 中
+`dual_distinct` 的 `split_rate` / `risk_score`。GMM 的 `total_loss` 不与旧
+hard-min 实验作绝对值比较。

@@ -13,7 +13,13 @@ from loss_counter import LossCounter
 from VQ.common_func import parse_label
 from dataloader import load_enc_eval_data
 from queryLearn.opernet import OperNet, comb_q_z
-from queryLearn.training_helpers import init_queries, regul_sample, sanity_check_oper_loss
+from queryLearn.training_helpers import (
+    init_queries,
+    operation_loss,
+    regul_sample,
+    resolve_operation_loss_config,
+    sanity_check_oper_loss,
+)
 from queryLearn.pair_diagnostics import PairDiagnosticsRecorder
 from queryLearn.label_codebook import (
     DEFAULT_LABEL_CODEBOOK_CODES,
@@ -23,6 +29,10 @@ try:
     from queryLearn.query_vis import record_dir, save_query_operation_tables
 except ImportError:
     from query_vis import record_dir, save_query_operation_tables
+try:
+    from queryLearn.record_visualizer import RecordVisualizer, best_record_metric
+except ImportError:
+    from record_visualizer import RecordVisualizer, best_record_metric
 
 
 VQSPS_EXP_ROOT = '{}{}'.format(os.path.dirname(os.path.abspath(__file__)), '/../VQ/exp/')
@@ -99,10 +109,13 @@ class QueryLearn:
         self.pair_risk_record_path = config.get('pair_risk_record_path', 'PairRiskStats_record.csv')
         self.log_interval = config['log_interval']
         self.eval_interval = config['eval_interval']
-        self.checkpoint_interval = config['checkpoint_interval']
+        self.checkpoint_interval = config.get('checkpoint_interval', self.log_interval)
         self.checkpoint_after = config.get('checkpoint_after', 0)
         self.max_iter_num = config['max_iter_num']
         self.model_path = config['model_path']
+        self.best_model_path = config.get('best_model_path', 'best_model.pt')
+        self.best_checkpoint_metric = config.get('best_checkpoint_metric', 'total_loss')
+        self.best_checkpoint_value = float('inf')
         self.is_symm = config.get('is_symm', False)
         self.is_assoc = config.get('is_assoc', False)
         self.eqLoss_scalar = config.get('eqLoss_scalar', 0.05)
@@ -112,8 +125,23 @@ class QueryLearn:
         self._num_label_to_index = None
         self.mean_mse = nn.MSELoss(reduction='mean')
         self.sanity_check = config.get('sanity_check', False)
+        self.operation_loss_config = resolve_operation_loss_config(
+            config.get('operation_loss', None),
+            self.sps_model.latent_code_1,
+        )
+        self.eval_terms = list(EVAL_TERMS)
+        self.record_hard_min_loss = (
+            self.operation_loss_config['type'] == 'gaussian_mixture_nll'
+        )
+        if self.record_hard_min_loss:
+            self.eval_terms.insert(1, 'hard_min_loss')
         self.query_vis_format = config.get('query_vis_format', 'png').lower().lstrip('.')
         self.grad_clip_norm = config.get('grad_clip_norm', None)
+        self.record_visualizer = RecordVisualizer(
+            config,
+            self.train_record_path,
+            self.eval_record_path,
+        )
         self.pair_diagnostics = PairDiagnosticsRecorder(
             self.train_loader.dataset,
             self.critical_pair_record_path,
@@ -138,6 +166,11 @@ class QueryLearn:
         print(self.pair_diagnostics.summary_text())
         if self.sanity_check:
             print('Sanity check mode...')
+        print(f"Operation loss: {self.operation_loss_config}")
+        print(
+            f"Checkpoint policy: latest={self.model_path}, "
+            f"best={self.best_model_path} by train/{self.best_checkpoint_metric}"
+        )
 
     def _ensure_num_z_c(self):
         if self.num_z_c is not None and self.num_labels is not None and self._num_label_to_index is not None:
@@ -203,6 +236,7 @@ class QueryLearn:
             query_vis_dir=None):
         self.sps_model.model.eval()
         epoch_oper_losses = []
+        epoch_hard_min_losses = []
         epoch_symm_losses = []
         epoch_total_losses = []
         epoch_label_a = []
@@ -251,9 +285,13 @@ class QueryLearn:
 
             if self.sanity_check:
                 oper_loss = sanity_check_oper_loss(per_loss_q1, per_loss_q2, label_a, label_b, label_c)
+                hard_min_loss = torch.minimum(per_loss_q1, per_loss_q2).mean()
             else:
-                per_loss = torch.minimum(per_loss_q1, per_loss_q2)
-                oper_loss = per_loss.mean()
+                oper_loss, hard_min_loss = operation_loss(
+                    per_loss_q1,
+                    per_loss_q2,
+                    self.operation_loss_config,
+                )
 
             # symm loss
             q1_symm_loss = self.symm_loss(*regul_sample(e_content), q1)
@@ -264,6 +302,7 @@ class QueryLearn:
 
             if loss_counter is not None or save_query_vis:
                 epoch_oper_losses.append(oper_loss.item())
+                epoch_hard_min_losses.append(hard_min_loss.item())
                 epoch_symm_losses.append(symm_loss.item())
                 epoch_total_losses.append(total_loss.item())
                 epoch_label_a.extend(label_a)
@@ -295,8 +334,14 @@ class QueryLearn:
             )
             if loss_counter is not None:
                 q_l2_dist = torch.norm(self.queries[0] - self.queries[1], p=2).item()
-                loss_counter.add_values([
+                loss_values = [
                     sum(epoch_oper_losses) / len(epoch_oper_losses),
+                ]
+                if self.record_hard_min_loss:
+                    loss_values.append(
+                        sum(epoch_hard_min_losses) / len(epoch_hard_min_losses)
+                    )
+                loss_values.extend([
                     sum(epoch_symm_losses) / len(epoch_symm_losses),
                     sum(epoch_total_losses) / len(epoch_total_losses),
                     accu['add_acc_q1'],
@@ -309,6 +354,7 @@ class QueryLearn:
                     accu['mm21_total'],
                     q_l2_dist,
                 ])
+                loss_counter.add_values(loss_values)
             if save_query_vis:
                 if query_vis_dir is None:
                     query_vis_dir = self.eval_result_path if stage == STAGE_VAL else self.train_result_path
@@ -371,20 +417,57 @@ class QueryLearn:
             )
         print("Skipped checkpoint vq_layer weights because label codebook is rebuilt from labels")
 
-    def _save_model(self, path, epoch):
+    def _save_model(self, path, epoch, extra=None):
         ckpt = {
             'oper_net_state_dict': self.oper_net.state_dict(),
             'queries': self.queries.detach().cpu(),
             'epoch': epoch,
         }
+        if extra:
+            ckpt.update(extra)
         torch.save(ckpt, path)
+
+    def _init_best_checkpoint_value(self):
+        if not os.path.exists(self.best_model_path):
+            self.best_checkpoint_value = float('inf')
+            return
+        record_best = best_record_metric(self.train_record_path, self.best_checkpoint_metric)
+        self.best_checkpoint_value = record_best if record_best is not None else float('inf')
+
+    def _maybe_save_logged_checkpoints(self, epoch, train_metric_values):
+        metric_value = train_metric_values.get(self.best_checkpoint_metric, None)
+        self._save_model(
+            self.model_path,
+            epoch,
+            {
+                'checkpoint_kind': 'latest',
+                'best_checkpoint_metric': self.best_checkpoint_metric,
+            },
+        )
+        if metric_value is None:
+            return
+        if metric_value < self.best_checkpoint_value:
+            self.best_checkpoint_value = metric_value
+            self._save_model(
+                self.best_model_path,
+                epoch,
+                {
+                    'checkpoint_kind': 'best',
+                    'best_checkpoint_metric': self.best_checkpoint_metric,
+                    'best_metric_value': metric_value,
+                },
+            )
+            print(
+                f"New best checkpoint: {self.best_model_path} "
+                f"epoch={epoch} {self.best_checkpoint_metric}={metric_value:.6g}"
+            )
 
     def train(self):
         os.makedirs(self.train_result_path, exist_ok=True)
         os.makedirs(self.eval_result_path, exist_ok=True)
         self.oper_net.train()
-        train_loss_counter = LossCounter(EVAL_TERMS, record_path=self.train_record_path)
-        eval_loss_counter = LossCounter(EVAL_TERMS, record_path=self.eval_record_path)
+        train_loss_counter = LossCounter(self.eval_terms, record_path=self.train_record_path)
+        eval_loss_counter = LossCounter(self.eval_terms, record_path=self.eval_record_path)
         optim_params = [p for p in self.oper_net.parameters() if p.requires_grad]
         if self.train_queries:
             optim_params.append(self.queries)
@@ -398,9 +481,11 @@ class QueryLearn:
             raise ValueError(f"Unsupported optimizer: {optimizer_name}")
         start_epoch = train_loss_counter.load_iter_num(self.train_record_path)
         self._resume_model()
+        self._init_best_checkpoint_value()
         for epoch in range(start_epoch, self.max_iter_num):
             print(f"Epoch {epoch}")
             is_log_epoch = epoch % self.log_interval == 0
+            did_write_record = False
             self.one_epoch(
                 epoch,
                 self.train_loader,
@@ -413,7 +498,11 @@ class QueryLearn:
 
             if is_log_epoch:
                 self.pair_diagnostics.record_interval(epoch)
+                train_values = train_loss_counter.calc_values_mean()
+                train_metric_values = dict(zip(self.eval_terms, train_values))
                 train_loss_counter.record_and_clear(num=epoch)
+                self._maybe_save_logged_checkpoints(epoch, train_metric_values)
+                did_write_record = True
 
             if self.use_eval_set and epoch % self.eval_interval == 0:
                 self.oper_net.eval()
@@ -429,12 +518,10 @@ class QueryLearn:
                     )
                 eval_loss_counter.record_and_clear(num=epoch)
                 self.oper_net.train()
+                did_write_record = True
 
-            if epoch % self.checkpoint_interval == 0 and epoch >= self.checkpoint_after:
-                ckpt_dir = self._exp_dir
-                ckpt_name = os.path.join(ckpt_dir, f'checkpoint_{epoch}.pt')
-                self._save_model(ckpt_name, epoch)
-                self._save_model(self.model_path, epoch)
+            if did_write_record:
+                self.record_visualizer.refresh()
 
     def _query_target_correct(self, target_labels, q_out):
         self._ensure_num_z_c()

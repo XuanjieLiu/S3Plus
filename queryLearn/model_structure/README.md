@@ -14,3 +14,12 @@
 - 冻结的 VQ/SPS encoder 将图片编码为 content embedding：`e_a, e_b, e_c`。
 - `OperNet` 接收 `(e_a, e_b, q)`，输出预测的 content embedding `e_pred`。
 - q0/q1 表示不同 query，希望最终能对应不同运算。
+
+无监督训练支持两种 operation objective。默认 hard-min 为
+`mean(min(mse_q1, mse_q2))`。可选的等权 Gaussian mixture NLL 使用
+
+`-tau * log(0.5 * exp(-mse_q1 / tau) + 0.5 * exp(-mse_q2 / tau))`,
+
+其中 `tau = 2 * variance / content_dim`。这个形式与固定各向同性方差的
+Gaussian mixture NLL 有相同的 responsibilities 和最优解，同时保持与原 MSE
+接近的梯度尺度。
