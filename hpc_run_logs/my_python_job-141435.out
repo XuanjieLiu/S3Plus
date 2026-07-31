@@ -1,0 +1,774 @@
+
+==============NVSMI LOG==============
+
+Timestamp                                 : Thu Jun 11 08:59:04 2026
+Driver Version                            : 570.195.03
+CUDA Version                              : 12.8
+
+Attached GPUs                             : 1
+GPU 00000000:55:00.0
+    Product Name                          : NVIDIA RTX 5000 Ada Generation
+    Product Brand                         : NVIDIA RTX
+    Product Architecture                  : Ada Lovelace
+    Display Mode                          : Disabled
+    Display Active                        : Disabled
+    Persistence Mode                      : Enabled
+    Addressing Mode                       : None
+    MIG Mode
+        Current                           : N/A
+        Pending                           : N/A
+    Accounting Mode                       : Disabled
+    Accounting Mode Buffer Size           : 4000
+    Driver Model
+        Current                           : N/A
+        Pending                           : N/A
+    Serial Number                         : 1323925024706
+    GPU UUID                              : GPU-9825e3b7-f9b0-f0e4-ff7e-58f807162c79
+    Minor Number                          : 0
+    VBIOS Version                         : 95.02.5E.00.06
+    MultiGPU Board                        : No
+    Board ID                              : 0x5500
+    Board Part Number                     : 900-5G132-0140-000
+    GPU Part Number                       : 26B2-850-A1
+    FRU Part Number                       : N/A
+    Platform Info
+        Chassis Serial Number             : N/A
+        Slot Number                       : N/A
+        Tray Index                        : N/A
+        Host ID                           : N/A
+        Peer Type                         : N/A
+        Module Id                         : 1
+        GPU Fabric GUID                   : N/A
+    Inforom Version
+        Image Version                     : G132.0550.00.02
+        OEM Object                        : 2.1
+        ECC Object                        : 6.16
+        Power Management Object           : N/A
+    Inforom BBX Object Flush
+        Latest Timestamp                  : N/A
+        Latest Duration                   : N/A
+    GPU Operation Mode
+        Current                           : N/A
+        Pending                           : N/A
+    GPU C2C Mode                          : N/A
+    GPU Virtualization Mode
+        Virtualization Mode               : None
+        Host VGPU Mode                    : N/A
+        vGPU Heterogeneous Mode           : N/A
+    GPU Reset Status
+        Reset Required                    : Requested functionality has been deprecated
+        Drain and Reset Recommended       : Requested functionality has been deprecated
+    GPU Recovery Action                   : None
+    GSP Firmware Version                  : 570.195.03
+    IBMNPU
+        Relaxed Ordering Mode             : N/A
+    PCI
+        Bus                               : 0x55
+        Device                            : 0x00
+        Domain                            : 0x0000
+        Base Classcode                    : 0x3
+        Sub Classcode                     : 0x0
+        Device Id                         : 0x26B210DE
+        Bus Id                            : 00000000:55:00.0
+        Sub System Id                     : 0x17FA1028
+        GPU Link Info
+            PCIe Generation
+                Max                       : 4
+                Current                   : 1
+                Device Current            : 1
+                Device Max                : 4
+                Host Max                  : 5
+            Link Width
+                Max                       : 16x
+                Current                   : 16x
+        Bridge Chip
+            Type                          : N/A
+            Firmware                      : N/A
+        Replays Since Reset               : 0
+        Replay Number Rollovers           : 0
+        Tx Throughput                     : 390 KB/s
+        Rx Throughput                     : 341 KB/s
+        Atomic Caps Outbound              : N/A
+        Atomic Caps Inbound               : N/A
+    Fan Speed                             : 30 %
+    Performance State                     : P8
+    Clocks Event Reasons
+        Idle                              : Active
+        Applications Clocks Setting       : Not Active
+        SW Power Cap                      : Not Active
+        HW Slowdown                       : Not Active
+            HW Thermal Slowdown           : Not Active
+            HW Power Brake Slowdown       : Not Active
+        Sync Boost                        : Not Active
+        SW Thermal Slowdown               : Not Active
+        Display Clock Setting             : Not Active
+    Sparse Operation Mode                 : N/A
+    FB Memory Usage
+        Total                             : 32760 MiB
+        Reserved                          : 530 MiB
+        Used                              : 27 MiB
+        Free                              : 32204 MiB
+    BAR1 Memory Usage
+        Total                             : 256 MiB
+        Used                              : 11 MiB
+        Free                              : 245 MiB
+    Conf Compute Protected Memory Usage
+        Total                             : 0 MiB
+        Used                              : 0 MiB
+        Free                              : 0 MiB
+    Compute Mode                          : Default
+    Utilization
+        GPU                               : 0 %
+        Memory                            : 0 %
+        Encoder                           : 0 %
+        Decoder                           : 0 %
+        JPEG                              : 0 %
+        OFA                               : 0 %
+    Encoder Stats
+        Active Sessions                   : 0
+        Average FPS                       : 0
+        Average Latency                   : 0
+    FBC Stats
+        Active Sessions                   : 0
+        Average FPS                       : 0
+        Average Latency                   : 0
+    DRAM Encryption Mode
+        Current                           : N/A
+        Pending                           : N/A
+    ECC Mode
+        Current                           : Disabled
+        Pending                           : Disabled
+    ECC Errors
+        Volatile
+            SRAM Correctable              : N/A
+            SRAM Uncorrectable Parity     : N/A
+            SRAM Uncorrectable SEC-DED    : N/A
+            DRAM Correctable              : N/A
+            DRAM Uncorrectable            : N/A
+        Aggregate
+            SRAM Correctable              : N/A
+            SRAM Uncorrectable Parity     : N/A
+            SRAM Uncorrectable SEC-DED    : N/A
+            DRAM Correctable              : N/A
+            DRAM Uncorrectable            : N/A
+            SRAM Threshold Exceeded       : N/A
+        Aggregate Uncorrectable SRAM Sources
+            SRAM L2                       : N/A
+            SRAM SM                       : N/A
+            SRAM Microcontroller          : N/A
+            SRAM PCIE                     : N/A
+            SRAM Other                    : N/A
+    Retired Pages
+        Single Bit ECC                    : N/A
+        Double Bit ECC                    : N/A
+        Pending Page Blacklist            : N/A
+    Remapped Rows
+        Correctable Error                 : 0
+        Uncorrectable Error               : 0
+        Pending                           : No
+        Remapping Failure Occurred        : No
+        Bank Remap Availability Histogram
+            Max                           : 128 bank(s)
+            High                          : 0 bank(s)
+            Partial                       : 0 bank(s)
+            Low                           : 0 bank(s)
+            None                          : 0 bank(s)
+    Temperature
+        GPU Current Temp                  : 40 C
+        GPU T.Limit Temp                  : 44 C
+        GPU Shutdown T.Limit Temp         : -7 C
+        GPU Slowdown T.Limit Temp         : -2 C
+        GPU Max Operating T.Limit Temp    : 0 C
+        GPU Target Temperature            : 84 C
+        Memory Current Temp               : N/A
+        Memory Max Operating T.Limit Temp : N/A
+    GPU Power Readings
+        Average Power Draw                : 17.03 W
+        Instantaneous Power Draw          : 17.03 W
+        Current Power Limit               : 250.00 W
+        Requested Power Limit             : 250.00 W
+        Default Power Limit               : 250.00 W
+        Min Power Limit                   : 100.00 W
+        Max Power Limit                   : 250.00 W
+    GPU Memory Power Readings 
+        Average Power Draw                : N/A
+        Instantaneous Power Draw          : N/A
+    Module Power Readings
+        Average Power Draw                : N/A
+        Instantaneous Power Draw          : N/A
+        Current Power Limit               : N/A
+        Requested Power Limit             : N/A
+        Default Power Limit               : N/A
+        Min Power Limit                   : N/A
+        Max Power Limit                   : N/A
+    Power Smoothing                       : N/A
+    Workload Power Profiles
+        Requested Profiles                : N/A
+        Enforced Profiles                 : N/A
+    Clocks
+        Graphics                          : 210 MHz
+        SM                                : 210 MHz
+        Memory                            : 405 MHz
+        Video                             : 1185 MHz
+    Applications Clocks
+        Graphics                          : 2550 MHz
+        Memory                            : 9001 MHz
+    Default Applications Clocks
+        Graphics                          : 2550 MHz
+        Memory                            : 9001 MHz
+    Deferred Clocks
+        Memory                            : N/A
+    Max Clocks
+        Graphics                          : 3105 MHz
+        SM                                : 3105 MHz
+        Memory                            : 9001 MHz
+        Video                             : 2415 MHz
+    Max Customer Boost Clocks
+        Graphics                          : N/A
+    Clock Policy
+        Auto Boost                        : N/A
+        Auto Boost Default                : N/A
+    Voltage
+        Graphics                          : N/A
+    Fabric
+        State                             : N/A
+        Status                            : N/A
+        CliqueId                          : N/A
+        ClusterUUID                       : N/A
+        Health
+            Bandwidth                     : N/A
+            Route Recovery in progress    : N/A
+            Route Unhealthy               : N/A
+            Access Timeout Recovery       : N/A
+    Processes
+        GPU instance ID                   : N/A
+        Compute instance ID               : N/A
+        Process ID                        : 5007
+            Type                          : G
+            Name                          : /usr/lib/xorg/Xorg
+            Used GPU Memory               : 20 MiB
+    Capabilities
+        EGM                               : disabled
+
+0
+ws-l5-016
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/1
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/2
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/3
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/4
+Optimal checkpoint: 46000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/5
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/6
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/7
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/8
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/9
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/10
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/11
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/12
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/13
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/14
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/15
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/16
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/17
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/18
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/19
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ
+{'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train', 'single_img_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle', 'plus_eval_set_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', 'plus_eval_set_path_2': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2', 'latent_embedding_1': 2, 'latent_embedding_2': 0, 'multi_num_embeddings': None, 'latent_code_2': 0, 'embedding_dim': 1, 'is_plot_zc_value': True, 'embeddings_num': 10, 'is_plot_vis_num': True, 'kld_loss_scalar': 0.0, 'checkpoint_interval': 2000, 'learning_rate': 0.0001, 'scheduler_base_num': 0.99999, 'max_iter_num': 50001, 'model_path': 'curr_model.pt', 'train_result_path': 'TrainingResults/', 'eval_result_path': 'EvalResults/', 'train_record_path': 'Train_record.txt', 'eval_record_path': 'Eval_record.txt', 'plus_accu_record_path': 'plus_eval.txt', 'log_interval': 500, 'eval_interval': 2000, 'is_save_img': True, 'batch_size': 128, 'is_commutative_train': False, 'is_commutative_all': False, 'z_plus_loss_scalar': 0.0, 'commutative_z_loss_scalar': 0.0, 'associative_z_loss_scalar': 0.0, 'plus_mse_scalar': -1, 'plus_recon_loss_scalar': 0, 'min_loss_scalar': 1e-05, 'K': 1024, 'assoc_aug_range': (-3, 3), 'commitment_scalar': 0.0025, 'embedding_scalar': 0.01, 'isVQStyle': False, 'plus_by_embedding': False, 'plus_by_zcode': False, 'VQPlus_eqLoss_scalar': 0.0, 'is_zc_based_assoc': True, 'is_rand_z_assoc': False, 'is_assoc_within_batch': True, 'is_switch_digital': False, 'is_full_symm': False, 'is_pure_assoc': False, 'is_twice_oper': False, 'img_noise': 0.0, 'network_config': {'enc_dec': {'img_channel': 3, 'last_H': 4, 'last_W': 4, 'first_ch_num': 16}, 'enc_fc': {'n_units': 128, 'n_hidden_layers': 2}, 'plus': {'plus_unit': 1024, 'n_hidden_layers': 2}}, 'eval_config': {'pipeline_result_path': 'PIPELINE_EVAL', 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}, 'plus_eval_configs': [{'name': 'eval_set', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_1', '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/test_2'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'emb_matching_rate_configs': [{'name': 'emb_matching_rate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'orderliness_configs': [{'name': 'orderliness', 'img_dir_name': 'orderliness', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/(0,20)-FixedPos-oneStyle'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1}], 'interpolate_configs': [{'name': 'train_interpolate', 'eval_set_path_list': ['/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs(0,20)_tripleSet/train'], 'is_blur': False, 'blur_config': {'kernel_size_choices': (5, 7, 9), 'sigma_range': (0.5, 3.0), 'p_no_blur': 0.0}, 'augment_times': 1, 'interpolate_num': 1}]}}
+[{'task_name': 'minus_16_1.1', 'train_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/train', 'eval_data_path': '/home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/../../../dataset/single_style_pairs_minus(0,20)/test', 'batch_size': 128, 'train_record_path': 'train_record.txt', 'eval_record_path': 'eval_record.txt', 'pretrained_path': 'auto', 'fc_model_path': 'minus_model.pt', 'max_iter_num': 10001, 'log_interval': 200, 'num_class': 21, 'fc_network_config': {'plus_unit': 16, 'n_hidden_layers': 1}, 'learning_rate': 0.001, 'optimal_checkpoint_finding_config': {'optimal_checkpoint_num': 'find_by_keys', 'record_name': 'Train_record.txt', 'keys': ['plus_recon', 'plus_z', 'loss_oper', 'loss_ED'], 'iter_after': 0.1}}]
+Sub-Exp path: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/20
+Optimal checkpoint: 48000
+Pretrained Model is loaded
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed
+No more training is needed

@@ -13,6 +13,7 @@ slurm_*.err
 *.pickle
 *.html
 /venv
+/hpc_run_logs
 /Pascal_VOC
 /data/MNIST
 /tb_logs
