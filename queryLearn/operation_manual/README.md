@@ -60,6 +60,45 @@ exit
 - `QueryLearn.train()` 看到 `eval_loader=None` 会跳过 pair eval，不写新的 `Eval_record.txt` 行。
 - `single_img_eval_set_path` 仍可保留；它用于 query target accuracy 的 embedding lookup，不等价于 pair eval set。
 
+## Record 可视化和 checkpoint
+
+训练会在写入 `Train_record.txt` / `Eval_record.txt` 后同步刷新 record 曲线。可在 config 中配置：
+
+```python
+'record_visualizer': {
+    'enabled': True,
+    'output_dir': 'RecordPlots/',
+    'format': 'png',
+    'metrics': {
+        'query_accuracy': ['add_acc_q1', 'add_acc_q2', 'mm21_acc_q1', 'mm21_acc_q2', 'add_acc', 'mm21_acc'],
+        'loss': ['oper_loss', 'hard_min_loss', 'symm_loss', 'total_loss'],
+    },
+}
+```
+
+输出包括每个 metric group 的图片和 `RecordPlots/index.html`。
+
+无监督 operation loss 默认为原有的逐样本 hard-min。Gaussian mixture NLL 可通过 config 开启：
+
+```python
+'operation_loss': {
+    'type': 'gaussian_mixture_nll',
+    'variance': 0.04,
+    'mixture_weights': [0.5, 0.5],
+    'weight': 1.0,
+}
+```
+
+GMM 使用固定方差和 mixture prior。训练记录中的 `oper_loss` 是保持 MSE 单位的
+scaled NLL；`hard_min_loss` 是同批数据上的原始 winner MSE，用于和 hard-min
+实验比较。`sanity_check=True` 时仍使用显式 query 分配，并忽略该无监督 loss
+选择。
+
+checkpoint 现在默认只保留两个文件：
+
+- `curr_model.pt`：最近一次写 record 时的模型。
+- `best_model.pt`：训练记录中 `best_checkpoint_metric` 最低的模型，默认 `total_loss`。
+
 ## 运行模板
 
 ```bash
