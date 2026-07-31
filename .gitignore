@@ -11,6 +11,7 @@ slurm_*.out
 slurm_*.err
 *.gz
 *.pickle
+*.html
 /venv
 /Pascal_VOC
 /data/MNIST
@@ -23,3 +24,4 @@ slurm_*.err
 new_icon_train/
 new_icon_val/
 __pycache__
+/queryLearn/exps/**/*.csv

@@ -22,6 +22,7 @@ def init_dataloaders(config):
     aug_t = config.get('augment_times', 1)
     blur_cfg = config.get('blur_config', None)
     is_blur = config.get('is_blur', False)
+    use_eval_set = config.get('use_eval_set', True)
     trans = make_dataset_trans(is_blur, blur_cfg) if is_blur else None
     n_workers = config.get('num_workers', 0)
     loader_config = {
@@ -52,14 +53,22 @@ def init_dataloaders(config):
                 dataset_all, [train_size, eval_size], generator=split_generator
             )
         plus_train_loader = DataLoader(train_dataset, **loader_config)
-        plus_eval_loader = DataLoader(eval_dataset, **loader_config)
+        if use_eval_set and len(eval_dataset) > 0:
+            plus_eval_loader = DataLoader(eval_dataset, **loader_config)
+        else:
+            plus_eval_loader = None
         print(f"Random split with ratio {train_ratio}, train size: {len(train_dataset)}, eval size: {len(eval_dataset)}")
     else:
         print("Using predefined datasets")
         plus_train_set = make_dataset(config['train_data_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
-        plus_eval_set = make_dataset(config['plus_eval_set_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
         plus_train_loader = DataLoader(plus_train_set, **loader_config)
-        plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
+        plus_eval_loader = None
+        if use_eval_set and config.get('plus_eval_set_path', None) is not None:
+            plus_eval_set = make_dataset(config['plus_eval_set_path'], MultiImgDataset, transform=trans, augment_times=aug_t)
+            if len(plus_eval_set) > 0:
+                plus_eval_loader = DataLoader(plus_eval_set, **loader_config)
+    if plus_eval_loader is None:
+        print("No plus eval loader; evaluation on pair dataset will be skipped")
     if config.get('single_img_eval_set_path', None) is not None:
         single_img_eval_set = make_dataset(config['single_img_eval_set_path'], SingleImgDataset, transform=trans, augment_times=aug_t)
         single_img_eval_loader = DataLoader(single_img_eval_set, **loader_config)

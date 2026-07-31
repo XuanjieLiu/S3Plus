@@ -1,0 +1,755 @@
+
+==============NVSMI LOG==============
+
+Timestamp                                 : Thu Jun 11 11:16:55 2026
+Driver Version                            : 570.195.03
+CUDA Version                              : 12.8
+
+Attached GPUs                             : 1
+GPU 00000000:55:00.0
+    Product Name                          : NVIDIA RTX 5000 Ada Generation
+    Product Brand                         : NVIDIA RTX
+    Product Architecture                  : Ada Lovelace
+    Display Mode                          : Disabled
+    Display Active                        : Disabled
+    Persistence Mode                      : Enabled
+    Addressing Mode                       : None
+    MIG Mode
+        Current                           : N/A
+        Pending                           : N/A
+    Accounting Mode                       : Disabled
+    Accounting Mode Buffer Size           : 4000
+    Driver Model
+        Current                           : N/A
+        Pending                           : N/A
+    Serial Number                         : 1323925025593
+    GPU UUID                              : GPU-ab7a1592-7552-8cc4-e37d-5bf593bd0807
+    Minor Number                          : 0
+    VBIOS Version                         : 95.02.5E.00.06
+    MultiGPU Board                        : No
+    Board ID                              : 0x5500
+    Board Part Number                     : 900-5G132-0140-000
+    GPU Part Number                       : 26B2-850-A1
+    FRU Part Number                       : N/A
+    Platform Info
+        Chassis Serial Number             : N/A
+        Slot Number                       : N/A
+        Tray Index                        : N/A
+        Host ID                           : N/A
+        Peer Type                         : N/A
+        Module Id                         : 1
+        GPU Fabric GUID                   : N/A
+    Inforom Version
+        Image Version                     : G132.0550.00.02
+        OEM Object                        : 2.1
+        ECC Object                        : 6.16
+        Power Management Object           : N/A
+    Inforom BBX Object Flush
+        Latest Timestamp                  : N/A
+        Latest Duration                   : N/A
+    GPU Operation Mode
+        Current                           : N/A
+        Pending                           : N/A
+    GPU C2C Mode                          : N/A
+    GPU Virtualization Mode
+        Virtualization Mode               : None
+        Host VGPU Mode                    : N/A
+        vGPU Heterogeneous Mode           : N/A
+    GPU Reset Status
+        Reset Required                    : Requested functionality has been deprecated
+        Drain and Reset Recommended       : Requested functionality has been deprecated
+    GPU Recovery Action                   : None
+    GSP Firmware Version                  : 570.195.03
+    IBMNPU
+        Relaxed Ordering Mode             : N/A
+    PCI
+        Bus                               : 0x55
+        Device                            : 0x00
+        Domain                            : 0x0000
+        Base Classcode                    : 0x3
+        Sub Classcode                     : 0x0
+        Device Id                         : 0x26B210DE
+        Bus Id                            : 00000000:55:00.0
+        Sub System Id                     : 0x17FA1028
+        GPU Link Info
+            PCIe Generation
+                Max                       : 4
+                Current                   : 1
+                Device Current            : 1
+                Device Max                : 4
+                Host Max                  : 5
+            Link Width
+                Max                       : 16x
+                Current                   : 16x
+        Bridge Chip
+            Type                          : N/A
+            Firmware                      : N/A
+        Replays Since Reset               : 0
+        Replay Number Rollovers           : 0
+        Tx Throughput                     : 390 KB/s
+        Rx Throughput                     : 341 KB/s
+        Atomic Caps Outbound              : N/A
+        Atomic Caps Inbound               : N/A
+    Fan Speed                             : 30 %
+    Performance State                     : P8
+    Clocks Event Reasons
+        Idle                              : Active
+        Applications Clocks Setting       : Not Active
+        SW Power Cap                      : Not Active
+        HW Slowdown                       : Not Active
+            HW Thermal Slowdown           : Not Active
+            HW Power Brake Slowdown       : Not Active
+        Sync Boost                        : Not Active
+        SW Thermal Slowdown               : Not Active
+        Display Clock Setting             : Not Active
+    Sparse Operation Mode                 : N/A
+    FB Memory Usage
+        Total                             : 32760 MiB
+        Reserved                          : 530 MiB
+        Used                              : 27 MiB
+        Free                              : 32204 MiB
+    BAR1 Memory Usage
+        Total                             : 256 MiB
+        Used                              : 11 MiB
+        Free                              : 245 MiB
+    Conf Compute Protected Memory Usage
+        Total                             : 0 MiB
+        Used                              : 0 MiB
+        Free                              : 0 MiB
+    Compute Mode                          : Default
+    Utilization
+        GPU                               : 0 %
+        Memory                            : 0 %
+        Encoder                           : 0 %
+        Decoder                           : 0 %
+        JPEG                              : 0 %
+        OFA                               : 0 %
+    Encoder Stats
+        Active Sessions                   : 0
+        Average FPS                       : 0
+        Average Latency                   : 0
+    FBC Stats
+        Active Sessions                   : 0
+        Average FPS                       : 0
+        Average Latency                   : 0
+    DRAM Encryption Mode
+        Current                           : N/A
+        Pending                           : N/A
+    ECC Mode
+        Current                           : Disabled
+        Pending                           : Disabled
+    ECC Errors
+        Volatile
+            SRAM Correctable              : N/A
+            SRAM Uncorrectable Parity     : N/A
+            SRAM Uncorrectable SEC-DED    : N/A
+            DRAM Correctable              : N/A
+            DRAM Uncorrectable            : N/A
+        Aggregate
+            SRAM Correctable              : N/A
+            SRAM Uncorrectable Parity     : N/A
+            SRAM Uncorrectable SEC-DED    : N/A
+            DRAM Correctable              : N/A
+            DRAM Uncorrectable            : N/A
+            SRAM Threshold Exceeded       : N/A
+        Aggregate Uncorrectable SRAM Sources
+            SRAM L2                       : N/A
+            SRAM SM                       : N/A
+            SRAM Microcontroller          : N/A
+            SRAM PCIE                     : N/A
+            SRAM Other                    : N/A
+    Retired Pages
+        Single Bit ECC                    : N/A
+        Double Bit ECC                    : N/A
+        Pending Page Blacklist            : N/A
+    Remapped Rows
+        Correctable Error                 : 0
+        Uncorrectable Error               : 0
+        Pending                           : No
+        Remapping Failure Occurred        : No
+        Bank Remap Availability Histogram
+            Max                           : 128 bank(s)
+            High                          : 0 bank(s)
+            Partial                       : 0 bank(s)
+            Low                           : 0 bank(s)
+            None                          : 0 bank(s)
+    Temperature
+        GPU Current Temp                  : 36 C
+        GPU T.Limit Temp                  : 50 C
+        GPU Shutdown T.Limit Temp         : -7 C
+        GPU Slowdown T.Limit Temp         : -2 C
+        GPU Max Operating T.Limit Temp    : 0 C
+        GPU Target Temperature            : 84 C
+        Memory Current Temp               : N/A
+        Memory Max Operating T.Limit Temp : N/A
+    GPU Power Readings
+        Average Power Draw                : 16.24 W
+        Instantaneous Power Draw          : 16.23 W
+        Current Power Limit               : 250.00 W
+        Requested Power Limit             : 250.00 W
+        Default Power Limit               : 250.00 W
+        Min Power Limit                   : 100.00 W
+        Max Power Limit                   : 250.00 W
+    GPU Memory Power Readings 
+        Average Power Draw                : N/A
+        Instantaneous Power Draw          : N/A
+    Module Power Readings
+        Average Power Draw                : N/A
+        Instantaneous Power Draw          : N/A
+        Current Power Limit               : N/A
+        Requested Power Limit             : N/A
+        Default Power Limit               : N/A
+        Min Power Limit                   : N/A
+        Max Power Limit                   : N/A
+    Power Smoothing                       : N/A
+    Workload Power Profiles
+        Requested Profiles                : N/A
+        Enforced Profiles                 : N/A
+    Clocks
+        Graphics                          : 210 MHz
+        SM                                : 210 MHz
+        Memory                            : 405 MHz
+        Video                             : 1185 MHz
+    Applications Clocks
+        Graphics                          : 2550 MHz
+        Memory                            : 9001 MHz
+    Default Applications Clocks
+        Graphics                          : 2550 MHz
+        Memory                            : 9001 MHz
+    Deferred Clocks
+        Memory                            : N/A
+    Max Clocks
+        Graphics                          : 3105 MHz
+        SM                                : 3105 MHz
+        Memory                            : 9001 MHz
+        Video                             : 2415 MHz
+    Max Customer Boost Clocks
+        Graphics                          : N/A
+    Clock Policy
+        Auto Boost                        : N/A
+        Auto Boost Default                : N/A
+    Voltage
+        Graphics                          : N/A
+    Fabric
+        State                             : N/A
+        Status                            : N/A
+        CliqueId                          : N/A
+        ClusterUUID                       : N/A
+        Health
+            Bandwidth                     : N/A
+            Route Recovery in progress    : N/A
+            Route Unhealthy               : N/A
+            Access Timeout Recovery       : N/A
+    Processes
+        GPU instance ID                   : N/A
+        Compute instance ID               : N/A
+        Process ID                        : 5031
+            Type                          : G
+            Name                          : /usr/lib/xorg/Xorg
+            Used GPU Memory               : 20 MiB
+    Capabilities
+        EGM                               : disabled
+
+0
+ws-l5-029
+Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Fullsymm/train_config.py
+Optimal checkpoint number for 1: 48000
+Optimal checkpoint number for 2: 48000
+Optimal checkpoint number for 3: 48000
+Optimal checkpoint number for 4: 46000
+Optimal checkpoint number for 5: 48000
+Optimal checkpoint number for 6: 46000
+Optimal checkpoint number for 7: 48000
+Optimal checkpoint number for 8: 48000
+Optimal checkpoint number for 9: 48000
+Optimal checkpoint number for 10: 48000
+Optimal checkpoint number for 11: 48000
+Optimal checkpoint number for 12: 48000
+Optimal checkpoint number for 13: 48000
+Optimal checkpoint number for 14: 48000
+Optimal checkpoint number for 15: 48000
+Optimal checkpoint number for 16: 48000
+Optimal checkpoint number for 17: 48000
+Optimal checkpoint number for 18: 48000
+Optimal checkpoint number for 19: 48000
+Optimal checkpoint number for 20: 48000
+No model is loaded
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+No model is loaded
+No model is loaded
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.925
+Nearest neighbor analysis score: 0.925
+No model is loaded
+Emb Select Plus Accu: 0.9619, Cycle Accu: 0.9619
+Interpolated Plus Mode dict Accu: 0.9619, Cycle Accu: 0.9619
+Interpolated Plus Selection Accu: 0.9619, Cycle Accu: 0.9619
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9714
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 0.9524
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9714
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9714
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 0.9619
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9714
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9810
+Interpolated Plus Mode dict Accu: 0.9810, Cycle Accu: 0.9810
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9810
+Emb Select Plus Accu: 0.9619, Cycle Accu: 0.9048
+Interpolated Plus Mode dict Accu: 0.9048, Cycle Accu: 0.9048
+Interpolated Plus Selection Accu: 0.9619, Cycle Accu: 0.9048
+Emb Select Plus Accu: 0.8667, Cycle Accu: 0.8571
+Interpolated Plus Mode dict Accu: 0.8286, Cycle Accu: 0.8381
+Interpolated Plus Selection Accu: 0.8667, Cycle Accu: 0.8571
+Emb Select Plus Accu: 0.9619, Cycle Accu: 0.9524
+Interpolated Plus Mode dict Accu: 0.9238, Cycle Accu: 0.9524
+Interpolated Plus Selection Accu: 0.9619, Cycle Accu: 0.9524
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9714
+Interpolated Plus Mode dict Accu: 0.9714, Cycle Accu: 0.9714
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9714
+Emb Select Plus Accu: 0.9714, Cycle Accu: 0.9333
+Interpolated Plus Mode dict Accu: 0.9048, Cycle Accu: 0.9143
+Interpolated Plus Selection Accu: 0.9714, Cycle Accu: 0.9333
+Emb Select Plus Accu: 0.8571, Cycle Accu: 0.8762
+Interpolated Plus Mode dict Accu: 0.8381, Cycle Accu: 0.8762
+Interpolated Plus Selection Accu: 0.8571, Cycle Accu: 0.8762
+Emb Select Plus Accu: 0.9524, Cycle Accu: 0.9524
+Interpolated Plus Mode dict Accu: 0.8952, Cycle Accu: 0.9238
+Interpolated Plus Selection Accu: 0.9524, Cycle Accu: 0.9524
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9048, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9714
+Interpolated Plus Mode dict Accu: 0.9333, Cycle Accu: 0.9524
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9714
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9810
+Interpolated Plus Mode dict Accu: 0.9714, Cycle Accu: 0.9714
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9810
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9905
+Interpolated Plus Mode dict Accu: 0.9905, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9905
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9619
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 0.9524
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9619
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9048, Cycle Accu: 0.8952
+Interpolated Plus Mode dict Accu: 0.8381, Cycle Accu: 0.8667
+Interpolated Plus Selection Accu: 0.9048, Cycle Accu: 0.8952
+Emb Select Plus Accu: 0.9333, Cycle Accu: 0.9333
+Interpolated Plus Mode dict Accu: 0.8095, Cycle Accu: 0.9048
+Interpolated Plus Selection Accu: 0.9333, Cycle Accu: 0.9333
+Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.05.18_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing/train_config.py
+Optimal checkpoint number for 1: 44000
+Optimal checkpoint number for 2: 48000
+Optimal checkpoint number for 3: 46000
+Optimal checkpoint number for 4: 48000
+Optimal checkpoint number for 5: 48000
+Optimal checkpoint number for 6: 48000
+Optimal checkpoint number for 7: 48000
+Optimal checkpoint number for 8: 48000
+Optimal checkpoint number for 9: 48000
+Optimal checkpoint number for 10: 48000
+Optimal checkpoint number for 11: 48000
+Optimal checkpoint number for 12: 48000
+Optimal checkpoint number for 13: 48000
+Optimal checkpoint number for 14: 48000
+Optimal checkpoint number for 15: 48000
+Optimal checkpoint number for 16: 48000
+Optimal checkpoint number for 17: 48000
+Optimal checkpoint number for 18: 48000
+Optimal checkpoint number for 19: 48000
+Optimal checkpoint number for 20: 48000
+No model is loaded
+Emb Select Plus Accu: 0.1963, Cycle Accu: 0.2025
+Emb Select Plus Accu: 0.2638, Cycle Accu: 0.2577
+Emb Select Plus Accu: 0.3497, Cycle Accu: 0.3374
+Emb Select Plus Accu: 0.4479, Cycle Accu: 0.4110
+Emb Select Plus Accu: 0.2209, Cycle Accu: 0.2454
+Emb Select Plus Accu: 0.2454, Cycle Accu: 0.2086
+Emb Select Plus Accu: 0.2209, Cycle Accu: 0.2025
+Emb Select Plus Accu: 0.2699, Cycle Accu: 0.2270
+Emb Select Plus Accu: 0.3190, Cycle Accu: 0.2945
+Emb Select Plus Accu: 0.3558, Cycle Accu: 0.3067
+Emb Select Plus Accu: 0.3681, Cycle Accu: 0.3804
+Emb Select Plus Accu: 0.2945, Cycle Accu: 0.2699
+Emb Select Plus Accu: 0.3804, Cycle Accu: 0.4049
+Emb Select Plus Accu: 0.4663, Cycle Accu: 0.4785
+Emb Select Plus Accu: 0.2393, Cycle Accu: 0.2270
+Emb Select Plus Accu: 0.4110, Cycle Accu: 0.3804
+Emb Select Plus Accu: 0.4294, Cycle Accu: 0.4110
+Emb Select Plus Accu: 0.2822, Cycle Accu: 0.2454
+Emb Select Plus Accu: 0.2454, Cycle Accu: 0.2270
+Emb Select Plus Accu: 0.3374, Cycle Accu: 0.3374
+No model is loaded
+No model is loaded
+Nearest neighbor analysis score: 0.675
+Nearest neighbor analysis score: 0.775
+Nearest neighbor analysis score: 0.85
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.85
+Nearest neighbor analysis score: 0.8
+Nearest neighbor analysis score: 0.875
+Nearest neighbor analysis score: 0.8
+Nearest neighbor analysis score: 0.8
+Nearest neighbor analysis score: 0.925
+Nearest neighbor analysis score: 0.925
+Nearest neighbor analysis score: 0.65
+Nearest neighbor analysis score: 0.875
+Nearest neighbor analysis score: 0.925
+Nearest neighbor analysis score: 0.825
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.9
+Nearest neighbor analysis score: 0.8
+Nearest neighbor analysis score: 0.725
+No model is loaded
+Emb Select Plus Accu: 0.5048, Cycle Accu: 0.4381
+Interpolated Plus Mode dict Accu: 0.2667, Cycle Accu: 0.4095
+Interpolated Plus Selection Accu: 0.5048, Cycle Accu: 0.4381
+Emb Select Plus Accu: 0.4381, Cycle Accu: 0.4000
+Interpolated Plus Mode dict Accu: 0.1905, Cycle Accu: 0.3048
+Interpolated Plus Selection Accu: 0.4381, Cycle Accu: 0.4000
+Emb Select Plus Accu: 0.6952, Cycle Accu: 0.6762
+Interpolated Plus Mode dict Accu: 0.5714, Cycle Accu: 0.6286
+Interpolated Plus Selection Accu: 0.6952, Cycle Accu: 0.6762
+Emb Select Plus Accu: 0.8286, Cycle Accu: 0.8190
+Interpolated Plus Mode dict Accu: 0.6286, Cycle Accu: 0.6952
+Interpolated Plus Selection Accu: 0.8286, Cycle Accu: 0.8190
+Emb Select Plus Accu: 0.5238, Cycle Accu: 0.5524
+Interpolated Plus Mode dict Accu: 0.3333, Cycle Accu: 0.4762
+Interpolated Plus Selection Accu: 0.5238, Cycle Accu: 0.5524
+Emb Select Plus Accu: 0.5619, Cycle Accu: 0.4952
+Interpolated Plus Mode dict Accu: 0.3429, Cycle Accu: 0.4476
+Interpolated Plus Selection Accu: 0.5619, Cycle Accu: 0.4952
+Emb Select Plus Accu: 0.4190, Cycle Accu: 0.4000
+Interpolated Plus Mode dict Accu: 0.2571, Cycle Accu: 0.3524
+Interpolated Plus Selection Accu: 0.4190, Cycle Accu: 0.4000
+Emb Select Plus Accu: 0.5524, Cycle Accu: 0.5810
+Interpolated Plus Mode dict Accu: 0.2952, Cycle Accu: 0.4381
+Interpolated Plus Selection Accu: 0.5524, Cycle Accu: 0.5810
+Emb Select Plus Accu: 0.6476, Cycle Accu: 0.6190
+Interpolated Plus Mode dict Accu: 0.3238, Cycle Accu: 0.4952
+Interpolated Plus Selection Accu: 0.6476, Cycle Accu: 0.6190
+Emb Select Plus Accu: 0.7048, Cycle Accu: 0.6762
+Interpolated Plus Mode dict Accu: 0.4476, Cycle Accu: 0.6190
+Interpolated Plus Selection Accu: 0.7048, Cycle Accu: 0.6762
+Emb Select Plus Accu: 0.6857, Cycle Accu: 0.6667
+Interpolated Plus Mode dict Accu: 0.4667, Cycle Accu: 0.6095
+Interpolated Plus Selection Accu: 0.6857, Cycle Accu: 0.6667
+Emb Select Plus Accu: 0.5048, Cycle Accu: 0.4857
+Interpolated Plus Mode dict Accu: 0.3143, Cycle Accu: 0.4000
+Interpolated Plus Selection Accu: 0.5048, Cycle Accu: 0.4857
+Emb Select Plus Accu: 0.6952, Cycle Accu: 0.6857
+Interpolated Plus Mode dict Accu: 0.5524, Cycle Accu: 0.6667
+Interpolated Plus Selection Accu: 0.6952, Cycle Accu: 0.6857
+Emb Select Plus Accu: 0.7905, Cycle Accu: 0.7810
+Interpolated Plus Mode dict Accu: 0.6095, Cycle Accu: 0.7048
+Interpolated Plus Selection Accu: 0.7905, Cycle Accu: 0.7810
+Emb Select Plus Accu: 0.5238, Cycle Accu: 0.5238
+Interpolated Plus Mode dict Accu: 0.3143, Cycle Accu: 0.4571
+Interpolated Plus Selection Accu: 0.5238, Cycle Accu: 0.5238
+Emb Select Plus Accu: 0.6667, Cycle Accu: 0.6381
+Interpolated Plus Mode dict Accu: 0.5714, Cycle Accu: 0.5714
+Interpolated Plus Selection Accu: 0.6667, Cycle Accu: 0.6381
+Emb Select Plus Accu: 0.7619, Cycle Accu: 0.6952
+Interpolated Plus Mode dict Accu: 0.5048, Cycle Accu: 0.6095
+Interpolated Plus Selection Accu: 0.7619, Cycle Accu: 0.6952
+Emb Select Plus Accu: 0.5905, Cycle Accu: 0.5810
+Interpolated Plus Mode dict Accu: 0.3810, Cycle Accu: 0.5333
+Interpolated Plus Selection Accu: 0.5905, Cycle Accu: 0.5810
+Emb Select Plus Accu: 0.6571, Cycle Accu: 0.6476
+Interpolated Plus Mode dict Accu: 0.4286, Cycle Accu: 0.5714
+Interpolated Plus Selection Accu: 0.6571, Cycle Accu: 0.6476
+Emb Select Plus Accu: 0.5238, Cycle Accu: 0.4952
+Interpolated Plus Mode dict Accu: 0.3524, Cycle Accu: 0.4095
+Interpolated Plus Selection Accu: 0.5238, Cycle Accu: 0.4952
+Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.05.19_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_Nothing_trainAll/train_config.py
+Optimal checkpoint number for 1: 48000
+Optimal checkpoint number for 2: 48000
+Optimal checkpoint number for 3: 48000
+Optimal checkpoint number for 4: 48000
+Optimal checkpoint number for 5: 46000
+Optimal checkpoint number for 6: 46000
+Optimal checkpoint number for 7: 46000
+Optimal checkpoint number for 8: 46000
+Optimal checkpoint number for 9: 48000
+Optimal checkpoint number for 10: 46000
+Optimal checkpoint number for 11: 46000
+Optimal checkpoint number for 12: 48000
+Optimal checkpoint number for 13: 48000
+Optimal checkpoint number for 14: 48000
+Optimal checkpoint number for 15: 48000
+Optimal checkpoint number for 16: 48000
+Optimal checkpoint number for 17: 48000
+Optimal checkpoint number for 18: 46000
+Optimal checkpoint number for 19: 46000
+Optimal checkpoint number for 20: 46000
+No model is loaded
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+No model is loaded
+No model is loaded
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 1.0
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 0.95
+Nearest neighbor analysis score: 0.975
+Nearest neighbor analysis score: 1.0
+No model is loaded
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9619, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9905
+Interpolated Plus Mode dict Accu: 0.9810, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9905
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9714, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9810
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 0.9714
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9810
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9905
+Interpolated Plus Mode dict Accu: 0.9333, Cycle Accu: 0.9810
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9905
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9810, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9905, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9905, Cycle Accu: 0.9810
+Interpolated Plus Mode dict Accu: 0.8571, Cycle Accu: 0.9238
+Interpolated Plus Selection Accu: 0.9905, Cycle Accu: 0.9810
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9905, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9714, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9810, Cycle Accu: 0.9810
+Interpolated Plus Mode dict Accu: 0.9524, Cycle Accu: 0.9810
+Interpolated Plus Selection Accu: 0.9810, Cycle Accu: 0.9810
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9714, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9810, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9143, Cycle Accu: 1.0000
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Emb Select Plus Accu: 0.9905, Cycle Accu: 0.9905
+Interpolated Plus Mode dict Accu: 0.8476, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 0.9905, Cycle Accu: 0.9905
+Emb Select Plus Accu: 0.9238, Cycle Accu: 0.9333
+Interpolated Plus Mode dict Accu: 0.7905, Cycle Accu: 0.9048
+Interpolated Plus Selection Accu: 0.9238, Cycle Accu: 0.9333
+Emb Select Plus Accu: 1.0000, Cycle Accu: 0.9905
+Interpolated Plus Mode dict Accu: 0.9905, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 0.9905
+Emb Select Plus Accu: 1.0000, Cycle Accu: 1.0000
+Interpolated Plus Mode dict Accu: 0.9429, Cycle Accu: 0.9905
+Interpolated Plus Selection Accu: 1.0000, Cycle Accu: 1.0000
+Loading config from: /home/xuanjie.liu/Projects/S3Plus/VQ/exp/2025.06.05_10vq_Zc[2]_Zs[0]_edim1_[0-20]_plus1024_1_tripleSet_PureVQ/train_config.py
+Optimal checkpoint number for 1: 48000
+Optimal checkpoint number for 2: 48000
+Optimal checkpoint number for 3: 48000
+Optimal checkpoint number for 4: 46000
+Optimal checkpoint number for 5: 48000
+Optimal checkpoint number for 6: 48000
+Optimal checkpoint number for 7: 48000
+Optimal checkpoint number for 8: 48000
+Optimal checkpoint number for 9: 48000
+Optimal checkpoint number for 10: 48000
+Optimal checkpoint number for 11: 48000
+Optimal checkpoint number for 12: 48000
+Optimal checkpoint number for 13: 48000
+Optimal checkpoint number for 14: 48000
+Optimal checkpoint number for 15: 48000
+Optimal checkpoint number for 16: 48000
+Optimal checkpoint number for 17: 48000
+Optimal checkpoint number for 18: 48000
+Optimal checkpoint number for 19: 48000
+Optimal checkpoint number for 20: 48000
+No model is loaded
+Emb Select Plus Accu: 0.0798, Cycle Accu: 0.0859
+Emb Select Plus Accu: 0.0429, Cycle Accu: 0.0429
+Emb Select Plus Accu: 0.0061, Cycle Accu: 0.0061
+Emb Select Plus Accu: 0.0798, Cycle Accu: 0.0798
+Emb Select Plus Accu: 0.0307, Cycle Accu: 0.0307
+Emb Select Plus Accu: 0.0491, Cycle Accu: 0.0491
+Emb Select Plus Accu: 0.0798, Cycle Accu: 0.0798
+Emb Select Plus Accu: 0.0613, Cycle Accu: 0.0613
+Emb Select Plus Accu: 0.0859, Cycle Accu: 0.0736
+Emb Select Plus Accu: 0.0798, Cycle Accu: 0.0798
+Emb Select Plus Accu: 0.0552, Cycle Accu: 0.0552
+Emb Select Plus Accu: 0.0429, Cycle Accu: 0.0429
+Emb Select Plus Accu: 0.0491, Cycle Accu: 0.0491
+Emb Select Plus Accu: 0.0613, Cycle Accu: 0.0736
+Emb Select Plus Accu: 0.0061, Cycle Accu: 0.0429
+Emb Select Plus Accu: 0.0061, Cycle Accu: 0.0061
+Emb Select Plus Accu: 0.0491, Cycle Accu: 0.0491
+Emb Select Plus Accu: 0.0429, Cycle Accu: 0.0429
+Emb Select Plus Accu: 0.0798, Cycle Accu: 0.0798
+Emb Select Plus Accu: 0.0429, Cycle Accu: 0.0429
+No model is loaded
+No model is loaded
+Nearest neighbor analysis score: 0.75
+Nearest neighbor analysis score: 0.6
+Nearest neighbor analysis score: 0.7
+Nearest neighbor analysis score: 0.625
+Nearest neighbor analysis score: 0.7
+Nearest neighbor analysis score: 0.65
+Nearest neighbor analysis score: 0.625
+Nearest neighbor analysis score: 0.525
+Nearest neighbor analysis score: 0.625
+Nearest neighbor analysis score: 0.7
+Nearest neighbor analysis score: 0.675
+Nearest neighbor analysis score: 0.55
+Nearest neighbor analysis score: 0.7
+Nearest neighbor analysis score: 0.6
+Nearest neighbor analysis score: 0.7
+Nearest neighbor analysis score: 0.75
+Nearest neighbor analysis score: 0.65
+Nearest neighbor analysis score: 0.525
+Nearest neighbor analysis score: 0.6
+Nearest neighbor analysis score: 0.65
+No model is loaded
+Emb Select Plus Accu: 0.0762, Cycle Accu: 0.0857
+Interpolated Plus Mode dict Accu: 0.0095, Cycle Accu: 0.0571
+Interpolated Plus Selection Accu: 0.0762, Cycle Accu: 0.0857
+Emb Select Plus Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0381
+Interpolated Plus Selection Accu: 0.0381, Cycle Accu: 0.0381
+Emb Select Plus Accu: 0.0095, Cycle Accu: 0.0095
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0095, Cycle Accu: 0.0095
+Emb Select Plus Accu: 0.0667, Cycle Accu: 0.0667
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0381
+Interpolated Plus Selection Accu: 0.0667, Cycle Accu: 0.0667
+Emb Select Plus Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Mode dict Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Selection Accu: 0.0381, Cycle Accu: 0.0381
+Emb Select Plus Accu: 0.0667, Cycle Accu: 0.0667
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0381
+Interpolated Plus Selection Accu: 0.0667, Cycle Accu: 0.0667
+Emb Select Plus Accu: 0.0476, Cycle Accu: 0.0476
+Interpolated Plus Mode dict Accu: 0.0095, Cycle Accu: 0.0476
+Interpolated Plus Selection Accu: 0.0476, Cycle Accu: 0.0476
+Emb Select Plus Accu: 0.0667, Cycle Accu: 0.0667
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0476
+Interpolated Plus Selection Accu: 0.0667, Cycle Accu: 0.0667
+Emb Select Plus Accu: 0.0762, Cycle Accu: 0.0667
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0762, Cycle Accu: 0.0667
+Emb Select Plus Accu: 0.0667, Cycle Accu: 0.0667
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0667
+Interpolated Plus Selection Accu: 0.0667, Cycle Accu: 0.0667
+Emb Select Plus Accu: 0.0286, Cycle Accu: 0.0286
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0286, Cycle Accu: 0.0286
+Emb Select Plus Accu: 0.0286, Cycle Accu: 0.0286
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0286
+Interpolated Plus Selection Accu: 0.0286, Cycle Accu: 0.0286
+Emb Select Plus Accu: 0.0190, Cycle Accu: 0.0190
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0190, Cycle Accu: 0.0190
+Emb Select Plus Accu: 0.0381, Cycle Accu: 0.0476
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0381, Cycle Accu: 0.0476
+Emb Select Plus Accu: 0.0190, Cycle Accu: 0.0286
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0190, Cycle Accu: 0.0286
+Emb Select Plus Accu: 0.0190, Cycle Accu: 0.0190
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0190
+Interpolated Plus Selection Accu: 0.0190, Cycle Accu: 0.0190
+Emb Select Plus Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Mode dict Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Selection Accu: 0.0381, Cycle Accu: 0.0381
+Emb Select Plus Accu: 0.0381, Cycle Accu: 0.0381
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0381, Cycle Accu: 0.0381
+Emb Select Plus Accu: 0.0476, Cycle Accu: 0.0476
+Interpolated Plus Mode dict Accu: 0.0381, Cycle Accu: 0.0476
+Interpolated Plus Selection Accu: 0.0476, Cycle Accu: 0.0476
+Emb Select Plus Accu: 0.0286, Cycle Accu: 0.0286
+Interpolated Plus Mode dict Accu: 0.0000, Cycle Accu: 0.0000
+Interpolated Plus Selection Accu: 0.0286, Cycle Accu: 0.0286
+Pipeline evaluation completed.

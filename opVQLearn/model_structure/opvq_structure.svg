@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" role="img" aria-labelledby="title desc">
+  <title id="title">OpVQ Learn architecture</title>
+  <desc id="desc">Frozen VQ/SPS encoder produces ea eb ec. OpEncoder maps the triplet to z_op, a two-code VQ codebook produces q, and OperDecoder predicts ec from ea eb q. Losses include pred, op VQ, SPS VQ, balance, and codebook-level symmetry.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .lane { fill: #ffffff; stroke: #dbe4ee; stroke-width: 1.5; }
+      .box { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.8; filter: url(#soft-shadow); }
+      .frozen { fill: #eef6ff; stroke: #60a5fa; }
+      .learned { fill: #f4f7ec; stroke: #84a35a; }
+      .vq { fill: #fff5e8; stroke: #f59e0b; }
+      .loss { fill: #fff1f2; stroke: #fb7185; }
+      .symm { fill: #f5f3ff; stroke: #8b5cf6; }
+      .title { font: 700 28px Inter, Arial, sans-serif; fill: #0f172a; }
+      .section { font: 700 18px Inter, Arial, sans-serif; fill: #334155; }
+      .label { font: 600 16px Inter, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 13px Inter, Arial, sans-serif; fill: #475569; }
+      .tiny { font: 12px Inter, Arial, sans-serif; fill: #64748b; }
+      .code { font: 13px "SFMono-Regular", Consolas, monospace; fill: #1e293b; }
+      .arrow { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .arrow-blue { stroke: #2563eb; stroke-width: 2.2; fill: none; marker-end: url(#arrow-blue); }
+      .dash { stroke-dasharray: 7 6; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="820"/>
+  <text class="title" x="56" y="54">OpVQ Learn Architecture</text>
+  <text class="small" x="56" y="82">Unsupervised operation-code learning with a frozen VQ/SPS representation and two latent operation codes.</text>
+
+  <rect class="lane" x="40" y="112" width="1200" height="330" rx="14"/>
+  <text class="section" x="64" y="146">Main reconstruction path</text>
+
+  <rect class="box frozen" x="70" y="184" width="190" height="120" rx="10"/>
+  <text class="label" x="94" y="216">Frozen VQ/SPS</text>
+  <text class="label" x="116" y="240">Encoder</text>
+  <text class="small" x="96" y="268">images a, b, c</text>
+  <text class="code" x="103" y="290">-&gt; ea, eb, ec</text>
+
+  <rect class="box learned" x="330" y="176" width="190" height="136" rx="10"/>
+  <text class="label" x="378" y="210">OpEncoder</text>
+  <text class="code" x="360" y="238">[ea, eb, ec]</text>
+  <text class="code" x="395" y="262">-&gt; z_op</text>
+  <text class="tiny" x="366" y="288">learned MLP</text>
+
+  <rect class="box vq" x="590" y="166" width="210" height="156" rx="10"/>
+  <text class="label" x="635" y="202">OpVQ Codebook</text>
+  <text class="code" x="648" y="230">Q = {q1, q2}</text>
+  <text class="code" x="625" y="256">nearest_Q(z_op)</text>
+  <text class="code" x="628" y="282">straight-through q</text>
+  <text class="tiny" x="638" y="304">discrete operation code</text>
+
+  <rect class="box learned" x="870" y="176" width="190" height="136" rx="10"/>
+  <text class="label" x="910" y="210">OperDecoder</text>
+  <text class="code" x="900" y="238">[ea, eb, q]</text>
+  <text class="code" x="920" y="262">-&gt; z_pred</text>
+  <text class="tiny" x="908" y="288">learned MLP</text>
+
+  <rect class="box frozen" x="1110" y="184" width="110" height="120" rx="10"/>
+  <text class="label" x="1134" y="216">SPS</text>
+  <text class="label" x="1130" y="240">VQ</text>
+  <text class="code" x="1128" y="268">z_pred</text>
+  <text class="code" x="1132" y="290">-&gt; e_pred</text>
+
+  <path class="arrow" d="M260 244 L330 244"/>
+  <path class="arrow" d="M520 244 L590 244"/>
+  <path class="arrow" d="M800 244 L870 244"/>
+  <path class="arrow" d="M1060 244 L1110 244"/>
+
+  <path class="arrow-blue" d="M260 286 C340 370, 760 380, 870 286"/>
+  <text class="small" x="504" y="382">ea, eb bypass to decoder input</text>
+
+  <rect class="lane" x="40" y="468" width="1200" height="270" rx="14"/>
+  <text class="section" x="64" y="502">Training losses</text>
+
+  <rect class="box loss" x="80" y="540" width="190" height="120" rx="10"/>
+  <text class="label" x="118" y="574">Prediction</text>
+  <text class="code" x="112" y="602">L_pred</text>
+  <text class="small" x="107" y="628">MSE(e_pred, ec)</text>
+
+  <rect class="box loss" x="310" y="540" width="190" height="120" rx="10"/>
+  <text class="label" x="362" y="574">Op VQ</text>
+  <text class="code" x="358" y="602">L_op_vq</text>
+  <text class="small" x="342" y="628">embedding + commit</text>
+
+  <rect class="box loss" x="540" y="540" width="190" height="120" rx="10"/>
+  <text class="label" x="586" y="574">SPS VQ</text>
+  <text class="code" x="585" y="602">L_sps_vq</text>
+  <text class="small" x="573" y="628">frozen VQ loss</text>
+
+  <rect class="box loss" x="770" y="540" width="190" height="120" rx="10"/>
+  <text class="label" x="818" y="574">Balance</text>
+  <text class="code" x="822" y="602">L_balance</text>
+  <text class="small" x="800" y="628">mean code probs -> 0.5</text>
+
+  <rect class="box symm" x="1000" y="520" width="200" height="160" rx="10"/>
+  <text class="label" x="1038" y="552">Symmetry</text>
+  <text class="code" x="1024" y="580">for q in {q1,q2}</text>
+  <text class="code" x="1024" y="606">f_q(f_q(a,b),c)</text>
+  <text class="code" x="1024" y="630">~= f_q(f_q(a,c),b)</text>
+  <text class="code" x="1024" y="654">L_symm</text>
+
+  <path class="arrow dash" d="M1165 304 C1165 420, 175 420, 175 540"/>
+  <path class="arrow dash" d="M695 322 C695 440, 405 440, 405 540"/>
+  <path class="arrow dash" d="M1165 304 C1165 440, 635 440, 635 540"/>
+  <path class="arrow dash" d="M695 322 C695 450, 865 450, 865 540"/>
+  <path class="arrow dash" d="M695 322 C760 420, 1050 430, 1100 520"/>
+
+  <rect x="354" y="708" width="572" height="50" rx="10" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/>
+  <text class="label" x="398" y="739">L_total = L_pred + lambda_op L_op_vq + lambda_sps L_sps_vq + lambda_balance L_balance + lambda_symm L_symm</text>
+</svg>

@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title { font-family:Arial, Helvetica, sans-serif; font-size:22px; font-weight:700; fill:#0f172a; }
+      .text { font-family:Arial, Helvetica, sans-serif; font-size:17px; fill:#0f172a; }
+      .small { font-family:Arial, Helvetica, sans-serif; font-size:14px; fill:#475569; }
+      .formula { font-family:Arial, Helvetica, sans-serif; font-size:15px; fill:#1e293b; }
+      .panel { fill:#ffffff; stroke:#cbd5e1; stroke-width:2; rx:14; }
+      .data { fill:#f8fafc; stroke:#334155; stroke-width:2; rx:10; }
+      .encoder { fill:#ecfdf5; stroke:#047857; stroke-width:2; rx:12; }
+      .query { fill:#eef2ff; stroke:#4f46e5; stroke-width:2; rx:10; }
+      .compute { fill:#f0fdfa; stroke:#0f766e; stroke-width:2; rx:12; }
+      .loss { fill:#fff7ed; stroke:#c2410c; stroke-width:2; rx:12; }
+      .min { fill:#fef9c3; stroke:#a16207; stroke-width:2; rx:12; }
+      .arrow { stroke:#334155; stroke-width:2; fill:none; marker-end:url(#arrow); }
+      .soft { stroke:#64748b; stroke-width:2; fill:none; marker-end:url(#arrow); }
+      .query-arrow { stroke:#4f46e5; stroke-width:2; fill:none; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="40" y="42" class="title">queryLearn concat model</text>
+  <text x="40" y="68" class="small">One shared operator is called for each query. Query conditioning happens only by concatenating q with the pair embedding.</text>
+
+  <rect x="35" y="105" width="315" height="385" class="panel"/>
+  <text x="58" y="135" class="text">1. Encode images once</text>
+
+  <rect x="62" y="170" width="95" height="54" class="data"/>
+  <text x="86" y="203" class="text">a</text>
+  <rect x="62" y="255" width="95" height="54" class="data"/>
+  <text x="86" y="288" class="text">b</text>
+  <rect x="62" y="390" width="95" height="54" class="data"/>
+  <text x="86" y="423" class="text">c</text>
+
+  <rect x="205" y="185" width="105" height="220" class="encoder"/>
+  <text x="233" y="278" class="text">Frozen</text>
+  <text x="229" y="304" class="text">VQ/SPS</text>
+  <text x="233" y="328" class="small">encoder</text>
+
+  <path d="M157 197 L205 225" class="arrow"/>
+  <path d="M157 282 L205 295" class="arrow"/>
+  <path d="M157 417 L205 370" class="arrow"/>
+
+  <rect x="385" y="145" width="120" height="54" class="data"/>
+  <text x="427" y="178" class="text">e_a</text>
+  <rect x="385" y="245" width="120" height="54" class="data"/>
+  <text x="427" y="278" class="text">e_b</text>
+  <rect x="385" y="405" width="120" height="54" class="data"/>
+  <text x="427" y="438" class="text">e_c</text>
+
+  <path d="M310 225 L385 172" class="arrow"/>
+  <path d="M310 295 L385 272" class="arrow"/>
+  <path d="M310 370 L385 432" class="arrow"/>
+
+  <rect x="545" y="105" width="250" height="385" class="panel"/>
+  <text x="568" y="135" class="text">2. Build query-conditioned inputs</text>
+
+  <rect x="590" y="170" width="70" height="46" class="query"/>
+  <text x="614" y="199" class="text">q1</text>
+  <rect x="680" y="170" width="70" height="46" class="query"/>
+  <text x="704" y="199" class="text">q2</text>
+  <text x="600" y="238" class="small">query set Q = {q1, q2}</text>
+
+  <rect x="585" y="295" width="170" height="95" class="compute"/>
+  <text x="618" y="325" class="text">for each q_i</text>
+  <text x="605" y="352" class="formula">x_i = [e_a ; e_b ; q_i]</text>
+  <text x="622" y="374" class="small">i in {1, 2}</text>
+
+  <path d="M505 172 C545 188 555 292 585 320" class="arrow"/>
+  <path d="M505 272 C545 278 558 324 585 342" class="arrow"/>
+  <path d="M670 216 L670 295" class="query-arrow"/>
+
+  <rect x="835" y="105" width="310" height="385" class="panel"/>
+  <text x="858" y="135" class="text">3. Shared operator and loss</text>
+
+  <rect x="880" y="185" width="220" height="120" class="compute"/>
+  <text x="924" y="218" class="text">Shared OperNet</text>
+  <text x="908" y="247" class="formula">z_i = MLP_theta(x_i)</text>
+  <text x="908" y="274" class="formula">e_pred_i = VQ(z_i)</text>
+  <text x="925" y="294" class="small">same theta for q1 and q2</text>
+
+  <path d="M755 342 C805 335 835 270 880 246" class="arrow"/>
+
+  <rect x="872" y="340" width="112" height="50" class="data"/>
+  <text x="892" y="371" class="text">e_pred1</text>
+  <rect x="1000" y="340" width="112" height="50" class="data"/>
+  <text x="1020" y="371" class="text">e_pred2</text>
+
+  <path d="M960 305 C930 318 920 328 928 340" class="soft"/>
+  <path d="M1020 305 C1050 318 1060 328 1056 340" class="soft"/>
+
+  <rect x="835" y="525" width="142" height="48" class="loss"/>
+  <text x="858" y="555" class="formula">L1 = MSE(...)</text>
+  <rect x="995" y="525" width="142" height="48" class="loss"/>
+  <text x="1018" y="555" class="formula">L2 = MSE(...)</text>
+
+  <path d="M505 432 C600 500 740 545 835 549" class="arrow"/>
+  <path d="M928 390 L906 525" class="arrow"/>
+  <path d="M1056 390 L1066 525" class="arrow"/>
+
+  <rect x="545" y="525" width="205" height="55" class="min"/>
+  <text x="595" y="548" class="text">operator loss</text>
+  <text x="592" y="572" class="formula">L = min(L1, L2)</text>
+
+  <path d="M835 549 L750 552" class="arrow"/>
+  <path d="M995 549 C900 590 805 580 750 563" class="arrow"/>
+</svg>
